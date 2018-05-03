@@ -19,7 +19,7 @@ class Potoky_ImageAutoImport_Adminhtml_ImageAutoImportController extends Mage_Ad
     {
         try {
             $import = Mage::getModel('importexport/import');
-            $sourceFile = $import->setData('entity', 'import_to_queue')->uploadSource();
+            $sourceFile = $import->setData('entity', 'catalog_product')->uploadSource();
             $imageInfo = Mage::getModel('imageautoimport/imageinfo');
             $imageInfo->setAdapter($sourceFile)
                 ->validateContent()
