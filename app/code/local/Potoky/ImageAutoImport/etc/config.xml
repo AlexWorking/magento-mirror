@@ -89,7 +89,7 @@
     <crontab>
        <jobs>
            <potoky_imageautoimport_go>
-               <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
+               <schedule><cron_expr>*/1 * * * *</cron_expr></schedule>
                <run>
                     <model>imageautoimport/observer::importImages</model>
               </run>
