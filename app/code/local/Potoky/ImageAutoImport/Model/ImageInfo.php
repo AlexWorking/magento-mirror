@@ -40,18 +40,13 @@ class Potoky_ImageAutoImport_Model_ImageInfo extends Mage_Core_Model_Abstract
         return $this->_rows;
     }
 
-    public function validateContent()
+    public function validate()
     {
         $this->isSetAdapter();
         if (empty($this->_rows)) {
             throw new Exception(Mage::HELPER('imageautoimport')->__("File columns do not contain any information."));
         }
-        return $this;
-    }
 
-    public function validateColNames()
-    {
-        $this->isSetAdapter();
         $colNames = $this->_adapter->getColNames();
         $required = ['sku', 'url'];
         $errorMessage = '';
@@ -86,12 +81,7 @@ class Potoky_ImageAutoImport_Model_ImageInfo extends Mage_Core_Model_Abstract
                  1
             );
         }
-        return $this;
-    }
 
-    public function validateRows()
-    {
-        $this->isSetAdapter();
         $product = Mage::getModel('catalog/product');
         $errorMessage = '';
         foreach ($this->_rows as $key => $row) {

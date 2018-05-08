@@ -8,6 +8,11 @@
  */
 class Potoky_ImageAutoImport_Adminhtml_ImageAutoImportController extends Mage_Adminhtml_Controller_Action
 {
+    /**
+     * Renders the starting page for file with images validation and adding them to queue.
+     *
+     * @return void
+     */
     public function indexAction()
     {
         $this->loadLayout();
@@ -15,25 +20,26 @@ class Potoky_ImageAutoImport_Adminhtml_ImageAutoImportController extends Mage_Ad
         Mage::getSingleton('adminhtml/session')->unsetData('resultMessage');
     }
 
+    /**
+     * Validates the source file with images that are going to be added to queue.
+     *
+     * @return void
+     */
     public function validateAction()
     {
         try {
             $import = Mage::getModel('importexport/import');
             $sourceFile = $import->setData('entity', 'catalog_product')->uploadSource();
             $imageInfo = Mage::getModel('imageautoimport/imageinfo');
-            $imageInfo->setAdapter($sourceFile)
-                ->validateContent()
-                ->validateColNames()
-                ->validateRows();
+            $imageInfo->setAdapter($sourceFile)->validate();
             $key = 0;
             $rows = $imageInfo->getRows();
             do {
                 $imageInfo->setData([
                     'product_sku' => $rows[$key]['sku'],
                     'image_url' => $rows[$key]['url'],
-                    'image_size' => filesize($rows[$key]['url']),
+                    'image_size' => strlen(file_get_contents($rows[$key]['url'])),
                     'status' => 'In Queue',
-                    //'loading_at' => strftime('%Y-%m-%d %H:%M:%S', time())
                 ]);
                 $imageInfo->save();
             } while (isset($rows[++$key]));
@@ -47,6 +53,11 @@ class Potoky_ImageAutoImport_Adminhtml_ImageAutoImportController extends Mage_Ad
         $this->_redirect('*/*/index');
     }
 
+    /**
+     * Action used for "Image Import" tab forming in product page tabs.
+     *
+     * @return void
+     */
     public function flowAction()
     {
         preg_match(
@@ -61,6 +72,11 @@ class Potoky_ImageAutoImport_Adminhtml_ImageAutoImportController extends Mage_Ad
         $this->renderLayout();
     }
 
+    /**
+     * Action used for "Image Import" tab's grid forming in product page tabs.
+     *
+     * @return void
+     */
     public function flowGridAction()
     {
         preg_match(
@@ -75,3 +91,4 @@ class Potoky_ImageAutoImport_Adminhtml_ImageAutoImportController extends Mage_Ad
         $this->renderLayout();
     }
 }
+

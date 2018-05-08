@@ -2,12 +2,19 @@
 
 class Potoky_ImageAutoImport_Model_Observer
 {
+    /**
+     * Loads images and adds them to the corresponding products when "potoky_imageautoimport_go" Cron job is fired.
+     *
+     * @param Varien_Event_Observer $observer
+     * @return void
+     */
     public function importImages(Varien_Event_Observer $observer)
     {
         $importData = Mage::getModel('imageautoimport/imageinfo')
             ->getCollection()
             ->addFieldToFilter('status', array('in' => array('In Queue', 'Retrial')))
             ->setOrder('loading_at', 'ASC');
+        /** @var Mage_Catalog_Model_Product $row */
         foreach ($importData as $row) {
 
             if ($row['status'] == 'Retrial' && $row['loading_at'] + 86400 < time()) {
@@ -27,7 +34,6 @@ class Potoky_ImageAutoImport_Model_Observer
                             'status'        => ($errorMessage === '') ? 'Loaded' : 'Error',
                             'error_message' => ($errorMessage === '') ? null : $errorMessage
                         ]);
-                        $row->save();
                     } catch (Exception $e) {
                         $row->setData([
                             'record_id'     => $row['record_id'],
@@ -35,7 +41,6 @@ class Potoky_ImageAutoImport_Model_Observer
                             'status'        => 'Loaded',
                             'error_message' => $e->getMessage()
                         ]);
-                        $row->save();
                     }
                     break;
                 case '404':
@@ -45,7 +50,6 @@ class Potoky_ImageAutoImport_Model_Observer
                         'status'        => 'Retrial',
                         'error_message' => $header
                     ]);
-                    $row->save();
                     break;
                 default:
                     $row->setData([
@@ -54,13 +58,19 @@ class Potoky_ImageAutoImport_Model_Observer
                         'status'        => 'Error',
                         'error_message' => $header
                     ]);
-                    $row->save();
                     break;
             }
-
+            $row->save();
         }
     }
 
+    /**
+     * Designates the image from passed in URL to occupy free image types of the product.
+     *
+     * @param string $productSku
+     * @param static $imageUrl
+     * @return string $errorMessage
+     */
     private function coreProcess($productSku, $imageUrl)
     {
         $errorMessage = '';
@@ -94,6 +104,12 @@ class Potoky_ImageAutoImport_Model_Observer
         return $errorMessage;
     }
 
+    /**
+     * Downloads the image located by passed in URL.
+     *
+     * @param string $imageUrl
+     * @return string $fileName
+     */
     private function downloadImage($imageUrl)
     {
         $content = file_get_contents($imageUrl);
@@ -107,3 +123,4 @@ class Potoky_ImageAutoImport_Model_Observer
         return $fileName;
     }
 }
+

@@ -79,18 +79,4 @@ class Potoky_ImageAutoImport_Block_Adminhtml_Grid extends Mage_Adminhtml_Block_W
             ? $this->getData('grid_url')
             : $this->getUrl('*/imageautoimport/flowgrid', array('_current'=>true));
     }
-
-    protected function _setFilterValues($data)
-    {
-        foreach ($this->getColumns() as $columnId => $column) {
-            if (isset($data[$columnId])
-                && (!empty($data[$columnId]) || strlen($data[$columnId]) > 0)
-                && $column->getFilter()
-            ) {
-                $column->getFilter()->setValue($data[$columnId]);
-                $this->_addColumnFilterToCollection($column);
-            }
-        }
-        return $this;
-    }
 }

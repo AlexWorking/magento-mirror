@@ -6,7 +6,7 @@
                 <id>images_import_queue</id>
                 <data>
                     <label>Import of Images</label>
-                    <onclick>setLocation(queue_button_url)</onclick>
+                    <onclick>setLocation(queueButtonUrl)</onclick>
                     <class>imageautoimport</class>
                 </data>
             </action>
