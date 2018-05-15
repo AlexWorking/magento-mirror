@@ -39,25 +39,25 @@ class Potoky_ViewedCommodities_Model_Observer
     public function productToJs(Mage_Catalog_Model_Product $product)
     {
         $prodInfoArr= [
-            $product->getSku() => [
-                'product_url' => $product->getProductUrl(),
-                'image_src'   => Mage::helper('catalog/image')->init($product, 'thumbnail')->resize(50, 50)->setWatermarkSize('30x10')->__toString(),
-                'image_alt'   => Mage::helper('core')->escapeHtml($product->getName()),
-                'name_link'   => Mage::helper('catalog/output')->productAttribute($product, $product->getName() , 'name')
-            ]
+            'product_url' => $product->getProductUrl(),
+            'image_src'   => Mage::helper('catalog/image')->init($product, 'thumbnail')->resize(50, 50)->setWatermarkSize('30x10')->__toString(),
+            'image_alt'   => Mage::helper('core')->escapeHtml($product->getName()),
+            'name_link'   => Mage::helper('catalog/output')->productAttribute($product, $product->getName() , 'name')
         ];
 
-        $productId = $product->getSku();
+        $productSku = $product->getSku();
         $prodInfoJson = Mage::helper('core')->jsonEncode($prodInfoArr);
         echo <<<EOP
             <script>
             var viewedList = JSON.parse(localStorage.getItem("viewedCommodities"));
             if (viewedList !== null) {
-                localStorage.setItem("viewedCommodities", viewedList + JSON.stringify(viewedList));
+                viewedList.$productSku = $prodInfoJson;
+                localStorage.setItem("viewedCommodities", JSON.stringify(viewedList));
             } else {
-                viewedList = $prodInfoJson;
+                viewedList = Object();
+                viewedList.$productSku = $prodInfoJson;
+                localStorage.setItem("viewedCommodities", JSON.stringify(viewedList));
             }
-            localStorage.setItem("viewedCommodities", JSON.stringify(viewedList));
             </script>
 EOP;
     }

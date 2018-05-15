@@ -1,7 +1,11 @@
 <script>
-    var products = [];
-    for (var i = 0; i < localStorage.length; i++) {
-        if (localStorage.key[i] )
+    var products = Object();
+    var element = JSON.parse(localStorage.getItem('viewedCommodities'));
+    for (var i = 0; i < count(element); i++) {
+        var key = element.key[i];
+        var value = element.value[i];
+        products.key[i] = key;
+        products.value[i] = value;
     }
 </script>
 <?php if ($_products = $this->getRecentlyViewedProducts()): ?>
