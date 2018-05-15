@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Potoky_ViewedCommodities>
+            <version>0.1.0</version>
+        </Potoky_ViewedCommodities>
+    </modules>
+    <frontend>
+        <events>
+            <controller_action_layout_generate_blocks_after>
+                <observers>
+                    <potoky_viewedcommodities_model_observer>
+                        <class>Potoky_ViewedCommodities_Model_Observer</class>
+                        <method>pageWatch</method>
+                    </potoky_viewedcommodities_model_observer>
+                </observers>
+            </controller_action_layout_generate_blocks_after>
+        </events>
+    </frontend>
+</config>
