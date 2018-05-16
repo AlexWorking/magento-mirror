@@ -44,7 +44,7 @@ class Potoky_ViewedCommodities_Model_Observer
             'image_alt'   => Mage::helper('core')->escapeHtml($product->getName()),
             'name_link'   => Mage::helper('catalog/output')->productAttribute($product, $product->getName() , 'name')
         ];
-
+        //Just so
         $productSku = $product->getSku();
         $prodInfoJson = Mage::helper('core')->jsonEncode($prodInfoArr);
         echo <<<EOP
