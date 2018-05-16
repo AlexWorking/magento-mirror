@@ -50,14 +50,11 @@ class Potoky_ViewedCommodities_Model_Observer
         echo <<<EOP
             <script>
             var viewedList = JSON.parse(localStorage.getItem("viewedCommodities"));
-            if (viewedList !== null) {
-                viewedList.$productSku = $prodInfoJson;
-                localStorage.setItem("viewedCommodities", JSON.stringify(viewedList));
-            } else {
+            if (viewedList === null) {
                 viewedList = Object();
-                viewedList.$productSku = $prodInfoJson;
-                localStorage.setItem("viewedCommodities", JSON.stringify(viewedList));
             }
+            viewedList.$productSku = $prodInfoJson;
+            localStorage.setItem("viewedCommodities", JSON.stringify(viewedList));
             </script>
 EOP;
     }

@@ -1,34 +1,48 @@
-<script>
+<script type="text/javascript">
     var products = Object();
-    var element = JSON.parse(localStorage.getItem('viewedCommodities'));
-    for (var i = 0; i < Object.keys(element).length; i++) {
-        var key = Object.keys(element)[i];
-        products[key] = Object.values(element)[i];
+    var element = localStorage.getItem('viewedCommodities');
+    if (element) {
+        element = JSON.parse(element);
+        for (var i = 0; i < Object.keys(element).length; i++) {
+            var key = Object.keys(element)[i];
+            products[key] = Object.values(element)[i];
+        }
+    }
+    var scriptTag = document.scripts[document.scripts.length - 1];
+    var parentTag = scriptTag.parentNode;
+    if (Object.keys(products).length !== 0) {
+        document.writeln('<div class="block block-list block-viewed">');
+        document.writeln('<div class="block-title">');
+        document.writeln('<strong><span><?php echo $this->__('Recently Viewed Products') ?></span></strong>');
+        document.writeln('</div>');
+        document.writeln('<div class="block-content">');
+        document.writeln('<ol id="recently-viewed-items" class="mini-products-list">');
+        document.writeln('</ol>');
+        (function (p) {
+            for (i = 0; i < Object.keys(p).length; i++) {
+                var sku = Object.keys(p)[i];
+                var elemOl = document.getElementById('recently-viewed-items');
+                var elemOlLi = document.createElement('li');
+                elemOlLi.setAttribute('class', 'item');
+                var elemOlLiA = document.createElement('a');
+                elemOlLiA.setAttribute('href', p[sku].product_url);
+                elemOlLiA.innerHTML = '<span class="product-image"><img src=\"' + p[sku].image_src + '\" alt=\"' + p[sku].name_link + '\"/></span>';
+                var elemOlLiDiv = document.createElement('div');
+                elemOlLiDiv.setAttribute('class', 'product-details');
+                var elemOlLiDivP = document.createElement('p');
+                elemOlLiDivP.setAttribute('class', 'product-name');
+                var elemOlLiDivPA = document.createElement('a');
+                elemOlLiDivPA.setAttribute('href', 'p[sku].product_url');
+                elemOlLiDivPA.innerHTML = p[sku].name_link;
+                elemOlLiDivP.appendChild(elemOlLiDivPA);
+                elemOlLiDiv.appendChild(elemOlLiDivP);
+                elemOlLi.appendChild(elemOlLiA);
+                elemOlLi.appendChild(elemOlLiDiv);
+                elemOl.appendChild(elemOlLi);
+            }
+        })(products);
+        decorateList('recently-viewed-items');
+        document.writeln('</div>');
+        document.writeln('</div>');
     }
 </script>
-<?php if ($_products = $this->getRecentlyViewedProducts()): ?>
-    <div class="block block-list block-viewed">
-        <div class="block-title">
-            <strong><span><?php echo $this->__('Recently Viewed Products') ?></span></strong>
-        </div>
-        <div class="block-content">
-            <ol id="recently-viewed-items" class="mini-products-list">
-                <?php foreach ($_products as $_item): ?>
-                    <li class="item">
-                        <a href="<?php echo $this->getProductUrl($_item) ?>">
-                            <span class="product-image"><img src="<?php echo $this->helper('catalog/image')->init($_item, 'thumbnail')->resize(50, 50)->setWatermarkSize('30x10'); ?>" width="50" height="50" alt="<?php echo $this->escapeHtml($this->getProductName()) ?>" /></span>
-                        </a>
-                        <div class="product-details">
-                            <p class="product-name">
-                                <a href="<?php echo $this->getProductUrl($_item) ?>">
-                                    <?php echo $this->helper('catalog/output')->productAttribute($_item, $_item->getName() , 'name') ?>
-                                </a>
-                            </p>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
-            </ol>
-            <script type="text/javascript">decorateList('recently-viewed-items');</script>
-        </div>
-    </div>
-<?php endif; ?>
