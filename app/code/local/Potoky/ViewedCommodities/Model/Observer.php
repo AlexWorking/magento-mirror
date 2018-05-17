@@ -17,6 +17,7 @@ class Potoky_ViewedCommodities_Model_Observer
     public function pageWatch(Varien_Event_Observer $observer)
     {
         $layout = $observer->getEvent()->getLayout();
+        $this->storageScript();
         if (in_array('catalog_product_view', $layout->getUpdate()->getHandles())) {
             $this->productToJs(Mage::registry('current_product'));
             return;
@@ -36,7 +37,7 @@ class Potoky_ViewedCommodities_Model_Observer
      * @param Mage_Catalog_Model_Product $product
      * @return void
      */
-    public function productToJs(Mage_Catalog_Model_Product $product)
+    private function productToJs(Mage_Catalog_Model_Product $product)
     {
         $prodInfoArr= [
             'product_url' => $product->getProductUrl(),
@@ -45,17 +46,36 @@ class Potoky_ViewedCommodities_Model_Observer
             'name_link'   => Mage::helper('catalog/output')->productAttribute($product, $product->getName() , 'name')
         ];
         //Just so
-        $productSku = $product->getSku();
+        $productSku = trim($product->getSku());
         $prodInfoJson = Mage::helper('core')->jsonEncode($prodInfoArr);
         echo <<<EOP
             <script>
-            var viewedList = JSON.parse(localStorage.getItem("viewedCommodities"));
-            if (viewedList === null) {
-                viewedList = Object();
-            }
-            viewedList.$productSku = $prodInfoJson;
-            localStorage.setItem("viewedCommodities", JSON.stringify(viewedList));
+                var viewedList = JSON.parse(localStorage.getItem("viewedCommodities"));
+                if (viewedList === null) {
+                    viewedList = Object();
+                }
+                viewedList.$productSku = $prodInfoJson;
+                renderStorage("viewedCommodities", viewedList, 3600000);
             </script>
 EOP;
+    }
+
+    /**
+     * Echos the script with the JS function for local storage arrangement.
+     *
+     * @return void
+     */
+    private function storageScript() {
+        echo <<<EOR
+        <script>
+            var renderStorage = function(key, jsonValue, lifeTime) {
+                localStorage.setItem(key, JSON.stringify(jsonValue));
+                setTimeout(function() {
+                    localStorage.removeItem(key);  
+                }, lifeTime);
+            }
+        </script>
+EOR;
+
     }
 }

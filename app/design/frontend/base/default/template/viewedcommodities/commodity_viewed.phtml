@@ -1,12 +1,21 @@
 <script type="text/javascript">
+    var fillData = function(e, p) {
+        for (var i = 0; i < Object.keys(e).length; i++) {
+            var key = Object.keys(e)[i];
+            p[key] = Object.values(e)[i];
+        }
+    };
     var products = Object();
     var element = localStorage.getItem('viewedCommodities');
     if (element) {
         element = JSON.parse(element);
-        for (var i = 0; i < Object.keys(element).length; i++) {
-            var key = Object.keys(element)[i];
-            products[key] = Object.values(element)[i];
-        }
+        fillData(element, products);
+    } else {
+        var viewedList = <?php $products = $this->getRecentlyViewedProducts();
+            echo Mage::helper('viewedcommodities')->getViewedJson($products)
+        ?>;
+        fillData(viewedList, products);
+        renderStorage("viewedCommodities", viewedList, 3600000);
     }
     var scriptTag = document.scripts[document.scripts.length - 1];
     var parentTag = scriptTag.parentNode;

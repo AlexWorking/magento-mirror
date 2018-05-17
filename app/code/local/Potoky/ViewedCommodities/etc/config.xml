@@ -5,6 +5,13 @@
             <version>0.1.0</version>
         </Potoky_ViewedCommodities>
     </modules>
+    <global>
+        <helpers>
+            <viewedcommodities>
+                <class>Potoky_ViewedCommodities_Helper</class>
+            </viewedcommodities>
+        </helpers>
+    </global>
     <frontend>
         <events>
             <controller_action_layout_generate_blocks_after>
