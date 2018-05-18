@@ -13,6 +13,22 @@
         </helpers>
     </global>
     <frontend>
+        <layout>
+            <updates>
+                <potoky_viewedcommodities>
+                    <file>viewedcommodities.xml</file>
+                </potoky_viewedcommodities>
+            </updates>
+        </layout>
+        <routers>
+            <viewedcommodities>
+                <use>standard</use>d
+                <args>
+                    <module>Potoky_ViewedCommodities</module>
+                    <frontName>viewedcommodities</frontName>
+                </args>
+            </viewedcommodities>
+        </routers>
         <events>
             <controller_action_layout_generate_blocks_after>
                 <observers>

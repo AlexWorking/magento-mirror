@@ -1,0 +1,7 @@
+<layout version="0.1.0">
+    <catalog_product_view>
+        <reference name = "content">
+            <block type="core/template" name="product_data_getherer" template="viewedcommodities/getherer.phtml" />
+        </reference>
+    </catalog_product_view>
+</layout>
