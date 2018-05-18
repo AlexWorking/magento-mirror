@@ -5,7 +5,6 @@
             var key = Object.keys(e)[i];
             p[key] = Object.values(e)[i];
         }
-
         return p;
     };
     var products = {};
@@ -15,7 +14,7 @@
         products = fillData(element);
     } else {
         var responseJson = jQuery.ajax({
-            url: "/viewedcommodities/storage/gether",
+            url: "/viewedcommodities/storage/gather",
             type: "GET",
             async: false
         }).responseText;

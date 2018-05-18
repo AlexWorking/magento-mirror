@@ -8,16 +8,19 @@
  */
 class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    public function getProductInfo ($product)
+    public function getProductInfo($products)
     {
+        $prodsInfoArr =[];
+        foreach ($products as $product) {
             $productSku = trim($product->getSku());
-            $prodInfoArr[$productSku] = [
+            $prodsInfoArr[$productSku] = [
                 'product_url' => $product->getProductUrl(),
                 'image_src'   => Mage::helper('catalog/image')->init($product, 'thumbnail')->resize(50, 50)->setWatermarkSize('30x10')->__toString(),
                 'image_alt'   => Mage::helper('core')->escapeHtml($product->getName()),
                 'name_link'   => Mage::helper('catalog/output')->productAttribute($product, $product->getName() , 'name')
             ];
+        }
 
-        return $prodInfoArr;
+        return $prodsInfoArr;
     }
 }
