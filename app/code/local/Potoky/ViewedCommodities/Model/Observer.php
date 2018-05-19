@@ -17,7 +17,6 @@ class Potoky_ViewedCommodities_Model_Observer
     public function pageWatch(Varien_Event_Observer $observer)
     {
         $layout = $observer->getEvent()->getLayout();
-        //$this->storageScript();
         $blocks = $layout->getAllBlocks();
         foreach ($blocks as $block) {
             if ($block instanceof Mage_Reports_Block_Product_Viewed) {

@@ -8,20 +8,13 @@
         return p;
     };
     var products = {};
-    var element = localStorage.getItem('viewedCommodities');
-    if (element) {
-        element = JSON.parse(element);
-        products = fillData(element);
+    var viewedList = localStorage.getItem('viewedCommodities');
+    if (viewedList) {
+        viewedList = JSON.parse(viewedList);
     } else {
-        var responseJson = jQuery.ajax({
-            url: "/viewedcommodities/storage/gather",
-            type: "GET",
-            async: false
-        }).responseText;
-        viewedList = JSON.parse(responseJson);
-        products = fillData(viewedList);
-        renderStorage("viewedCommodities", viewedList, 3600000);
+        ajaxGotViewed();
     }
+    products = fillData(viewedList);
     var scriptTag = document.scripts[document.scripts.length - 1];
     var parentTag = scriptTag.parentNode;
     if (Object.keys(products).length !== 0) {

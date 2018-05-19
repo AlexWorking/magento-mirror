@@ -6,15 +6,10 @@
 ?>
 <script>
     var viewedList = JSON.parse(localStorage.getItem("viewedCommodities"));
-    if (!viewedList) {
-        var responseJson = jQuery.ajax({
-            url: "/viewedcommodities/storage/gather",
-            type: "GET",
-            async: false
-        }).responseText;
-        viewedList = JSON.parse(responseJson);
-    } else {
+    if (viewedList) {
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
+        renderStorage("viewedCommodities", viewedList, 3600000);
+    } else {
+        ajaxGotViewed();
     }
-    renderStorage("viewedCommodities", viewedList, 3600000);
 </script>
