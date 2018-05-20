@@ -2,8 +2,12 @@
  * Created by light on 5/19/2018.
  */
 var renderStorage = function(key, jsonValue, lifeTime) {
-    var expires = Date.now() + lifeTime;
-    document.cookie = "viewedcommodities=stored; expires=" + expires + "; path=/";
+    var d = new Date();
+    var current = d.getTime();
+    d.setTime(current - 1);
+    document.cookie = "viewedcommodities=; expires=" + d.toUTCString() + "; path=/";
+    d.setTime(current + lifeTime);
+    document.cookie = "viewedcommodities=stored; expires=" + d.toUTCString() + "; path=/";
     localStorage.setItem(key, JSON.stringify(jsonValue));
     setTimeout(function() {
         localStorage.removeItem(key);

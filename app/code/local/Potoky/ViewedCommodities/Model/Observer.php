@@ -20,10 +20,19 @@ class Potoky_ViewedCommodities_Model_Observer
         $blocks = $layout->getAllBlocks();
         foreach ($blocks as $block) {
             if ($block instanceof Mage_Reports_Block_Product_Viewed) {
-                $block->setTemplate('viewedcommodities/commodity_viewed.phtml');
+                $layout->getBlock('head')->addJs('local/storage.js');
+                if (isset($_COOKIE['viewedcommodities'])) {
+                    $block->setTemplate('viewedcommodities/commodity_viewed.phtml');
+                } else {
+                    $endBlock = $layout->createBlock(
+                        'Mage_Core_Block_Template',
+                        'localstorage_rendering',
+                        array('template' => 'viewedcommodities/storage_execution.phtml'
+                        ));
+                    $layout->getBlock('before_body_end')->append($endBlock);
+                }
                 break;
-            };
+            }
         }
-        $layout->getBlock('head')->addJs('local/storage.js');
     }
 }
