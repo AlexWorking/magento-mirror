@@ -6,6 +6,16 @@
         </Potoky_ViewedCommodities>
     </modules>
     <global>
+        <blocks>
+            <viewedcommodities>
+                <class>Potoky_ViewedCommodities_Block</class>
+            </viewedcommodities>
+            <reports>
+                <rewrite>
+                    <product_viewed>Potoky_ViewedCommodities_Block_Product_Viewed</product_viewed>
+                </rewrite>
+            </reports>
+        </blocks>
         <helpers>
             <viewedcommodities>
                 <class>Potoky_ViewedCommodities_Helper</class>

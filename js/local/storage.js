@@ -19,7 +19,10 @@ var ajaxGotViewed = function() {
            url: "/viewedcommodities/storage/gather",
            type: "GET",
            success: function (response) {
-               viewedList = JSON.parse(response);
+               var viewedList = {};
+               if (response !== "[]") {
+                   viewedList = JSON.parse(response);
+               }
                renderStorage("viewedCommodities", viewedList, 3600000);
            }
        });

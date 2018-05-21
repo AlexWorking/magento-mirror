@@ -17,22 +17,18 @@ class Potoky_ViewedCommodities_Model_Observer
     public function pageWatch(Varien_Event_Observer $observer)
     {
         $layout = $observer->getEvent()->getLayout();
-        $blocks = $layout->getAllBlocks();
-        foreach ($blocks as $block) {
-            if ($block instanceof Mage_Reports_Block_Product_Viewed) {
-                $layout->getBlock('head')->addJs('local/storage.js');
-                if (isset($_COOKIE['viewedcommodities'])) {
-                    $block->setTemplate('viewedcommodities/commodity_viewed.phtml');
+            if (!isset($_COOKIE['viewedcommodities'])) {
+                if (in_array('catalog_product_view', $layout->getUpdate()->getHandles())) {
+                    $layout->unsetBlock('product_data_gatherer');
                 } else {
-                    $endBlock = $layout->createBlock(
-                        'Mage_Core_Block_Template',
-                        'localstorage_rendering',
-                        array('template' => 'viewedcommodities/storage_execution.phtml'
-                        ));
-                    $layout->getBlock('before_body_end')->append($endBlock);
+                    $layout->getBlock('head')->addJs('local/storage.js');
                 }
-                break;
+                $endBlock = $layout->createBlock(
+                    'Mage_Core_Block_Template',
+                    'localstorage_rendering',
+                    array('template' => 'viewedcommodities/storage_execution.phtml'
+                    ));
+                $layout->getBlock('before_body_end')->append($endBlock);
             }
-        }
     }
 }

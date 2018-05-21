@@ -11,8 +11,6 @@
     var viewedList = localStorage.getItem('viewedCommodities');
     if (viewedList) {
         viewedList = JSON.parse(viewedList);
-    } else {
-        ajaxGotViewed();
     }
     products = fillData(viewedList);
     var scriptTag = document.scripts[document.scripts.length - 1];
@@ -52,4 +50,5 @@
         document.writeln('</div>');
         document.writeln('</div>');
     }
+    alert('In comm..._v..phtml');
 </script>

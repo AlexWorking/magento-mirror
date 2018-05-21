@@ -7,9 +7,8 @@
 <script>
     var viewedList = JSON.parse(localStorage.getItem("viewedCommodities"));
     if (viewedList) {
+        alert('in gatherer.phtml');
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
         renderStorage("viewedCommodities", viewedList, 3600000);
-    } else {
-        ajaxGotViewed();
     }
 </script>
