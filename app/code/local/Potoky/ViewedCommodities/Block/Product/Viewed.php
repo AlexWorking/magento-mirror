@@ -16,7 +16,7 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
      */
     protected function _toHtml()
     {
-        if (isset($_COOKIE['viewedcommodities'])) {
+        if (isset($_COOKIE['viewed_commodities'])) {
             $this->setTemplate('viewedcommodities/commodity_viewed.phtml');
             $html = $this->renderView();
             return $html;

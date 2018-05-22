@@ -40,6 +40,22 @@
             </viewedcommodities>
         </routers>
         <events>
+            <customer_login>
+                <observers>
+                    <reports>
+                        <class>Potoky_ViewedCommodities_Model_Observer</class>
+                        <method>customerLogin</method>
+                    </reports>
+                </observers>
+            </customer_login>
+            <customer_logout>
+                <observers>
+                    <reports>
+                        <class>Potoky_ViewedCommodities_Model_Observer</class>
+                        <method>customerLogout</method>
+                    </reports>
+                </observers>
+            </customer_logout>
             <controller_action_layout_generate_blocks_after>
                 <observers>
                     <potoky_viewedcommodities_model_observer>

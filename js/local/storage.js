@@ -5,9 +5,9 @@ var renderStorage = function(key, jsonValue, lifeTime) {
     var d = new Date();
     var current = d.getTime();
     d.setTime(current - 1);
-    document.cookie = "viewedcommodities=; expires=" + d.toUTCString() + "; path=/";
+    document.cookie = key + "=; expires=" + d.toUTCString() + "; path=/";
     d.setTime(current + lifeTime);
-    document.cookie = "viewedcommodities=stored; expires=" + d.toUTCString() + "; path=/";
+    document.cookie = key + "=stored; expires=" + d.toUTCString() + "; path=/";
     localStorage.setItem(key, JSON.stringify(jsonValue));
     setTimeout(function() {
         localStorage.removeItem(key);
@@ -23,7 +23,7 @@ var ajaxGotViewed = function() {
                if (response !== "[]") {
                    viewedList = JSON.parse(response);
                }
-               renderStorage("viewedCommodities", viewedList, 3600000);
+               renderStorage("viewed_commodities", viewedList, 3600000);
            }
        });
 };

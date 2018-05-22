@@ -5,10 +5,10 @@
     $productInfo = Mage::helper('core')->jsonEncode($prodsInfoArr[$sku]);
 ?>
 <script>
-    var viewedList = JSON.parse(localStorage.getItem("viewedCommodities"));
+    var viewedList = JSON.parse(localStorage.getItem("viewed_commodities"));
     if (viewedList) {
-        alert('in gatherer.phtml');
+        //alert('in gatherer.phtml');
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
-        renderStorage("viewedCommodities", viewedList, 3600000);
+        renderStorage("viewed_commodities", viewedList, 3600000);
     }
 </script>
