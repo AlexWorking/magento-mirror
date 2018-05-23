@@ -1,13 +1,10 @@
 <?php
-    $prodsInfoArr = Mage::helper('viewedcommodities')
-        ->getProductInfo([Mage::registry('current_product')]);
-    $sku = array_keys($prodsInfoArr)[0];
-    $productInfo = Mage::helper('core')->jsonEncode($prodsInfoArr[$sku]);
+    extract($this->getProdInfo());
 ?>
 <script>
     var viewedList = JSON.parse(localStorage.getItem("viewed_commodities"));
     if (viewedList) {
-        //alert('in gatherer.phtml');
+        alert('in gatherer.phtml');
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
         renderStorage("viewed_commodities", viewedList, 3600000);
     }

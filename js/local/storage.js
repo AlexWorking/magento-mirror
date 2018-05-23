@@ -1,17 +1,16 @@
 /**
  * Created by light on 5/19/2018.
  */
-var renderStorage = function(key, jsonValue, lifeTime) {
-    var d = new Date();
-    var current = d.getTime();
-    d.setTime(current - 1);
-    document.cookie = key + "=; expires=" + d.toUTCString() + "; path=/";
-    d.setTime(current + lifeTime);
-    document.cookie = key + "=stored; expires=" + d.toUTCString() + "; path=/";
-    localStorage.setItem(key, JSON.stringify(jsonValue));
-    setTimeout(function() {
-        localStorage.removeItem(key);
-    }, lifeTime);
+var renderStorage = function(jsonValue, lifeTime) {
+    if (jsonValue === undefined || lifeTime === undefined) {
+        localStorage.removeItem('viewed_commodities');
+    } else {
+        localStorage.setItem('viewed_commodities', JSON.stringify(jsonValue));
+        setTimeout(function() {
+            localStorage.removeItem('viewed_commodities');
+        }, lifeTime);
+    }
+    createDestroy();
 };
 
 var ajaxGotViewed = function() {
@@ -23,7 +22,18 @@ var ajaxGotViewed = function() {
                if (response !== "[]") {
                    viewedList = JSON.parse(response);
                }
-               renderStorage("viewed_commodities", viewedList, 3600000);
+               renderStorage(viewedList, 3600000);
            }
        });
+};
+
+
+var createDestroy = function (cookieVal) {
+    if (cookieVal !== undefined) {
+        document.cookie = "viewed_commodities=" + cookieVal + "; path=/";
+    } else {
+        var d = new Date();
+        d.setTime(d.getTime() - 1000);
+        document.cookie = "viewed_commodities; expires=" + d.toUTCString() + "; path=/";
+    }
 };

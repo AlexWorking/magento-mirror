@@ -1,4 +1,19 @@
 
 <script>
-    ajaxGotViewed();
+    (function (cookies) {
+        var cookiesArr = cookies.split(';');
+        for (var i = 0; i < cookiesArr.length; i++) {
+            switch (cookiesArr[i]) {
+                case 'viewed_commodities=reset':
+                    ajaxGotViewed();
+                    return;
+                case 'viewed_commodities=clear':
+                    renderStorage();
+                    return;
+                case 'viewed_commodities=engage':
+                    ajaxGotViewed();
+                    return;
+            }
+        }
+    }(decodeURIComponent(document.cookie)));
 </script>

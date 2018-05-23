@@ -22,6 +22,11 @@
                     <product_viewed>Potoky_ViewedCommodities_Block_Product_Viewed</product_viewed>
                 </rewrite>
             </reports>
+            <catalog>
+                <rewrite>
+                    <product_view>Potoky_ViewedCommodities_Block_Product_View</product_view>
+                </rewrite>
+            </catalog>
         </blocks>
         <helpers>
             <viewedcommodities>
@@ -46,15 +51,5 @@
                 </args>
             </viewedcommodities>
         </routers>
-        <events>
-            <controller_action_layout_generate_blocks_after>
-                <observers>
-                    <potoky_viewedcommodities_model_observer>
-                        <class>Potoky_ViewedCommodities_Model_Observer</class>
-                        <method>pageWatch</method>
-                    </potoky_viewedcommodities_model_observer>
-                </observers>
-            </controller_action_layout_generate_blocks_after>
-        </events>
     </frontend>
 </config>
