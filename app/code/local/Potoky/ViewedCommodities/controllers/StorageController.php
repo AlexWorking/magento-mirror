@@ -15,7 +15,10 @@ class Potoky_ViewedCommodities_StorageController extends Mage_Core_Controller_Fr
             ->addAttributeToSelect(['name', 'thumbnail', 'url_key'])
             ->addIndexFilter();
         $prodsInfoArr = Mage::helper('viewedcommodities')->getProductInfo($products);
-
-        echo Mage::helper('core')->jsonEncode($prodsInfoArr);;
+        //$lifeTime = Mage::getStoreConfig('x/y');
+        $expiry = microtime() + 3600000;
+        $_SESSION['viewed_commodities'] = ['engaged' => false, 'expiry' => $expiry];
+        $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry];
+        echo Mage::helper('core')->jsonEncode($response);;
     }
 }

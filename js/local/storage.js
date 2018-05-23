@@ -2,7 +2,7 @@
  * Created by light on 5/19/2018.
  */
 var renderStorage = function(jsonValue, lifeTime) {
-    if (jsonValue === undefined || lifeTime === undefined) {
+    if (jsonValue === undefined && lifeTime === undefined) {
         localStorage.removeItem('viewed_commodities');
     } else {
         localStorage.setItem('viewed_commodities', JSON.stringify(jsonValue));
@@ -18,11 +18,11 @@ var ajaxGotViewed = function() {
            url: "/viewedcommodities/storage/gather",
            type: "GET",
            success: function (response) {
-               var viewedList = {};
-               if (response !== "[]") {
-                   viewedList = JSON.parse(response);
-               }
-               renderStorage(viewedList, 3600000);
+               var parsed = JSON.parse(response);
+               var viewedList = (parsed['products_info'] !== []) ? parsed['products_info'] : {};
+               var expiry = parsed['expiry'];
+               createDestroy('saving');
+               renderStorage(viewedList, expiry);
            }
        });
 };
