@@ -24,9 +24,6 @@ class Potoky_ViewedCommodities_Model_Observer
             unset($_SESSION['customer_log']);
         }
         if (!isset($_COOKIE['viewed_commodities'])) {
-            if ($layout->getBlock('customer_logout')) {
-                return;
-            }
             if (in_array('catalog_product_view', $layout->getUpdate()->getHandles())) {
                 $getherer = $layout->getBlock('product_data_gatherer')
                     ->setTemplate('viewedcommodities/storage_execution.phtml');
@@ -40,25 +37,5 @@ class Potoky_ViewedCommodities_Model_Observer
                 $layout->getBlock('before_body_end')->append($endBlock);
             }
         }
-    }
-
-    /**
-     * Observes for the event of customer having been logged in or registered.
-     *
-     *@return void
-     */
-    public function customerLogin()
-    {
-       $_SESSION['customer_log'] = 'In';
-    }
-
-    /**
-     * Observes for the event of customer having been logged out.
-     *
-     *@return void
-     */
-    public function customerLogout()
-    {
-       $_SESSION['customer_log'] = 'Out';
     }
 }
