@@ -23,9 +23,6 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
      */
     protected function _toHtml()
     {
-        //echo "HERE".$_SESSION['viewed_commodities'];
-        //unset($_SESSION['viewed_commodities']);
-        //die($_SESSION['viewed_commodities']);
         if ($this->allowed) {
                 return $this->loadFromJs();
         }
@@ -45,7 +42,7 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
         if (!Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
             Mage::helper('viewedcommodities')->addJsVC(
                 $this->getLayout(),
-                'engage'
+                'reset'
             );
             $this->allowed = false;
         } else {

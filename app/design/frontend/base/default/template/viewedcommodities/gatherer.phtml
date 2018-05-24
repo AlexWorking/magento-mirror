@@ -1,5 +1,5 @@
 <?php
-    extract($this->getProdInfo());
+    extract(Mage::registry('vieved_commodity'));
 ?>
 <script>
     var viewedList = JSON.parse(localStorage.getItem("viewed_commodities"));

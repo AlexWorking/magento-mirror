@@ -20,6 +20,6 @@ class Potoky_ViewedCommodities_StorageController extends Mage_Core_Controller_Fr
         $_SESSION['viewed_commodities'] = $expiry;
         $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry * 1000];
         setcookie('viewed_commodities', 'engage', 0,'/');
-        echo Mage::helper('core')->jsonEncode($response);;
+        echo Mage::helper('core')->jsonEncode($response);
     }
 }

@@ -12,6 +12,8 @@ class Potoky_ViewedCommodities_Block_Product_View extends Mage_Catalog_Block_Pro
     {
         if (!Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
             $this->shiftGatherer();
+        } else {
+            Mage::register('vieved_commodity', $this->getProdInfo());
         }
 
         return parent::_toHtml();
@@ -21,9 +23,10 @@ class Potoky_ViewedCommodities_Block_Product_View extends Mage_Catalog_Block_Pro
     {
         $prodsInfoArr = Mage::helper('viewedcommodities')
             ->getProductInfo([Mage::registry('current_product')]);
+        $sku = array_keys($prodsInfoArr)[0];
 
         return [
-            'sku'         => array_keys($prodsInfoArr)[0],
+            'sku'         => $sku,
             'productInfo' => Mage::helper('core')->jsonEncode($prodsInfoArr[$sku])
         ];
     }
