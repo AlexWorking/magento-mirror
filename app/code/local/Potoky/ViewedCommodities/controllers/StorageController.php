@@ -16,9 +16,9 @@ class Potoky_ViewedCommodities_StorageController extends Mage_Core_Controller_Fr
             ->addIndexFilter();
         $prodsInfoArr = Mage::helper('viewedcommodities')->getProductInfo($products);
         //$lifeTime = Mage::getStoreConfig('x/y');
-        $expiry = microtime() + 3600000;
-        $_SESSION['viewed_commodities'] = [round($expiry / 1000)];
-        $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry];
+        $expiry = time() + 3600;
+        $_SESSION['viewed_commodities'] = $expiry;
+        $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry * 1000];
         setcookie('viewed_commodities', 'engage', 0,'/');
         echo Mage::helper('core')->jsonEncode($response);;
     }

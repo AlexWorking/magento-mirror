@@ -3,10 +3,20 @@
     (function (cookies) {
         var cookiesArr = cookies.split(';');
         for (var i = 0; i < cookiesArr.length; i++) {
-            alert(cookiesArr[i]);
-            if (cookiesArr[i] === "viewed_commodities=engage ") {
-                alert('S:' + cookiesArr[i]);
+            if (cookiesArr[i].indexOf('viewed_commodities') < 0) {
+                continue;
             }
+            var value = cookiesArr[i].substr(cookiesArr[i].indexOf('=') + 1).trim();
+            switch (value) {
+                case 'clear':
+                    renderStorage();
+                    return;
+                case 'engage':
+                    ajaxGotViewed();
+                    return;
+                default:
+                    alert('JS block forming can not be engaged');
+             }
         }
     }(decodeURIComponent(document.cookie)));
 </script>

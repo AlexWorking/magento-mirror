@@ -48,6 +48,8 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
                 'engage'
             );
             $this->allowed = false;
+        } else {
+            $this->getLayout()->getBlock('head')->addJs('local/storage.js');
         }
 
         return parent::_prepareLayout();

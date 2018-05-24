@@ -19,6 +19,7 @@ var ajaxGotViewed = function() {
            type: "GET",
            success: function (response) {
                var parsed = JSON.parse(response);
+               alert(response);
                var viewedList = (parsed['products_info'] !== []) ? parsed['products_info'] : {};
                var expiry = parsed['expiry'];
                renderStorage(viewedList, expiry);
