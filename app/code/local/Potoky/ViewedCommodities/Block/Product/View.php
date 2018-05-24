@@ -10,17 +10,8 @@ class Potoky_ViewedCommodities_Block_Product_View extends Mage_Catalog_Block_Pro
 {
     public function _toHtml()
     {
-        if (isset($_SESSION['viewed_commodities'])) {
-            if ($_SESSION['viewed_commodities'] === 'engaged') {
-                return parent::_toHtml();
-            }
-            if (isset($_COOKIE['viewed_commodities'])) {
-                $this->shiftGetherer();
-            } else {
-                $_SESSION['viewed_commodities'] = 'engaged';
-            }
-        } else {
-            $this->shiftGetherer();
+        if (!Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
+            $this->shiftGatherer();
         }
 
         return parent::_toHtml();
@@ -37,7 +28,7 @@ class Potoky_ViewedCommodities_Block_Product_View extends Mage_Catalog_Block_Pro
         ];
     }
 
-    private function shiftGetherer()
+    private function shiftGatherer()
     {
         $blockToAlter = $this->getLayout()->getBlock('product_data_gatherer');
         $blockToAlter->setTemplate('storage_execution');

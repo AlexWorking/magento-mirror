@@ -21,7 +21,6 @@ var ajaxGotViewed = function() {
                var parsed = JSON.parse(response);
                var viewedList = (parsed['products_info'] !== []) ? parsed['products_info'] : {};
                var expiry = parsed['expiry'];
-               createDestroy('saving');
                renderStorage(viewedList, expiry);
            }
        });

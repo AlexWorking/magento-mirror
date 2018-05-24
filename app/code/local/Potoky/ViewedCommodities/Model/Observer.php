@@ -18,6 +18,7 @@ class Potoky_ViewedCommodities_Model_Observer
     public function pageWatch(Varien_Event_Observer $observer)
     {
         $layout = $observer->getEvent()->getLayout();
+        $layout->getBlock('head')->addJs('local/storage.js');
         if (true == $_SESSION['customer_log']) {
             unset($_COOKIE['viewed_commodities']);
             setcookie('viewed_commodities', null, time() - 1000, '/');

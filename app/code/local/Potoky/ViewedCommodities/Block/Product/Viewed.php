@@ -9,6 +9,13 @@
 class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_Product_Viewed
 {
     /**
+     * Defines whether where to load Viewed Products from: true => localstorage, false => server
+     *
+     *@var boolean
+     */
+    protected $allowed = true;
+
+    /**
      * Prepare to html
      * check if JS block forming has started to perform.
      *
@@ -16,27 +23,11 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
      */
     protected function _toHtml()
     {
+        //echo "HERE".$_SESSION['viewed_commodities'];
         //unset($_SESSION['viewed_commodities']);
-        //exit();
-        if (isset($_SESSION['viewed_commodities'])) {
-            if ($_SESSION['viewed_commodities'] === 'engaged') {
+        //die($_SESSION['viewed_commodities']);
+        if ($this->allowed) {
                 return $this->loadFromJs();
-            }
-            if (isset($_COOKIE['viewed_commodities'])) {
-                Mage::helper('viewedcommodities')->addJsVC(
-                    $this->getLayout(),
-                    'engage'
-                );
-            } else {
-                $_SESSION['viewed_commodities'] = 'engaged';
-                return $this->loadFromJs();
-            }
-        } else {
-            $_SESSION['viewed_commodities'] = 'engage';
-            Mage::helper('viewedcommodities')->addJsVC(
-                $this->getLayout(),
-                $_SESSION['viewed_commodities']
-            );
         }
 
         return parent::_toHtml();
@@ -47,5 +38,18 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
         $this->setTemplate('viewedcommodities/commodity_viewed.phtml');
         $html = $this->renderView();
         return $html;
+    }
+
+    protected function _prepareLayout()
+    {
+        if (!Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
+            Mage::helper('viewedcommodities')->addJsVC(
+                $this->getLayout(),
+                'engage'
+            );
+            $this->allowed = false;
+        }
+
+        return parent::_prepareLayout();
     }
 }
