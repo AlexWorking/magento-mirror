@@ -4,9 +4,8 @@
         var cookiesArr = cookies.split(';');
         for (var i = 0; i < cookiesArr.length; i++) {
             alert(cookiesArr[i]);
-            var s = cookiesArr[i];
-            if (s === "viewed_commodities=engage ") {
-                alert('S:' + s);
+            if (cookiesArr[i] === "viewed_commodities=engage ") {
+                alert('S:' + cookiesArr[i]);
             }
         }
     }(decodeURIComponent(document.cookie)));
