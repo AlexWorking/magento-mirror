@@ -28,14 +28,14 @@ class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
      * Adds needed Java Script to page
      *
      * @param Mage_Core_Model_Layout $layout
+     * @param string $template
      * @param string $cookieVal
      */
-    public function addJsVC(Mage_Core_Model_Layout $layout, $cookieVal = null) {
-        $layout->getBlock('head')->addJs('local/storage.js');
+    public function addJsVC(Mage_Core_Model_Layout $layout, $template, $cookieVal = null) {
         $endBlock = $layout->createBlock(
             'Mage_Core_Block_Template',
             'localstorage_rendering',
-            array('template' => 'viewedcommodities/storage_execution.phtml'
+            array('template' => 'viewedcommodities/' . $template,
             ));
         $layout->getBlock('before_body_end')->append($endBlock);
         setcookie('viewed_commodities', $cookieVal, 0,'/');

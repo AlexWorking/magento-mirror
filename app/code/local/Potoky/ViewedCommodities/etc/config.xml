@@ -42,6 +42,16 @@
                 </potoky_viewedcommodities>
             </updates>
         </layout>
+        <events>
+            <controller_action_layout_generate_blocks_after>
+                <observers>
+                    <potoky_viewedcommodities_model_observer>
+                        <class>Potoky_ViewedCommodities_Model_Observer</class>
+                        <method>pageWatch</method>
+                    </potoky_viewedcommodities_model_observer>
+                </observers>
+            </controller_action_layout_generate_blocks_after>
+        </events>
         <routers>
             <viewedcommodities>
                 <use>standard</use>d

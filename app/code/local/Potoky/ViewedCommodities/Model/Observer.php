@@ -18,25 +18,24 @@ class Potoky_ViewedCommodities_Model_Observer
     public function pageWatch(Varien_Event_Observer $observer)
     {
         $layout = $observer->getEvent()->getLayout();
-        $layout->getBlock('head')->addJs('local/storage.js');
-        if (true == $_SESSION['customer_log']) {
-            unset($_COOKIE['viewed_commodities']);
-            setcookie('viewed_commodities', null, time() - 1000, '/');
-            unset($_SESSION['customer_log']);
-        }
-        if (!isset($_COOKIE['viewed_commodities'])) {
-            if (in_array('catalog_product_view', $layout->getUpdate()->getHandles())) {
-                $getherer = $layout->getBlock('product_data_gatherer')
-                    ->setTemplate('viewedcommodities/storage_execution.phtml');
-            } else {
-                $layout->getBlock('head')->addJs('local/storage.js');
-                $endBlock = $layout->createBlock(
-                    'Mage_Core_Block_Template',
-                    'localstorage_rendering',
-                    array('template' => 'viewedcommodities/storage_execution.phtml'
-                    ));
-                $layout->getBlock('before_body_end')->append($endBlock);
+        if (in_array('catalog_product_view', $layout->getUpdate()->getHandles())) {
+            $layout->getBlock('head')->addJs('local/storage.js');
+            if (!$layout->getBlock('localstorage_rendering')) {
+                Mage::helper('viewedcommodities')->addJsVC($layout, 'gatherer.phtml', 'add');
+                Mage::register('vieved_commodity', $this->getProdInfo());
             }
         }
+    }
+
+    private function getProdInfo()
+    {
+        $prodsInfoArr = Mage::helper('viewedcommodities')
+            ->getProductInfo([Mage::registry('current_product')]);
+        $sku = array_keys($prodsInfoArr)[0];
+
+        return [
+            'sku'         => $sku,
+            'productInfo' => Mage::helper('core')->jsonEncode($prodsInfoArr[$sku])
+        ];
     }
 }

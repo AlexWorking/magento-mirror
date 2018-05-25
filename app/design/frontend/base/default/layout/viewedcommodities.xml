@@ -1,12 +1,2 @@
 <layout version="0.1.0">
-    <catalog_product_view>
-        <reference name="head">
-            <action method="addJs">
-                <script>local/storage.js</script>
-            </action>
-        </reference>
-        <reference name = "content">
-            <block type="core/template" name="product_data_gatherer" template="viewedcommodities/gatherer.phtml" />
-        </reference>
-    </catalog_product_view>
 </layout>

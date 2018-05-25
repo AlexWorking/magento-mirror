@@ -8,6 +8,7 @@
  */
 class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_Product_Viewed
 {
+
     /**
      * Defines whether where to load Viewed Products from: true => localstorage, false => server
      *
@@ -23,7 +24,7 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
      */
     protected function _toHtml()
     {
-        if ($this->allowed) {
+        if (Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
                 return $this->loadFromJs();
         }
 
@@ -39,14 +40,13 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
 
     protected function _prepareLayout()
     {
+        $this->getLayout()->getBlock('head')->addJs('local/storage.js');
         if (!Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
             Mage::helper('viewedcommodities')->addJsVC(
                 $this->getLayout(),
+                'storage_execution.phtml',
                 'reset'
             );
-            $this->allowed = false;
-        } else {
-            $this->getLayout()->getBlock('head')->addJs('local/storage.js');
         }
 
         return parent::_prepareLayout();

@@ -2,9 +2,9 @@
     extract(Mage::registry('vieved_commodity'));
 ?>
 <script>
+    alert('in gatherer.phtml');
     var viewedList = JSON.parse(localStorage.getItem("viewed_commodities"));
     if (viewedList) {
-        alert('in gatherer.phtml');
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
         renderStorage("viewed_commodities", viewedList, 3600000);
     }
