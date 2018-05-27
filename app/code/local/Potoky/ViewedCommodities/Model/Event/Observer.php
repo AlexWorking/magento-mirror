@@ -39,6 +39,7 @@ class Potoky_ViewedCommodities_Model_Event_Observer extends Mage_Reports_Model_E
         if (isset($_SESSION['viewed_commodities'])) {
             unset($_SESSION['viewed_commodities']);
         }
+        setcookie('viewed_commodities', $type, 0, '/');
 
     }
 

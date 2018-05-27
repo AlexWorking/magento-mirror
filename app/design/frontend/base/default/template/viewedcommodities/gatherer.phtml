@@ -1,11 +1,14 @@
 <?php
-    extract(Mage::registry('vieved_commodity'));
+    extract(Mage::registry('viewed_commodity'));
 ?>
 <script>
-    alert('in gatherer.phtml');
-    var viewedList = JSON.parse(localStorage.getItem("viewed_commodities"));
-    if (viewedList) {
-        viewedList.<?= $sku ?> = <?= $productInfo ?>;
-        renderStorage("viewed_commodities", viewedList, 3600000);
+    var viewedList = localStorage.getItem("viewed_commodities");
+    if (!viewedList || viewedList === "[]") {
+        viewedList = {};
+    } else {
+        viewedList = JSON.parse(viewedList);
     }
+        alert('In Gatherer fulfilling');
+        viewedList.<?= $sku ?> = <?= $productInfo ?>;
+        renderStorage(viewedList, 3600000);
 </script>

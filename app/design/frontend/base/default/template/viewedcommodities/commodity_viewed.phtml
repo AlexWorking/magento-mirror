@@ -1,7 +1,7 @@
 <script type="text/javascript">
     var fillData = function(e) {
         var p = Object();
-        for (var i = 0; i < Object.keys(e).length; i++) {
+        for (var i = Object.keys(e).length - 1; i > -1; i--) {
             var key = Object.keys(e)[i];
             p[key] = Object.values(e)[i];
         }
@@ -11,11 +11,11 @@
     var viewedList = localStorage.getItem('viewed_commodities');
     if (viewedList) {
         viewedList = JSON.parse(viewedList);
+        products = fillData(viewedList);
     }
-    products = fillData(viewedList);
-    var scriptTag = document.scripts[document.scripts.length - 1];
-    var parentTag = scriptTag.parentNode;
     if (Object.keys(products).length !== 0) {
+        var scriptTag = document.scripts[document.scripts.length - 1];
+        var parentTag = scriptTag.parentNode;
         document.writeln('<div class="block block-list block-viewed">');
         document.writeln('<div class="block-title">');
         document.writeln('<strong><span><?php echo $this->__('Recently Viewed Products') ?></span></strong>');

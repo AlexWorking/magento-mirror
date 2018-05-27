@@ -10,11 +10,15 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
 {
 
     /**
-     * Defines whether where to load Viewed Products from: true => localstorage, false => server
+     * Internal constructor, that is called from real constructor
      *
-     *@var boolean
      */
-    protected $allowed = true;
+    protected function _construct()
+    {
+        Mage::register('viewed_block', 'engaged');
+
+        parent::_construct();
+    }
 
     /**
      * Prepare to html
@@ -24,7 +28,7 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
      */
     protected function _toHtml()
     {
-        if (Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
+        if (Mage::registry('viewed_block') === 'allowed') {
                 return $this->loadFromJs();
         }
 
@@ -38,8 +42,9 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
         return $html;
     }
 
-    protected function _prepareLayout()
+    /*protected function _prepareLayout()
     {
+        //unset($_SESSION['viewed_commodities']);
         $this->getLayout()->getBlock('head')->addJs('local/storage.js');
         if (!Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
             Mage::helper('viewedcommodities')->addJsVC(
@@ -50,5 +55,5 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
         }
 
         return parent::_prepareLayout();
-    }
+    }*/
 }

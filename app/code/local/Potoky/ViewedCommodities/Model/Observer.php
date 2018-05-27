@@ -18,12 +18,19 @@ class Potoky_ViewedCommodities_Model_Observer
     public function pageWatch(Varien_Event_Observer $observer)
     {
         $layout = $observer->getEvent()->getLayout();
-        if (in_array('catalog_product_view', $layout->getUpdate()->getHandles())) {
-            $layout->getBlock('head')->addJs('local/storage.js');
-            if (!$layout->getBlock('localstorage_rendering')) {
+        $viewedPresent = (Mage::registry('viewed_block')) ? true : false;
+        $viewPresent = in_array('catalog_product_view', $layout->getUpdate()->getHandles());
+        if (($viewedPresent || $viewPresent) && !Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
+            Mage::helper('viewedcommodities')->addJsVC($layout, 'storage_execution.phtml', 'reset');
+            return;
+        }
+        elseif ($viewPresent) {
+                Mage::register('viewed_commodity',$this->getProdInfo());
                 Mage::helper('viewedcommodities')->addJsVC($layout, 'gatherer.phtml', 'add');
-                Mage::register('vieved_commodity', $this->getProdInfo());
-            }
+        }
+        elseif ($viewedPresent) {
+            Mage::register('viewed_block', 'allowed');
+            Mage::helper('viewedcommodities')->addJsVC($layout);
         }
     }
 

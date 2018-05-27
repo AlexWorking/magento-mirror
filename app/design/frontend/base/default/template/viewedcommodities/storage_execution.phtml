@@ -7,11 +7,14 @@
                 continue;
             }
             var value = cookiesArr[i].substr(cookiesArr[i].indexOf('=') + 1).trim();
+            alert(value);
             switch (value) {
                 case 'clear':
+                    alert('execution Clear');
                     renderStorage();
                     return;
                 case 'reset':
+                    alert('execution Reset');
                     ajaxGotViewed();
                     return;
                 default:
@@ -19,5 +22,4 @@
              }
         }
     }(decodeURIComponent(document.cookie)));
-    alert('in execution');
 </script>
