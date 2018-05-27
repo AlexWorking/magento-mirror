@@ -28,7 +28,7 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
      */
     protected function _toHtml()
     {
-        if (Mage::registry('viewed_block') === 'allowed') {
+        if (Mage::registry('jsblock_allowed')) {
                 return $this->loadFromJs();
         }
 

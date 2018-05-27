@@ -29,7 +29,7 @@ class Potoky_ViewedCommodities_Model_Observer
                 Mage::helper('viewedcommodities')->addJsVC($layout, 'gatherer.phtml', 'add');
         }
         elseif ($viewedPresent) {
-            Mage::register('viewed_block', 'allowed');
+            Mage::register('jsblock_allowed', true);
             Mage::helper('viewedcommodities')->addJsVC($layout);
         }
     }
