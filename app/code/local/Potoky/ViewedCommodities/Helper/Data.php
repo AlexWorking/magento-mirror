@@ -53,7 +53,10 @@ class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isAllowedJsBlock()
     {
-        if (!isset($_SESSION['viewed_commodities']) || (int) $_SESSION['viewed_commodities'] - time() < 0) {
+        if (!isset($_SESSION['viewed_commodities'])) {
+            return false;
+        }
+        if ((int) $_SESSION['viewed_commodities'] - time() < 0) {
             unset($_SESSION['viewed_commodities']);
 
             return false;

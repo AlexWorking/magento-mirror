@@ -1,0 +1,41 @@
+<config>
+    <tabs>
+        <viewedcommodities module="viewedcommodities">
+            <label>JS Block</label>
+            <sort_order>150</sort_order>
+        </viewedcommodities>
+    </tabs>
+    <sections>
+        <lifetime_vc translate="label" module="viewedcommodities">
+            <label>Lifetime of the Block</label>
+            <tab>viewedcommodities</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label">
+                    <label>General</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>50</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <viewedcommodities_lifetime translate="label">
+                            <label>Enter the lifetime for JS Block.:</label>
+                            <comment>Set to zero or leave empty to disable JS Block forming.</comment>
+                            <backend_model>viewedcommodities/lifetime</backend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </viewedcommodities_lifetime>
+                    </fields>
+                </general>
+            </groups>
+        </lifetime_vc>
+    </sections>
+</config>

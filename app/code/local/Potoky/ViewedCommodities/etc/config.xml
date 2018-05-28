@@ -7,6 +7,9 @@
     </modules>
     <global>
         <models>
+            <viewedcommodities>
+                <class>Potoky_ViewedCommodities_Model</class>
+            </viewedcommodities>
             <reports>
                 <rewrite>
                     <event_observer>Potoky_ViewedCommodities_Model_Event_Observer</event_observer>
