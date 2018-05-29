@@ -9,7 +9,6 @@
     } else {
         viewedList = JSON.parse(viewedList);
     }
-        alert('In Gatherer fulfilling');
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
         renderStorage(viewedList, <?= $lifetime ?>);
 </script>
