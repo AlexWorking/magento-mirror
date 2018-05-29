@@ -1,6 +1,4 @@
-/**
- * Created by light on 5/19/2018.
- */
+
 var renderStorage = function(jsonValue, expires) {
     if (jsonValue === undefined && expires === undefined) {
         localStorage.removeItem('viewed_commodities');
