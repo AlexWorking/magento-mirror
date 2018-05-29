@@ -1,13 +1,13 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Alex
- * Date: 5/18/2018
- * Time: 10:36 AM
- */
 class Potoky_ViewedCommodities_StorageController extends Mage_Core_Controller_Front_Action
 {
+    /**
+     * Gatheres information about the Viewed Products on the server and
+     * pass it to JS scripts via AJAX
+     *
+     * @return void
+     */
     public function gatherAction()
     {
         $products = Mage::getModel('reports/product_index_viewed')
@@ -15,8 +15,8 @@ class Potoky_ViewedCommodities_StorageController extends Mage_Core_Controller_Fr
             ->addAttributeToSelect(['name', 'thumbnail', 'url_key'])
             ->addIndexFilter();
         $prodsInfoArr = Mage::helper('viewedcommodities')->getProductInfo($products);
-        //$lifeTime = Mage::getStoreConfig('x/y');
-        $expiry = time() + 3600;
+        $lifeTime = Mage::helper('viewedcommodities')->getLifetime();
+        $expiry = time() + $lifeTime;
         $_SESSION['viewed_commodities'] = $expiry;
         $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry * 1000];
         setcookie('viewed_commodities', 'engage', 0,'/');

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Alex
- * Date: 5/21/2018
- * Time: 11:49 AM
- */
 class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_Product_Viewed
 {
 
@@ -21,8 +15,10 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
     }
 
     /**
-     * Prepare to html
-     * check if JS block forming has started to perform.
+     * Prepare to html.
+     * Checks if JS block forming has started to perform
+     * and due to that renders view ether from the standard template
+     * or from JS Block template
      *
      * @return string
      */
@@ -35,25 +31,15 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
         return parent::_toHtml();
     }
 
+    /**
+     * Retrieves html for JS Block template
+     *
+     * @return string
+     */
     private function loadFromJs()
     {
         $this->setTemplate('viewedcommodities/commodity_viewed.phtml');
         $html = $this->renderView();
         return $html;
     }
-
-    /*protected function _prepareLayout()
-    {
-        //unset($_SESSION['viewed_commodities']);
-        $this->getLayout()->getBlock('head')->addJs('local/storage.js');
-        if (!Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
-            Mage::helper('viewedcommodities')->addJsVC(
-                $this->getLayout(),
-                'storage_execution.phtml',
-                'reset'
-            );
-        }
-
-        return parent::_prepareLayout();
-    }*/
 }

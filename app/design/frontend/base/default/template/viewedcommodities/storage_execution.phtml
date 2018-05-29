@@ -1,3 +1,4 @@
+<?php $async = Mage::getStoreConfig('catalog/lifetime_vc/ajax_async'); ?>
 
 <script>
     (function (cookies) {
@@ -15,7 +16,7 @@
                     return;
                 case 'reset':
                     alert('execution Reset');
-                    ajaxGotViewed();
+                    ajaxGotViewed(<?= $async ?>);
                     return;
                 default:
                     alert('JS block forming can not be engaged');

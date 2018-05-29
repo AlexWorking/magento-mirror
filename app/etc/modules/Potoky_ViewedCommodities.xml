@@ -5,6 +5,7 @@
             <codePool>local</codePool>
             <depends>
                 <Mage_Reports/>
+                <Mage_Catalog/>
             </depends>
         </Potoky_ViewedCommodities>
     </modules>

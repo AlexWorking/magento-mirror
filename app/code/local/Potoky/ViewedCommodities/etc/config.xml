@@ -5,6 +5,14 @@
             <version>0.1.0</version>
         </Potoky_ViewedCommodities>
     </modules>
+    <default>
+        <catalog>
+            <lifetime_vc>
+                <viewedcommodities_lifetime>3600</viewedcommodities_lifetime>
+                <ajax_async>1</ajax_async>
+            </lifetime_vc>
+        </catalog>
+    </default>
     <global>
         <models>
             <viewedcommodities>
@@ -25,11 +33,6 @@
                     <product_viewed>Potoky_ViewedCommodities_Block_Product_Viewed</product_viewed>
                 </rewrite>
             </reports>
-            <catalog>
-                <rewrite>
-                    <product_view>Potoky_ViewedCommodities_Block_Product_View</product_view>
-                </rewrite>
-            </catalog>
         </blocks>
         <helpers>
             <viewedcommodities>

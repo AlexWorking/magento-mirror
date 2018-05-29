@@ -1,14 +1,23 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Alex
- * Date: 4/18/2018
- * Time: 11:39 AM
- */
 class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    public function getProductInfo($products)
+    /**
+     * Lifetime of JS Block
+     *
+     * @var int
+     */
+    private $lifetime;
+
+    /**
+     * Extracts sufficient information about the passed in products
+     * and returns it in the format expected by JS storage scripts
+     *
+     *
+     * @param Mage_Catalog_Model_Product[] $products
+     * @return array
+     */
+    public function getProductInfo(array $products)
     {
         $prodsInfoArr =[];
         foreach ($products as $product) {
@@ -25,7 +34,7 @@ class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Adds needed Java Script to page and creates control cookie
+     * Adds needed Java Script to a page and creates control cookie
      *
      * @param Mage_Core_Model_Layout $layout
      * @param string $template
@@ -33,6 +42,7 @@ class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function addJsVC(Mage_Core_Model_Layout $layout, $template = null, $cookieVal = null) {
         $layout->getBlock('head')->addJs('local/storage.js');
+
         if (!$template) {
             return;
         }
@@ -42,18 +52,23 @@ class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
             array('template' => 'viewedcommodities/' . $template,
             ));
         $layout->getBlock('before_body_end')->append($endBlock);
+
+        if (!$cookieVal) {
+            return;
+        }
         setcookie('viewed_commodities', $cookieVal, 0,'/');
     }
 
     /**
-     * Checks whether Viewed products will be loaded from JS block.
+     * Checks whether Viewed products may be loaded from JS block.
      * Unsets session variable 'viewed_commodities' if expired.
      *
      * @return bool
      */
-    public function isAllowedJsBlock()
+    public function jsGenerationAllowed()
     {
         if (!isset($_SESSION['viewed_commodities'])) {
+
             return false;
         }
         if ((int) $_SESSION['viewed_commodities'] - time() < 0) {
@@ -67,5 +82,20 @@ class Potoky_ViewedCommodities_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return true;
+    }
+
+    /**
+     * Retrieves the lifetime of the JS Block.
+     *
+     * @return int $this->lifetime
+     */
+    public function getLifetime()
+    {
+        if (!isset($this->lifetime)) {
+            $lifetime = Mage::getStoreConfig('catalog/lifetime_vc/viewedcommodities_lifetime');
+            $this->lifetime = $lifetime;
+        }
+
+        return $this->lifetime;
     }
 }

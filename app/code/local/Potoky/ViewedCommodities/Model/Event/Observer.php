@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: light
- * Date: 5/22/2018
- * Time: 8:27 PM
- */
 class Potoky_ViewedCommodities_Model_Event_Observer extends Mage_Reports_Model_Event_Observer
 {
     /**
@@ -34,6 +28,13 @@ class Potoky_ViewedCommodities_Model_Event_Observer extends Mage_Reports_Model_E
         return parent::customerLogout($observer);
     }
 
+    /**
+     * Unsets session variable that stores the time ща expiration of the JS Block
+     * and creates a cookie that should make the JS Block clear its data or reloaded
+     * it from the server
+     *
+     * @param string $type
+     */
     private function reactToLog($type)
     {
         if (isset($_SESSION['viewed_commodities'])) {

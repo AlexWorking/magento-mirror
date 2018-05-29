@@ -1,5 +1,6 @@
 <?php
     extract(Mage::registry('viewed_commodity'));
+    $lifetime = Mage::helper('viewedcommodities')->getLifetime();
 ?>
 <script>
     var viewedList = localStorage.getItem("viewed_commodities");
@@ -10,5 +11,5 @@
     }
         alert('In Gatherer fulfilling');
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
-        renderStorage(viewedList, 3600000);
+        renderStorage(viewedList, <?= $lifetime ?>);
 </script>

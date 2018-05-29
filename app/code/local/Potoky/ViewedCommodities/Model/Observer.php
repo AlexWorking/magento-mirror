@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Alex
- * Date: 5/14/2018
- * Time: 11:00 AM
- */
 class Potoky_ViewedCommodities_Model_Observer
 {
     /**
@@ -17,11 +11,16 @@ class Potoky_ViewedCommodities_Model_Observer
      */
     public function pageWatch(Varien_Event_Observer $observer)
     {
+        if (Mage::helper('viewedcommodities')->getLifetime() == false) {
+
+            return;
+        }
         $layout = $observer->getEvent()->getLayout();
         $viewedPresent = (Mage::registry('viewed_block')) ? true : false;
         $viewPresent = in_array('catalog_product_view', $layout->getUpdate()->getHandles());
-        if (($viewedPresent || $viewPresent) && !Mage::helper('viewedcommodities')->isAllowedJsBlock()) {
-            Mage::helper('viewedcommodities')->addJsVC($layout, 'storage_execution.phtml', 'reset');
+        if (($viewedPresent || $viewPresent) && !Mage::helper('viewedcommodities')->jsGenerationAllowed()) {
+            $cookieVal = (isset($_COOKIE['viewed_commodities'])) ? null : 'reset';
+            Mage::helper('viewedcommodities')->addJsVC($layout, 'storage_execution.phtml', $cookieVal);
             return;
         }
         elseif ($viewPresent) {
@@ -34,6 +33,12 @@ class Potoky_ViewedCommodities_Model_Observer
         }
     }
 
+    /**
+     * Retrieves necessary information about the product being viewed
+     * to be used in JS script that will add it to the "localStorage"
+     *
+     * @return array
+     */
     private function getProdInfo()
     {
         $prodsInfoArr = Mage::helper('viewedcommodities')

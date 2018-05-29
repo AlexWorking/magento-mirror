@@ -13,13 +13,17 @@ var renderStorage = function(jsonValue, expires) {
     cookieDestroy();
 };
 
-var ajaxGotViewed = function() {
+var ajaxGotViewed = function(asyncr) {
        jQuery.ajax({
            url: "/viewedcommodities/storage/gather",
            type: "GET",
+           async: asyncr,
            success: function (response) {
                var parsed = JSON.parse(response);
                renderStorage(parsed.products_info, parsed.expiry);
+           },
+           error: function () {
+               document.cookie = "viewed_commodities=fail; path=/";
            }
        });
 };
