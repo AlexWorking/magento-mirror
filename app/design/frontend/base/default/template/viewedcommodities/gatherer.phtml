@@ -9,6 +9,9 @@
     } else {
         viewedList = JSON.parse(viewedList);
     }
+        if(viewedList.<?= $sku ?>) {
+            delete viewedList.<?= $sku ?>;
+        }
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
         renderStorage(viewedList, <?= $lifetime ?>);
 </script>
