@@ -1,7 +1,10 @@
 <script type="text/javascript">
     var fillData = function(e) {
         var p = Object();
-        for (var i = Object.keys(e).length - 1; i > -1; i--) {
+        var viewedQuantity = Object.keys(e).length;
+        var confData = <?= Mage::getStoreConfig('catalog/recently_products/viewed_count'); ?>;
+        var goDownTill = (viewedQuantity < confData) ? 0 : viewedQuantity - confData;
+        for (var i = viewedQuantity - 1; i > goDownTill - 1; i--) {
             var key = Object.keys(e)[i];
             p[key] = Object.values(e)[i];
         }
