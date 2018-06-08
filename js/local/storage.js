@@ -1,11 +1,11 @@
 
 var renderStorage = function(jsonValue, expires) {
     if (jsonValue === undefined && expires === undefined) {
-        localStorage.removeItem('viewed_commodities');
+        localStorage.removeItem('viewed_products');
     } else {
-        localStorage.setItem('viewed_commodities', JSON.stringify(jsonValue));
+        localStorage.setItem('viewed_products', JSON.stringify(jsonValue));
         setTimeout(function() {
-            localStorage.removeItem('viewed_commodities');
+            localStorage.removeItem('viewed_products');
         }, expires - Date.now());
     }
     cookieDestroy();
@@ -13,7 +13,7 @@ var renderStorage = function(jsonValue, expires) {
 
 var ajaxGotViewed = function(asyncr) {
        jQuery.ajax({
-           url: "/viewedcommodities/storage/gather",
+           url: "/viewedproducts/storage/gather",
            type: "GET",
            async: asyncr,
            success: function (response) {
@@ -21,7 +21,7 @@ var ajaxGotViewed = function(asyncr) {
                renderStorage(parsed.products_info, parsed.expiry);
            },
            error: function () {
-               document.cookie = "viewed_commodities=fail; path=/";
+               document.cookie = "viewed_products=fail; path=/";
            }
        });
 };
@@ -30,5 +30,5 @@ var ajaxGotViewed = function(asyncr) {
 var cookieDestroy = function (cookieVal) {
     var d = new Date();
     d.setTime(d.getTime() - 1000000);
-    document.cookie = "viewed_commodities=; expires=" + d.toUTCString() + "; path=/";
+    document.cookie = "viewed_products=; expires=" + d.toUTCString() + "; path=/";
 };

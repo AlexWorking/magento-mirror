@@ -1,9 +1,9 @@
 <?php
-    extract(Mage::registry('viewed_commodity'));
-    $lifetime = Mage::helper('viewedcommodities')->getLifetime();
+    extract(Mage::registry('viewed_product'));
+    $lifetime = Mage::helper('viewedproducts/lifetime')->getLifetime();
 ?>
 <script>
-    var viewedList = localStorage.getItem("viewed_commodities");
+    var viewedList = localStorage.getItem("viewed_products");
     if (!viewedList || viewedList === "[]") {
         viewedList = {};
     } else {
@@ -14,4 +14,5 @@
         }
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
         renderStorage(viewedList, <?= $lifetime ?>);
+        alert('in GETHERER');
 </script>

@@ -1,6 +1,6 @@
 <?php
 
-class Potoky_ViewedCommodities_Model_Lifetime extends Mage_Core_Model_Config_Data
+class Potoky_ViewedProducts_Model_Lifetime extends Mage_Core_Model_Config_Data
 {
     /**
      * Validates data entered to the module"s System Configuration field

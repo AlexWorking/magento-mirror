@@ -11,7 +11,7 @@
         return p;
     };
     var products = {};
-    var viewedList = localStorage.getItem('viewed_commodities');
+    var viewedList = localStorage.getItem('viewed_products');
     if (viewedList) {
         viewedList = JSON.parse(viewedList);
         products = fillData(viewedList);
@@ -53,4 +53,5 @@
         document.writeln('</div>');
         document.writeln('</div>');
     }
+    alert('in PRODUCTS_VIEWED');
 </script>

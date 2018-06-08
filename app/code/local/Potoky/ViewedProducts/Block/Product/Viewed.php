@@ -1,6 +1,6 @@
 <?php
 
-class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_Product_Viewed
+class Potoky_ViewedProducts_Block_Product_Viewed extends Mage_Reports_Block_Product_Viewed
 {
 
     /**
@@ -38,7 +38,7 @@ class Potoky_ViewedCommodities_Block_Product_Viewed extends Mage_Reports_Block_P
      */
     private function loadFromJs()
     {
-        $this->setTemplate('viewedcommodities/commodity_viewed.phtml');
+        $this->setTemplate('viewedproducts/products_viewed.phtml');
         $html = $this->renderView();
         return $html;
     }

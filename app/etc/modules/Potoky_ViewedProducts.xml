@@ -1,12 +1,12 @@
 <config>
     <modules>
-        <Potoky_ViewedCommodities>
+        <Potoky_ViewedProducts>
             <active>true</active>
             <codePool>local</codePool>
             <depends>
                 <Mage_Reports/>
                 <Mage_Catalog/>
             </depends>
-        </Potoky_ViewedCommodities>
+        </Potoky_ViewedProducts>
     </modules>
 </config>
