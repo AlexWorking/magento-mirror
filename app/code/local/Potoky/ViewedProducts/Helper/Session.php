@@ -12,11 +12,11 @@ class Potoky_ViewedProducts_Helper_Session extends Mage_Core_Helper_Abstract
      */
     public function unsetSessionSetCookieForViewedProducts($type = null)
     {
-        if (isset($_SESSION['viewed_products'])) {
-            unset($_SESSION['viewed_products']);
+        if (Mage::getSingleton('core/session')->getData('viewed_products')) {
+            Mage::getSingleton('core/session')->unsData('viewed_products');
         }
         if ($type !== null) {
-            setcookie('viewed_products', $type, 0, '/');
+            Mage::getModel('core/cookie')->set('viewed_products', $type, 0, '/');
         }
     }
 }

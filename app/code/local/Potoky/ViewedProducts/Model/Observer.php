@@ -11,7 +11,7 @@ class Potoky_ViewedProducts_Model_Observer
      */
     public function pageWatch(Varien_Event_Observer $observer)
     {
-        if (Mage::helper('viewedproducts/lifetime')->getLifetime() == false) {
+        if (Mage::helper('viewedproducts/lifetime')->getLifetime() === false) {
 
             return;
         }
@@ -19,7 +19,7 @@ class Potoky_ViewedProducts_Model_Observer
         $viewedPresent = (Mage::registry('viewed_block')) ? true : false;
         $viewPresent = in_array('catalog_product_view', $layout->getUpdate()->getHandles());
         if (($viewedPresent || $viewPresent) && !$this->jsGenerationAllowed()) {
-            $cookieVal = (isset($_COOKIE['viewed_products'])) ? null : 'reset';
+            $cookieVal = (Mage::getModel('core/cookie')->get('viewed_products')) ? null : 'reset';
             $this->addJsVC($layout, 'storage_execution.phtml', $cookieVal);
             return;
         }
@@ -35,15 +35,14 @@ class Potoky_ViewedProducts_Model_Observer
 
     /**
      * Observes if any changes were made concerning Catalog section
-     * in System Config and if so provides a reset to data
-     * responsive for JS Block forming
+     * in System Config and if so provides rewrites its timestamp field anew
      *
      * @param Varien_Event_Observer $observer
      * @return void
      */
     public function systemConfigWatch(Varien_Event_Observer $observer)
     {
-            Mage::helper('viewedproducts/session')->unsetSessionSetCookieForViewedProducts();
+        Mage::getModel('core/config')->saveConfig('catalog/lifetime_vc/timestamp', time());
     }
 
     /**
@@ -87,7 +86,7 @@ class Potoky_ViewedProducts_Model_Observer
         if (!$cookieVal) {
             return;
         }
-        setcookie('viewed_products', $cookieVal, 0,'/');
+        Mage::getModel('core/cookie')->set('viewed_products', $cookieVal, 0,'/');
     }
 
     /**
@@ -98,16 +97,20 @@ class Potoky_ViewedProducts_Model_Observer
      */
     private function jsGenerationAllowed()
     {
-        if (!isset($_SESSION['viewed_products'])) {
+        $sessionData = Mage::getSingleton('core/session')->getData('viewed_products');
+        if (!$sessionData) {
 
             return false;
         }
-        if ((int) $_SESSION['viewed_products'] - time() < 0) {
-            unset($_SESSION['viewed_products']);
+
+        if ((int) $sessionData['timestamp'] !== (int) Mage::getStoreConfig('catalog/lifetime_vc/timestamp') ||
+            (int) $sessionData['expiry'] - time() < 0) {
+            Mage::helper('viewedproducts/session')->unsetSessionSetCookieForViewedProducts('reset');
 
             return false;
         }
-        if (isset($_COOKIE['viewed_products'])) {
+
+        if (Mage::getModel('core/cookie')->get('viewed_products')) {
 
             return false;
         }

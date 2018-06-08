@@ -9,7 +9,7 @@
         <catalog>
             <lifetime_vc>
                 <viewedproducts_lifetime>3600</viewedproducts_lifetime>
-                <ajax_async>1</ajax_async>
+                <ajax_async>0</ajax_async>
             </lifetime_vc>
         </catalog>
     </default>

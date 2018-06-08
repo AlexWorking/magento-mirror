@@ -1,11 +1,13 @@
-<?php $async = Mage::getStoreConfig('catalog/lifetime_vc/ajax_async'); ?>
+<?php $async = Mage::getStoreConfig('catalog/lifetime_vc/ajax_async');
+      $lifetime = Mage::helper('viewedproducts/lifetime')->getLifetime();
+?>
 
 <script>
     function forMostCases(message) {
         if (message !== undefined) {
             console.log(message);
         }
-        ajaxGotViewed(<?= $async ?>);
+        ajaxGotViewed(<?= $async ?>, <?= $lifetime ?>);
     }
 
     (function (cookies) {

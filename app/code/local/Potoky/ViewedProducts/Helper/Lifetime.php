@@ -7,20 +7,20 @@ class Potoky_ViewedProducts_Helper_Lifetime extends Mage_Core_Helper_Abstract
      *
      * @var int
      */
-    private $lifetime;
+    private static $lifetime;
 
     /**
      * Retrieves the lifetime of the JS Block.
      *
-     * @return int $this->lifetime
+     * @return int self::$lifetime
      */
     public function getLifetime()
     {
-        if (!isset($this->lifetime) && Mage::getStoreConfig('catalog/lifetime_vc/allow_jsblock')) {
+        if (!isset(self::$lifetime) && Mage::getStoreConfig('catalog/lifetime_vc/allow_jsblock')) {
             $lifetime = Mage::getStoreConfig('catalog/lifetime_vc/viewedproducts_lifetime');
-            $this->lifetime = $lifetime;
+            self::$lifetime = $lifetime;
         }
 
-        return $this->lifetime;
+        return self::$lifetime;
     }
 }

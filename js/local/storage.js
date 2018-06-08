@@ -11,11 +11,12 @@ var renderStorage = function(jsonValue, expires) {
     cookieDestroy();
 };
 
-var ajaxGotViewed = function(asyncr) {
+var ajaxGotViewed = function(asyncr, lifetime) {
        jQuery.ajax({
            url: "/viewedproducts/storage/gather",
-           type: "GET",
+           type: "POST",
            async: asyncr,
+           data: {lifetime: lifetime},
            success: function (response) {
                var parsed = JSON.parse(response);
                renderStorage(parsed.products_info, parsed.expiry);

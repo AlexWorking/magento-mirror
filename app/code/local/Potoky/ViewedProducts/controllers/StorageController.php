@@ -15,10 +15,13 @@ class Potoky_ViewedProducts_StorageController extends Mage_Core_Controller_Front
             ->addAttributeToSelect(['name', 'thumbnail', 'url_key'])
             ->addIndexFilter();
         $prodsInfoArr = Mage::helper('viewedproducts/product')->getProductInfo($products);
-        setcookie('viewed_products', 'engage', 0,'/');
-        $lifeTime = Mage::helper('viewedproducts/lifetime')->getLifetime();
+        Mage::getModel('core/cookie')->set('viewed_products', 'engage', 0,'/');
+        $lifeTime = $_POST['lifetime'];
         $expiry = time() + $lifeTime;
-        $_SESSION['viewed_products'] = $expiry;
+        Mage::getSingleton('core/session')->setData('viewed_products', [
+            'expiry'    => $expiry,
+            'timestamp' => Mage::getStoreConfig('catalog/lifetime_vc/timestamp')
+        ]);
         $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry * 1000];
         echo Mage::helper('core')->jsonEncode($response);
     }
