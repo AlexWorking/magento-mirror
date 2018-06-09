@@ -28,8 +28,8 @@ var ajaxGotViewed = function(asyncr, lifetime) {
 };
 
 
-var cookieDestroy = function (cookieVal) {
+var cookieDestroy = function () {
     var d = new Date();
     d.setTime(d.getTime() - 1000000);
-    document.cookie = "viewed_products=; expires=" + d.toUTCString() + "; path=/";
+    document.cookie = "viewed_products=; expires=" + d.toUTCString() + "; path=/; domain=" + document.domain;
 };

@@ -16,7 +16,7 @@ class Potoky_ViewedProducts_Helper_Session extends Mage_Core_Helper_Abstract
             Mage::getSingleton('core/session')->unsData('viewed_products');
         }
         if ($type !== null) {
-            Mage::getModel('core/cookie')->set('viewed_products', $type, 0, '/');
+            Mage::getModel('core/cookie')->set('viewed_products', $type, 0, '/', null, null, false);
         }
     }
 }

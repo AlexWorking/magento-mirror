@@ -86,7 +86,7 @@ class Potoky_ViewedProducts_Model_Observer
         if (!$cookieVal) {
             return;
         }
-        Mage::getModel('core/cookie')->set('viewed_products', $cookieVal, 0,'/');
+        Mage::getModel('core/cookie')->set('viewed_products', $cookieVal, 0, '/', null, null, false);
     }
 
     /**
