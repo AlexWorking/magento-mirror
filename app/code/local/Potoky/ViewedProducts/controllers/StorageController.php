@@ -20,7 +20,7 @@ class Potoky_ViewedProducts_StorageController extends Mage_Core_Controller_Front
         $expiry = time() + $lifeTime;
         Mage::getSingleton('core/session')->setData('viewed_products', [
             'expiry'    => $expiry,
-            'timestamp' => Mage::getStoreConfig('catalog/lifetime_vc/timestamp')
+            'timestamp' => Mage::getStoreConfig('catalog/js_viewed_products/timestamp')
         ]);
         $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry * 1000];
         echo Mage::helper('core')->jsonEncode($response);

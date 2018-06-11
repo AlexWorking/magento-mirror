@@ -7,9 +7,9 @@
                         <children>
                             <config>
                                 <children>
-                                    <lifetime_vc translate="title" module="viewedproducts">
+                                    <js_viewed_products translate="title" module="viewedproducts">
                                         <title>Lifetime of the JS Block</title>
-                                    </lifetime_vc>
+                                    </js_viewed_products>
                                 </children>
                             </config>
                         </children>

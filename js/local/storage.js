@@ -8,7 +8,9 @@ var renderStorage = function(jsonValue, expires) {
             localStorage.removeItem('viewed_products');
         }, expires - Date.now());
     }
-    cookieDestroy();
+    var d = new Date();
+    d.setTime(d.getTime() - 1000000);
+    document.cookie = "viewed_products=; expires=" + d.toUTCString() + "; path=/; domain=" + document.domain;
 };
 
 var ajaxGotViewed = function(asyncr, lifetime) {
@@ -25,11 +27,4 @@ var ajaxGotViewed = function(asyncr, lifetime) {
                document.cookie = "viewed_products=fail; path=/";
            }
        });
-};
-
-
-var cookieDestroy = function () {
-    var d = new Date();
-    d.setTime(d.getTime() - 1000000);
-    document.cookie = "viewed_products=; expires=" + d.toUTCString() + "; path=/; domain=" + document.domain;
 };

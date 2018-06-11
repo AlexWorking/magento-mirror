@@ -18,18 +18,18 @@ class Potoky_ViewedProducts_Model_Observer
         $layout = $observer->getEvent()->getLayout();
         $viewedPresent = (Mage::registry('viewed_block')) ? true : false;
         $viewPresent = in_array('catalog_product_view', $layout->getUpdate()->getHandles());
-        if (($viewedPresent || $viewPresent) && !$this->jsGenerationAllowed()) {
+        if (($viewedPresent || $viewPresent) && !$this->isJsGenerationAllowed()) {
             $cookieVal = (Mage::getModel('core/cookie')->get('viewed_products')) ? null : 'reset';
-            $this->addJsVC($layout, 'storage_execution.phtml', $cookieVal);
+            $this->addNeededJsToPage($layout, 'storage_execution.phtml', $cookieVal);
             return;
         }
         elseif ($viewPresent) {
                 Mage::register('viewed_product',$this->getProdInfo());
-                $this->addJsVC($layout, 'gatherer.phtml', 'add');
+                $this->addNeededJsToPage($layout, 'gatherer.phtml', 'add');
         }
         elseif ($viewedPresent) {
             Mage::register('jsblock_allowed', true);
-            $this->addJsVC($layout);
+            $this->addNeededJsToPage($layout);
         }
     }
 
@@ -42,7 +42,7 @@ class Potoky_ViewedProducts_Model_Observer
      */
     public function systemConfigWatch(Varien_Event_Observer $observer)
     {
-        Mage::getModel('core/config')->saveConfig('catalog/lifetime_vc/timestamp', time());
+        Mage::getModel('core/config')->saveConfig('catalog/js_viewed_products/timestamp', time());
     }
 
     /**
@@ -70,7 +70,7 @@ class Potoky_ViewedProducts_Model_Observer
      * @param string $template
      * @param string $cookieVal
      */
-    private function addJsVC(Mage_Core_Model_Layout $layout, $template = null, $cookieVal = null) {
+    private function addNeededJsToPage(Mage_Core_Model_Layout $layout, $template = null, $cookieVal = null) {
         $layout->getBlock('head')->addJs('local/storage.js');
 
         if (!$template) {
@@ -95,7 +95,7 @@ class Potoky_ViewedProducts_Model_Observer
      *
      * @return bool
      */
-    private function jsGenerationAllowed()
+    private function isJsGenerationAllowed()
     {
         $sessionData = Mage::getSingleton('core/session')->getData('viewed_products');
         if (!$sessionData) {
@@ -103,7 +103,7 @@ class Potoky_ViewedProducts_Model_Observer
             return false;
         }
 
-        if ((int) $sessionData['timestamp'] !== (int) Mage::getStoreConfig('catalog/lifetime_vc/timestamp') ||
+        if ((int) $sessionData['timestamp'] !== (int) Mage::getStoreConfig('catalog/js_viewed_products/timestamp') ||
             (int) $sessionData['expiry'] - time() < 0) {
             Mage::helper('viewedproducts/session')->unsetSessionSetCookieForViewedProducts('reset');
 

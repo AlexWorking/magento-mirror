@@ -7,10 +7,10 @@
     </modules>
     <default>
         <catalog>
-            <lifetime_vc>
+            <js_viewed_products>
                 <viewedproducts_lifetime>3600</viewedproducts_lifetime>
                 <ajax_async>0</ajax_async>
-            </lifetime_vc>
+            </js_viewed_products>
         </catalog>
     </default>
     <global>

@@ -9,7 +9,7 @@
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
             <groups>
-                <lifetime_vc translate="label">
+                <js_viewed_products translate="label">
                     <label>JS Block</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>1000</sort_order>
@@ -60,7 +60,7 @@
                             <show_in_store>1</show_in_store>
                         </timestamp>
                     </fields>
-                </lifetime_vc>
+                </js_viewed_products>
             </groups>
         </catalog>
     </sections>
