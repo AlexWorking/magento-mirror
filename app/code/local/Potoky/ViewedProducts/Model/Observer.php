@@ -11,7 +11,7 @@ class Potoky_ViewedProducts_Model_Observer
      */
     public function pageWatch(Varien_Event_Observer $observer)
     {
-        if (Mage::helper('viewedproducts/lifetime')->getLifetime() === false) {
+        if (Mage::helper('viewedproducts/lifetime')->getLifetime() == null) {
 
             return;
         }
