@@ -118,3 +118,4 @@ class Potoky_ViewedProducts_Model_Observer
         return true;
     }
 }
+

@@ -20,3 +20,4 @@ class Potoky_ViewedProducts_Helper_Session extends Mage_Core_Helper_Abstract
         }
     }
 }
+
