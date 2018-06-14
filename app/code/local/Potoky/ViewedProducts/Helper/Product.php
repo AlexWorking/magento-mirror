@@ -7,10 +7,10 @@ class Potoky_ViewedProducts_Helper_Product extends Mage_Core_Helper_Abstract
      * and returns it in the format expected by JS storage scripts
      *
      *
-     * @param Mage_Catalog_Model_Product[] $products
+     * @param Mage_Catalog_Model_Product[] | Mage_Reports_Model_Resource_Product_Index_Viewed_Collection $products
      * @return array
      */
-    public function getProductInfo(array $products)
+    public function getProductInfo($products)
     {
         $prodsInfoArr =[];
         foreach ($products as $product) {
