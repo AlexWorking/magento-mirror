@@ -1,6 +1,6 @@
 <?php
     extract(Mage::registry('viewed_product'));
-    $lifetime = Mage::helper('viewedproducts/lifetime')->getLifetime();
+    $expiry = Mage::getSingleton('core/session')->getData('viewed_products')['expiry'] * 1000;
 ?>
 <script>
     var viewedList = localStorage.getItem("viewed_products");
@@ -13,5 +13,5 @@
             delete viewedList.<?= $sku ?>;
         }
         viewedList.<?= $sku ?> = <?= $productInfo ?>;
-        renderStorage(viewedList, <?= $lifetime ?>);
+        renderStorage(viewedList, <?= $expiry ?>);
 </script>
