@@ -1,0 +1,7 @@
+<?php
+    $async = Mage::getStoreConfig('catalog/js_viewed_products/ajax_async');
+    $lifetime = Mage::helper('viewedproducts/lifetime')->getLifetime();
+?>
+<script>
+    storageContent(<?= $async ?>, <?= $lifetime ?>);
+</script>
