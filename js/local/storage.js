@@ -1,11 +1,11 @@
 
 var renderStorage = function(jsonValue, expires) {
     if (jsonValue === undefined && expires === undefined) {
-        localStorage.removeItem('viewed_products');
+        sessionStorage.removeItem('viewed_products');
     } else {
-        localStorage.setItem('viewed_products', JSON.stringify(jsonValue));
+        sessionStorage.setItem('viewed_products', JSON.stringify(jsonValue));
         setTimeout(function() {
-            localStorage.removeItem('viewed_products');
+            sessionStorage.removeItem('viewed_products');
         }, expires - Date.now());
     }
     var d = new Date();
@@ -30,15 +30,19 @@ var ajaxGotViewed = function(asyncr, lifetime) {
 };
 
 var storageContent = function(asyncr, lifetime) {
-    var viewedList = localStorage.getItem('viewed_products');
+    var viewedList = sessionStorage.getItem('viewed_products');
     var cookieVal = Mage.Cookies.get('viewed_products');
-    if (!viewedList || cookieVal) {
-        if (cookieVal === 'clear') {
-            renderStorage();
-        } else {
-            ajaxGotViewed(asyncr, lifetime);
-        }
+    if (viewedList && !cookieVal) {
+        return (viewedList && viewedList !== "[]") ? viewedList : {};
     }
-    viewedList = localStorage.getItem('viewed_products');
-    return (viewedList) ? viewedList : {};
+    if (!cookieVal) {
+        Mage.Cookies.set('viewed_products', 'reset');
+    }
+    if (cookieVal !== 'clear') {
+        ajaxGotViewed(asyncr, lifetime);
+    } else {
+        renderStorage();
+    }
+    viewedList = sessionStorage.getItem('viewed_products');
+    return (viewedList && viewedList !== "[]") ? viewedList : {};
 };

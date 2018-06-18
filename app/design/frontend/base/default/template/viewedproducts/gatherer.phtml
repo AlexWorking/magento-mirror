@@ -11,15 +11,15 @@
 ?>
 <script>
     var viewedList = storageContent(<?= $async ?>, <?= $lifetime ?>);
-    if (viewedList === "[]") {
+    if (viewedList === {}) {
         viewedList = {};
     } else {
         viewedList = JSON.parse(viewedList);
     }
-        if(viewedList.<?= $sku ?>) {
-            delete viewedList.<?= $sku ?>;
-        }
-        viewedList.<?= $sku ?> = <?= $productInfo ?>;
-        renderStorage(viewedList, <?= $expiry ?>);
+    if(viewedList.<?= $sku ?>) {
+        delete viewedList.<?= $sku ?>;
+    }
+    viewedList.<?= $sku ?> = <?= $productInfo ?>;
+    renderStorage(viewedList, <?= $expiry ?>);
     alert('In Gatherer');
 </script>

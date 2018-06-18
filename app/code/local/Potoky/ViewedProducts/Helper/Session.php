@@ -13,14 +13,6 @@ class Potoky_ViewedProducts_Helper_Session extends Mage_Core_Helper_Abstract
     public function processCookieForViewedProducts($type)
     {
         Mage::getModel('core/cookie')->set('viewed_products', $type, 0, '/', null, null, false);
-
-        $layout = Mage::app()->getLayout();
-        $endBlock = $layout->createBlock(
-            'Mage_Core_Block_Template',
-            'localstorage_rendering',
-            array('template' => 'viewedproducts/process_cookie.phtml',
-            ));
-        $layout->getBlock('before_body_end')->append($endBlock);
     }
 }
 

@@ -16,7 +16,7 @@
     };
     var products = {};
     var viewedList = storageContent(<?= $async ?>, <?= $lifetime ?>);
-    if (viewedList) {
+    if (viewedList !== "[]") {
         viewedList = JSON.parse(viewedList);
         products = fillData(viewedList);
     }

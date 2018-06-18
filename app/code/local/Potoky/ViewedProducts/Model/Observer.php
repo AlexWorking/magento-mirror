@@ -4,15 +4,23 @@ class Potoky_ViewedProducts_Model_Observer
 {
     /**
      * Observes the loaded page and ads necessary JS and scripts if
-     * the localstorage needs a renewal of viewed product or products
+     * the sessionstorage needs a renewal of viewed product or products
      *
      * @param Varien_Event_Observer $observer
      * @return void
      */
     public function pageWatch(Varien_Event_Observer $observer)
     {
+        if (!Mage::helper('viewedproducts/lifetime')->getLifetime() || !$_COOKIE['viewed_products']) {
+            return;
+        }
         $layout = $observer->getEvent()->getLayout();
-        $test = Mage::getStoreConfig("catalog/js_viewed_products/allow_jsblock");
+        $endBlock = $layout->createBlock(
+            'Mage_Core_Block_Template',
+            'sessionstorage_rendering',
+            array('template' => 'viewedproducts/process_cookie.phtml',
+            ));
+        $layout->getBlock('before_body_end')->append($endBlock);
     }
 
     /**
