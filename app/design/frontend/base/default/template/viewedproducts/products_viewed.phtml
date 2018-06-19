@@ -15,7 +15,7 @@
         return p;
     };
     var products = {};
-    var viewedList = storageContent(<?= $async ?>, <?= $lifetime ?>);
+    var viewedList = potokyViewedProducts.storageContent(<?= $async ?>, <?= $lifetime ?>);
     if (viewedList !== "[]") {
         viewedList = JSON.parse(viewedList);
         products = fillData(viewedList);

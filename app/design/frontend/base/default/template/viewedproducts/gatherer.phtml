@@ -10,16 +10,12 @@
     $expiry = (time() + $lifetime) * 1000;
 ?>
 <script>
-    var viewedList = storageContent(<?= $async ?>, <?= $lifetime ?>);
-    if (viewedList === {}) {
-        viewedList = {};
-    } else {
-        viewedList = JSON.parse(viewedList);
-    }
+    var viewedList = potokyViewedProducts.storageContent(<?= $async ?>, <?= $lifetime ?>);
+    viewedList = JSON.parse(viewedList);
     if(viewedList.<?= $sku ?>) {
         delete viewedList.<?= $sku ?>;
     }
     viewedList.<?= $sku ?> = <?= $productInfo ?>;
-    renderStorage(viewedList, <?= $expiry ?>);
+    potokyViewedProducts.renderStorage(viewedList, <?= $expiry ?>);
     alert('In Gatherer');
 </script>
