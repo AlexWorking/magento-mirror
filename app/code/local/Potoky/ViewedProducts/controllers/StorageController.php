@@ -20,4 +20,16 @@ class Potoky_ViewedProducts_StorageController extends Mage_Core_Controller_Front
         $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry * 1000];
         echo Mage::helper('core')->jsonEncode($response);
     }
+
+    /**
+     * Updates database on the product currently being vieved
+     *
+     */
+    public function updateAction() {
+        $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $_POST['sku']);
+        Mage::dispatchEvent(
+            'catalog_controller_product_view',
+            array('product' => $product)
+        );
+    }
 }

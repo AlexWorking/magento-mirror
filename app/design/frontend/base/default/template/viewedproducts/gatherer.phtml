@@ -14,6 +14,7 @@
     viewedList = JSON.parse(viewedList);
     if(viewedList.<?= $sku ?>) {
         delete viewedList.<?= $sku ?>;
+        potokyViewedProducts.ajaxUpdateViewed(<?= $async ?>, "<?= $sku ?>");
     }
     viewedList.<?= $sku ?> = <?= $productInfo ?>;
     potokyViewedProducts.renderStorage(viewedList, <?= $expiry ?>);

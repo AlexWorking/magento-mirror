@@ -22,26 +22,35 @@ var potokyViewedProducts = {
     },
 
     ajaxGotViewed: function(asyncr, lifetime) {
-           jQuery.ajax({
-               url: "/viewedproducts/storage/gather",
-               type: "POST",
-               async: asyncr,
-               data: {lifetime: lifetime},
-               success: function (response) {
-                   var parsed = JSON.parse(response);
-                   potokyViewedProducts.renderStorage(parsed.products_info, parsed.expiry);
-               },
-               error: function () {
-                   document.cookie = "viewed_products=fail; path=/";
-               }
-           });
+        jQuery.ajax({
+            url: "/viewedproducts/storage/gather",
+            type: "POST",
+            async: asyncr,
+            data: {lifetime: lifetime},
+            success: function (response) {
+                var parsed = JSON.parse(response);
+                potokyViewedProducts.renderStorage(parsed.products_info, parsed.expiry);
+            },
+            error: function () {
+                document.cookie = "viewed_products=fail; path=/";
+            }
+        });
+    },
+
+    ajaxUpdateViewed: function (asyncr, sku) {
+        jQuery.ajax({
+            url: "/viewedproducts/storage/update",
+            type: "POST",
+            async: asyncr,
+            data: {sku: sku}
+        });
     },
 
     storageContent: function(asyncr, lifetime) {
         var viewedList = sessionStorage.getItem('viewed_products');
         var cookieVal = Mage.Cookies.get('viewed_products');
         if (viewedList && !cookieVal) {
-            setTimeout(function() {
+            setTimeout(function () {
                 sessionStorage.removeItem('viewed_products');
             }, lifetime * 1000);
             return (viewedList && viewedList !== "[]") ? viewedList : Object();
@@ -49,7 +58,10 @@ var potokyViewedProducts = {
         if (!cookieVal) {
             Mage.Cookies.set('viewed_products', 'reset');
         }
-        if (cookieVal !== 'clear') {
+
+        if (cookieVal === 'reset') {
+
+        } else if (cookieVal === 'reset') {
             potokyViewedProducts.ajaxGotViewed(asyncr, lifetime);
         } else {
             potokyViewedProducts.renderStorage();

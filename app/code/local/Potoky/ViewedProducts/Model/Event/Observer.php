@@ -27,4 +27,17 @@ class Potoky_ViewedProducts_Model_Event_Observer extends Mage_Reports_Model_Even
 
         return parent::customerLogout($observer);
     }
+
+    /**
+     * View Catalog Product action
+     *
+     * @param Varien_Event_Observer $observer
+     * @return Mage_Reports_Model_Event_Observer
+     */
+    public function catalogProductView(Varien_Event_Observer $observer)
+    {
+        Mage::helper('viewedproducts/session')->processCookieForViewedProducts('update');
+
+        return parent::catalogProductView($observer);
+    }
 }
