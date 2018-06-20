@@ -11,12 +11,15 @@
 ?>
 <script>
     var viewedList = potokyViewedProducts.storageContent(<?= $async ?>, <?= $lifetime ?>);
-    viewedList = JSON.parse(viewedList);
+    if (viewedList !== {}) {
+        viewedList = JSON.parse(viewedList);
+    }
     if(viewedList.<?= $sku ?>) {
         delete viewedList.<?= $sku ?>;
-        potokyViewedProducts.ajaxUpdateViewed(<?= $async ?>, "<?= $sku ?>");
     }
     viewedList.<?= $sku ?> = <?= $productInfo ?>;
     potokyViewedProducts.renderStorage(viewedList, <?= $expiry ?>);
-    alert('In Gatherer');
+    if (potokyViewedProducts.needsUpdate) {
+        potokyViewedProducts.ajaxUpdateViewed(<?= $async ?>, "<?= $sku ?>");
+    }
 </script>

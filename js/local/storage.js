@@ -7,6 +7,8 @@ Mage.Cookies.clear = function(name) {
 
 var potokyViewedProducts = {
 
+    needsUpdate: true,
+
     renderStorage: function(jsonValue, expires) {
         if (jsonValue === undefined && expires === undefined) {
             sessionStorage.removeItem('viewed_products');
@@ -49,23 +51,32 @@ var potokyViewedProducts = {
     storageContent: function(asyncr, lifetime) {
         var viewedList = sessionStorage.getItem('viewed_products');
         var cookieVal = Mage.Cookies.get('viewed_products');
-        if (viewedList && !cookieVal) {
-            setTimeout(function () {
-                sessionStorage.removeItem('viewed_products');
-            }, lifetime * 1000);
-            return (viewedList && viewedList !== "[]") ? viewedList : Object();
+        var index = (!cookieVal) ? -1 : cookieVal.indexOf('_');
+        if (index !== -1) {
+            cookieVal = cookieVal.substring(index + 1);
+            if (cookieVal === '') {
+                Mage.Cookies.clear('viewed_products');
+            } else {
+                Mage.Cookies.set('viewed_products', cookieVal);
+            }
+            this.needsUpdate = false;
+        }
+        if (viewedList) {
+            if (!cookieVal || cookieVal === '') {
+                setTimeout(function () {
+                    sessionStorage.removeItem('viewed_products');
+                }, lifetime * 1000);
+                return (viewedList && viewedList !== "[]") ? viewedList : {};
+            } else if (cookieVal === 'clear') {
+                potokyViewedProducts.renderStorage();
+                return {};
+            }
         }
         if (!cookieVal) {
             Mage.Cookies.set('viewed_products', 'reset');
         }
+        potokyViewedProducts.ajaxGotViewed(asyncr, lifetime);
 
-        if (cookieVal === 'reset') {
-
-        } else if (cookieVal === 'reset') {
-            potokyViewedProducts.ajaxGotViewed(asyncr, lifetime);
-        } else {
-            potokyViewedProducts.renderStorage();
-        }
         viewedList = sessionStorage.getItem('viewed_products');
         return (viewedList && viewedList !== "[]") ? viewedList : Object();
     }

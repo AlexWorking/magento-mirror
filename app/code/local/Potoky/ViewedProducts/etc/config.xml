@@ -34,16 +34,6 @@
                 <class>Potoky_ViewedProducts_Helper</class>
             </viewedproducts>
         </helpers>
-        <events>
-            <admin_system_config_changed_section_catalog>
-                <observers>
-                    <potoky_viewedproducts_model_observer>
-                        <class>Potoky_ViewedProducts_Model_Observer</class>
-                        <method>systemConfigWatch</method>
-                    </potoky_viewedproducts_model_observer>
-                </observers>
-            </admin_system_config_changed_section_catalog>
-        </events>
     </global>
     <frontend>
         <layout>
