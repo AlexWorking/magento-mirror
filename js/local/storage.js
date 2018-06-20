@@ -62,7 +62,7 @@ var potokyViewedProducts = {
             this.needsUpdate = false;
         }
         if (viewedList) {
-            if (!cookieVal || cookieVal === '') {
+            if (!cookieVal) {
                 setTimeout(function () {
                     sessionStorage.removeItem('viewed_products');
                 }, lifetime * 1000);
