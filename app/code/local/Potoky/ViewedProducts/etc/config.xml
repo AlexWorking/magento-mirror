@@ -51,13 +51,6 @@
         </events>
     </global>
     <frontend>
-        <layout>
-            <updates>
-                <potoky_viewedproducts>
-                    <file>viewedproducts.xml</file>
-                </potoky_viewedproducts>
-            </updates>
-        </layout>
         <events>
             <controller_action_layout_generate_blocks_after>
                 <observers>
