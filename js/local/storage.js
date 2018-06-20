@@ -9,6 +9,8 @@ var potokyViewedProducts = {
 
     needsUpdate: true,
 
+    needsProcessing: true,
+
     renderStorage: function(jsonValue, expires) {
         if (jsonValue === undefined && expires === undefined) {
             sessionStorage.removeItem('viewed_products');
@@ -49,9 +51,14 @@ var potokyViewedProducts = {
     },
 
     storageContent: function(asyncr, lifetime) {
+        if (!this.needsProcessing) {
+            return;
+        }
+
         var viewedList = sessionStorage.getItem('viewed_products');
         var cookieVal = Mage.Cookies.get('viewed_products');
         var index = (!cookieVal) ? -1 : cookieVal.indexOf('_');
+
         if (index !== -1) {
             cookieVal = cookieVal.substring(index + 1);
             if (cookieVal === '') {
@@ -61,14 +68,17 @@ var potokyViewedProducts = {
             }
             this.needsUpdate = false;
         }
+
         if (viewedList) {
             if (!cookieVal) {
                 setTimeout(function () {
                     sessionStorage.removeItem('viewed_products');
                 }, lifetime * 1000);
+                this.needsProcessing = false;
                 return (viewedList && viewedList !== "[]") ? viewedList : {};
             } else if (cookieVal === 'clear') {
                 potokyViewedProducts.renderStorage();
+                this.needsProcessing = false;
                 return {};
             }
         }
@@ -78,6 +88,7 @@ var potokyViewedProducts = {
         potokyViewedProducts.ajaxGotViewed(asyncr, lifetime);
 
         viewedList = sessionStorage.getItem('viewed_products');
+        this.needsProcessing = false;
         return (viewedList && viewedList !== "[]") ? viewedList : Object();
     }
 };
