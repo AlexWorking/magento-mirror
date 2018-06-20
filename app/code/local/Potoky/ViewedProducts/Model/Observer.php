@@ -29,7 +29,6 @@ class Potoky_ViewedProducts_Model_Observer
         }
         elseif ($viewedPresent) {
             Mage::register('jsblock_allowed', true);
-            $this->addNeededJsToPage($layout);
         }
     }
 
@@ -114,6 +113,11 @@ class Potoky_ViewedProducts_Model_Observer
 
             return false;
         }
+
+        Mage::getSingleton('core/session')->setData('viewed_products', [
+            'expiry'    => time() + Mage::helper('viewedproducts/lifetime')->getLifetime(),
+            'timestamp' => Mage::getStoreConfig('catalog/js_viewed_products/timestamp')
+        ]);
 
         return true;
     }
