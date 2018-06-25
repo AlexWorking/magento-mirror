@@ -6,6 +6,16 @@
         </Potoky_AlertAnonymous>
     </modules>
     <global>
+        <blocks>
+            <alertanonymous>
+                <class>Potoky_AlertAnonymous_Block</class>
+            </alertanonymous>
+            <productalert>
+                <rewrite>
+                    <product_view>Potoky_AlertAnonymous_Block_Product_View</product_view>
+                </rewrite>
+            </productalert>
+        </blocks>
         <models>
             <alertanonymous>
                 <class>Potoky_AlertAnonymous_Model</class>
@@ -43,6 +53,15 @@
         </resources>
     </global>
     <frontend>
+        <routers>
+            <productalert>
+                <args>
+                    <modules>
+                        <alertanonymous before="Mage_ProductAlert">Potoky_AlertAnonymous</alertanonymous>
+                    </modules>
+                </args>
+            </productalert>
+        </routers>
         <layout>
             <updates>
                 <potoky_alertanonymous>

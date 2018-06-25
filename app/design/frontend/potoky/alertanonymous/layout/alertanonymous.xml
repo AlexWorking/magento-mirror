@@ -7,10 +7,6 @@
             </action>
             <action method="addItem">
                 <type>skin_js</type>
-                <name>js/jquery-ui-1.12.1.custom/external/jquery/jquery.js</name>
-            </action>
-            <action method="addItem">
-                <type>skin_js</type>
                 <name>js/jquery-ui-1.12.1.custom/jquery-ui.min.js</name>
             </action>
             <action method="addItem">
