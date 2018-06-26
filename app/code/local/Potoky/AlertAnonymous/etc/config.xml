@@ -62,12 +62,5 @@
                 </args>
             </productalert>
         </routers>
-        <layout>
-            <updates>
-                <potoky_alertanonymous>
-                    <file>alertanonymous.xml</file>
-                </potoky_alertanonymous>
-            </updates>
-        </layout>
     </frontend>
 </config>
