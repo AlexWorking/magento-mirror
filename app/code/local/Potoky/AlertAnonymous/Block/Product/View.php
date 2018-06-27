@@ -55,13 +55,9 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
      */
     public function prepareStockAlertData()
     {
-        if (!$this->_getHelper()->isStockAlertAllowed() || !$this->_product || $this->_product->isAvailable()) {
-            $this->setTemplate('');
-            return;
-        }
         $this->templateId = 'stock';
-        $url = (self::getIsLoggedIn() === false) ? "#" : $this->_getHelper()->getSaveUrl('stock');
-        $this->setSignupUrl($url);
+
+        parent::preparePriceAlertData();
     }
 
     /**
@@ -71,14 +67,8 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
      */
     public function preparePriceAlertData()
     {
-        if (!$this->_getHelper()->isPriceAlertAllowed()
-            || !$this->_product || false === $this->_product->getCanShowPrice()
-        ) {
-            $this->setTemplate('');
-            return;
-        }
         $this->templateId = 'price';
-        $url = (self::getIsLoggedIn() === false) ? "#" : $this->_getHelper()->getSaveUrl('price');
-        $this->setSignupUrl($url);
+
+        parent::preparePriceAlertData();
     }
 }

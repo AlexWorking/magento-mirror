@@ -28,7 +28,7 @@
     if (Potoky_AlertAnonymous_Block_Product_View::getIsLoggedIn()): ?>
 <p class="<?php echo $this->getHtmlClass() ?>">
     <?php else: ?>
-<p class="<?php echo $this->getHtmlClass() ?>" id="<?= 'alertanonymous-' . $this->getTemplateId() ?>" onclick="potokyAlertAnonymous.createForm(this.id, '<?= $this->_getHelper()->getSaveUrl($this->getTemplateId()); ?>')">
+<p class="<?php echo $this->getHtmlClass() ?>" id="<?= 'alertanonymous-' . $this->getTemplateId() ?>" onclick="potokyAlertAnonymous.createForm(this.id, '<?= $this->escapeHtml($this->getSignupUrl()); ?>', event)">
     <?php endif; ?>
     <a href="<?php echo $this->escapeHtml($this->getSignupUrl()) ?>" title="<?php echo $this->escapeHtml($this->__($this->getSignupLabel())); ?>"><?php echo $this->escapeHtml($this->__($this->getSignupLabel())); ?></a>
 </p>
