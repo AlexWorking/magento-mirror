@@ -13,9 +13,9 @@
     var viewedList = potokyViewedProducts.storageContent(<?= $async ?>, <?= $lifetime ?>);
     if (viewedList !== {}) {
         viewedList = JSON.parse(viewedList);
-    }
-    if(viewedList.<?= $sku ?>) {
-        delete viewedList.<?= $sku ?>;
+        if(viewedList.<?= $sku ?>) {
+            delete viewedList.<?= $sku ?>;
+        }
     }
     viewedList.<?= $sku ?> = <?= $productInfo ?>;
     potokyViewedProducts.renderStorage(viewedList, <?= $expiry ?>);

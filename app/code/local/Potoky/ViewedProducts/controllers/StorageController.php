@@ -15,7 +15,7 @@ class Potoky_ViewedProducts_StorageController extends Mage_Core_Controller_Front
             ->addAttributeToSelect(['name', 'thumbnail', 'url_key'])
             ->addIndexFilter();
         $prodsInfoArr = Mage::helper('viewedproducts/product')->getProductInfo($products);
-        $lifeTime = $_POST['lifetime'];
+        $lifeTime = $this->getRequest()->getParam('lifetime');
         $expiry = time() + $lifeTime;
         $response = ['products_info' => $prodsInfoArr, 'expiry' => $expiry * 1000];
         echo Mage::helper('core')->jsonEncode($response);
@@ -26,7 +26,7 @@ class Potoky_ViewedProducts_StorageController extends Mage_Core_Controller_Front
      *
      */
     public function updateAction() {
-        $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $_POST['sku']);
+        $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $this->getRequest()->getParam('lifetime'));
         Mage::dispatchEvent(
             'catalog_controller_product_view',
             array('product' => $product)

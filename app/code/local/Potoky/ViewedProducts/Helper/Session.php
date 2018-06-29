@@ -12,10 +12,10 @@ class Potoky_ViewedProducts_Helper_Session extends Mage_Core_Helper_Abstract
      */
     public function processCookieForViewedProducts($type)
     {
-        if ($type === 'updated_' && isset($_COOKIE['viewed_products'])) {
-            $type = $type . $_COOKIE['viewed_products'];
+        if ($type === 'updated_' && ($cookie = Mage::getSingleton('core/cookie')->get('viewed_products'))) {
+            $type = $type . $cookie;
         }
-        Mage::getModel('core/cookie')->set('viewed_products', $type, 0, '/', null, null, false);
+        Mage::getSingleton('core/cookie')->set('viewed_products', $type, 0, '/', null, null, false);
     }
 }
 

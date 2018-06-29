@@ -11,7 +11,7 @@ class Potoky_ViewedProducts_Model_Observer
      */
     public function pageWatch(Varien_Event_Observer $observer)
     {
-        if (!$_COOKIE['viewed_products'] || $_COOKIE['viewed_products'] === 'updated') {
+        if ((!$cookie = Mage::getSingleton('core/cookie')->get('viewed_products')) || $cookie === 'updated_') {
             return;
         }
         $layout = $observer->getEvent()->getLayout();
