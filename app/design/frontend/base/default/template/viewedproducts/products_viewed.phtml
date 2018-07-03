@@ -7,6 +7,7 @@
         var p = Object();
         var viewedQuantity = Object.keys(e).length;
         var confData = <?= Mage::getStoreConfig('catalog/recently_products/viewed_count'); ?>;
+        confData = (confData !== undefined) ? confData : 0;
         var goDownTill = (viewedQuantity < confData) ? 0 : viewedQuantity - confData;
         for (var i = viewedQuantity - 1; i > goDownTill - 1; i--) {
             var key = Object.keys(e)[i];
@@ -21,8 +22,6 @@
         products = fillData(viewedList);
     }
     if (Object.keys(products).length !== 0) {
-        var scriptTag = document.scripts[document.scripts.length - 1];
-        var parentTag = scriptTag.parentNode;
         document.writeln('<div class="block block-list block-viewed">');
         document.writeln('<div class="block-title">');
         document.writeln('<strong><span><?php echo $this->__('Recently Viewed Products') ?></span></strong>');
