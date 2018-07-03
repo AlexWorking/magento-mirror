@@ -11,7 +11,7 @@
 ?>
 <script>
     var viewedList = potokyViewedProducts.storageContent(<?= $async ?>, <?= $lifetime ?>);
-    if (viewedList !== {}) {
+    if (!jQuery.isEmptyObject(viewedList)) {
         viewedList = JSON.parse(viewedList);
         if(viewedList.<?= $sku ?>) {
             delete viewedList.<?= $sku ?>;
