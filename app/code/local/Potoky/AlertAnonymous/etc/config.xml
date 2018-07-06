@@ -24,9 +24,9 @@
             <alertanonymous_mysql4>
                 <class>Potoky_AlertAnonymous_Model_Mysql4</class>
                 <entities>
-                    <statistics>
+                    <ungeristered>
                         <table>anonymous_alerts</table>
-                    </statistics>
+                    </ungeristered>
                 </entities>
             </alertanonymous_mysql4>
         </models>

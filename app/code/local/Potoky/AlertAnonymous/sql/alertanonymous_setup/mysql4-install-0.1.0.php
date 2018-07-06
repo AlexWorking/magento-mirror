@@ -2,7 +2,7 @@
 
 $installer = $this;
 $installer->startSetup();
-$tabName = $installer->getTable('alertanonymous/statistics');
+$tabName = $installer->getTable('alertanonymous/ungeristered');
 $installer->getConnection()->dropTable($tabName);
 $table = $installer->getConnection()
     ->newTable($tabName)

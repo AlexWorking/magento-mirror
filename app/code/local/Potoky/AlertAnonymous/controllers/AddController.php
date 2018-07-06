@@ -63,6 +63,9 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             return ;
         }
 
+        if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+            Mage::getSingleton('customer/session')->setId(130);
+        }
         $customerId = (Mage::getSingleton('customer/session')->isLoggedIn()) ?
             Mage::getSingleton('customer/session')->getId() :
             $this->tempCustomer->getId();
