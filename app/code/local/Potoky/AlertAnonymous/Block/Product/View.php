@@ -57,7 +57,7 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
     {
         $this->templateId = 'stock';
 
-        parent::preparePriceAlertData();
+        parent::prepareStockAlertData();
     }
 
     /**
