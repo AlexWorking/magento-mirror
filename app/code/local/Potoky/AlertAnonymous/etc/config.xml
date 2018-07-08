@@ -30,6 +30,11 @@
                 </entities>
             </alertanonymous_mysql4>
         </models>
+        <helpers>
+            <alertanonymous>
+                <class>Potoky_AlertAnonymous_Helper</class>
+            </alertanonymous>
+        </helpers>
         <resources>
             <alertanonymous_write>
                 <connection>

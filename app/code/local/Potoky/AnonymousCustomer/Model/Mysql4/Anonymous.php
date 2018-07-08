@@ -10,6 +10,6 @@ class Potoky_AnonymousCustomer_Model_Mysql4_Anonymous extends Mage_Core_Model_My
 {
     protected function _construct()
     {
-        $this->_init('anonymouscustomer/anonymous', 'entity_id');
+        $this->_init('anonymouscustomer/anonymous', 'anonymous_id');
     }
 }
