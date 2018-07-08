@@ -5,7 +5,7 @@ require_once(
     DS.'AddController.php');
 class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddController
 {
-    public $anonymousId = 209;
+    public $anonymousId = null;
     
     public function preDispatch()
     {
@@ -31,6 +31,8 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         catch (Exception $e) {
             Zend_Debug::dump($e->getMessage());
         }
+
+        $this->anonymousId = $customer->getId();
     }
 
     private function manageSession()
