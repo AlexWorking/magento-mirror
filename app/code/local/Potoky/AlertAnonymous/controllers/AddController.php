@@ -5,6 +5,11 @@ require_once(
     DS.'AddController.php');
 class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddController
 {
+    /*
+     * Some Comment
+     *
+     * @var int
+     */
     public $anonymousId = null;
     
     public function preDispatch()
