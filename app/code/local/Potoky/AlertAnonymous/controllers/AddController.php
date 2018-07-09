@@ -5,13 +5,6 @@ require_once(
     DS.'AddController.php');
 class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddController
 {
-    /*
-     * Some Comment
-     *
-     * @var int
-     */
-    public $anonymousId = null;
-    
     public function preDispatch()
     {
         Mage_Core_Controller_Front_Action::preDispatch();
@@ -20,49 +13,26 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             return;
         }
 
-        $websiteId = Mage::app()->getWebsite()->getId();
-        $store = Mage::app()->getStore();
+        Mage::unregister('potoky_alertanonymous');
+        Mage::register('potoky_alertanonymous', 'anonymouscustomer_create');
 
-        $customer = Mage::getModel("customer/customer");
-        $customer   ->setWebsiteId($websiteId)
-            ->setFirstname('_Anonymous_')
-            ->setLastname('_Anonymous_')
+        $websiteId = Mage::app()->getWebsite()->getId();
+        $storeId = Mage::app()->getStore()->getId();
+
+        $anonymousСustomer = Mage::getModel("anonymouscustomer/anonymous");
+        $anonymousСustomer   ->setWebsiteId($websiteId)
             ->setEmail($this->getRequest()->getParam('email'))
-            ->setPassword('Mage-' . substr(time(), 4));
+            ->setGroupId(1)
+            ->setStoreId($storeId);
 
         try{
-            $customer->save();
+            $anonymousСustomer->save();
         }
         catch (Exception $e) {
             Zend_Debug::dump($e->getMessage());
         }
 
-        $this->anonymousId = $customer->getId();
+        Potoky_AlertAnonymous_Model_Price::$lastId = $anonymousСustomer->getId();
 
-    }
-
-    private function manageSession()
-    {
-        if ($this->anonymousId === null) {
-            return;
-        }
-
-        static $tumbler = 0;
-
-        if ($tumbler === 0) {
-            Mage::getSingleton('customer/session')->setId($this->anonymousId);
-        } else {
-            Mage::getSingleton('customer/session')->unsetData('id');
-        }
-        $tumbler = $tumbler + pow(-1, $tumbler);
-    }
-
-    public function priceAction()
-    {
-        $this->manageSession();
-
-        parent::priceAction();
-
-        $this->manageSession();
     }
 }

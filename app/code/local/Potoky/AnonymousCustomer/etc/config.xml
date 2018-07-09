@@ -15,7 +15,7 @@
                 <class>Potoky_AnonymousCustomer_Model_Mysql4</class>
                 <entities>
                     <anonymous>
-                        <table>anonymous_customer_info</table>
+                        <table>anonymous_customer</table>
                     </anonymous>
                 </entities>
             </anonymouscustomer_mysql4>

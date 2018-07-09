@@ -12,24 +12,32 @@ $table = $installer->getConnection()
         'nullable'  => false,
         'primary'   => true,
     ), 'Anonymous Id')
-    ->addColumn('reserved_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
-        'unsigned'  => true,
-        'nullable'  => false,
-    ), 'Reserved Id for a customer with these website_id and email if such one will ever going to be created')
     ->addColumn('website_id', Varien_Db_Ddl_Table::TYPE_SMALLINT, null, array(
         'unsigned'  => true,
     ), 'Website Id')
     ->addColumn('email', Varien_Db_Ddl_Table::TYPE_TEXT, 255, array(
         'nullable'  => false
     ), 'Email')
+    ->addColumn('group_id', Varien_Db_Ddl_Table::TYPE_SMALLINT, null, array(
+        'unsigned'  => true,
+        'nullable'  => false,
+        'default'   => '0',
+    ), 'Group Id')
+    ->addColumn('store_id', Varien_Db_Ddl_Table::TYPE_SMALLINT, null, array(
+        'unsigned'  => true,
+        'default'   => '0',
+    ), 'Store Id')
     ->addColumn('created_at',  Varien_Db_Ddl_Table::TYPE_TIMESTAMP, null, array(
         'nullable' => 'false',
         'default' => Varien_Db_Ddl_Table::TIMESTAMP_INIT
     ), 'Created At')
-    ->addIndex($installer->getIdxName('customer/entity', array('reserved_id'), Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE),
-        array('reserved_id'),
+    ->addColumn('registration_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
+        'unsigned'  => true,
+    ), 'Registration Id for a customer with these website_id and email when such one is registered')
+    ->addIndex($installer->getIdxName('anonymouscustomer/anonymous', array('registration_id'), Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE),
+        array('registration_id'),
         array('type' => Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE))
-    ->addIndex($installer->getIdxName('customer/entity', array('email', 'website_id'), Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE),
+    ->addIndex($installer->getIdxName('anonymouscustomer/anonymous', array('email', 'website_id'), Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE),
         array('email', 'website_id'),
         array('type' => Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE));
 $installer->getConnection()->createTable($table);
