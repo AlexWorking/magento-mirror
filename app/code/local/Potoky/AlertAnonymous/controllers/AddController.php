@@ -38,6 +38,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         }
 
         $this->anonymousId = $customer->getId();
+
     }
 
     private function manageSession()

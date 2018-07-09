@@ -29,6 +29,11 @@
                     </ungeristered>
                 </entities>
             </alertanonymous_mysql4>
+            <productalert>
+                <rewrite>
+                    <price>Potoky_AlertAnonymous_Model_Price</price>
+                </rewrite>
+            </productalert>
         </models>
         <helpers>
             <alertanonymous>
