@@ -13,26 +13,27 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             return;
         }
 
-        Mage::unregister('potoky_alertanonymous');
-        Mage::register('potoky_alertanonymous', 'anonymouscustomer_create');
-
+        $email = $this->getRequest()->getParam('email');
         $websiteId = Mage::app()->getWebsite()->getId();
-        $storeId = Mage::app()->getStore()->getId();
 
-        $anonymousСustomer = Mage::getModel("anonymouscustomer/anonymous");
-        $anonymousСustomer   ->setWebsiteId($websiteId)
-            ->setEmail($this->getRequest()->getParam('email'))
-            ->setGroupId(1)
-            ->setStoreId($storeId);
-
-        try{
-            $anonymousСustomer->save();
+        $anonymousСustomer = Mage::getModel("anonymouscustomer/anonymous")
+            ->getCollection()
+            ->addFieldToFilter('email', $email)
+            ->addFieldToFilter('website_id', $websiteId)
+            ->addFieldToFilter('registration_id', array('null' => true))
+            ->getFirstItem();
+        if (!$anonymousСustomer->getId()) {
+            $anonymousСustomer->setWebsiteId($websiteId)
+                ->setEmail($email)
+                ->setGroupId(1)
+                ->setStoreId(Mage::app()->getStore()->getId());
+            try {
+                $anonymousСustomer->save();
+            } catch (Exception $e) {
+                Zend_Debug::dump($e->getMessage());
+            }
         }
-        catch (Exception $e) {
-            Zend_Debug::dump($e->getMessage());
-        }
-
-        Potoky_AlertAnonymous_Model_Price::$lastId = $anonymousСustomer->getId();
-
+        Mage::unregister('potoky_alertanonymous');
+        Mage::register('potoky_alertanonymous', ['last_anonymous_id' => $anonymousСustomer->getId()]);
     }
 }

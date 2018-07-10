@@ -19,6 +19,11 @@
                     </anonymous>
                 </entities>
             </anonymouscustomer_mysql4>
+            <customer>
+                <rewrite>
+                    <customer>Potoky_AnonymousCustomer_Model_Customer</customer>
+                </rewrite>
+            </customer>
         </models>
         <resources>
             <anonymouscustomer_write>

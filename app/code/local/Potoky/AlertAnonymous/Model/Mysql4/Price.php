@@ -1,6 +1,6 @@
 <?php
 
-class Potoky_AlertAnonymous_Model_Mysql4_Price extends Mage_Core_Model_Mysql4_Abstract
+class Potoky_AlertAnonymous_Model_Mysql4_Price extends Mage_ProductAlert_Model_Mysql4_Price
 {
     protected function _construct()
     {

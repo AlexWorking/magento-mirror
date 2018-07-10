@@ -31,9 +31,9 @@
             </alertanonymous_mysql4>
             <productalert>
                 <rewrite>
-                    <price>Potoky_AlertAnonymous_Model_Price</price>
                     <email>Potoky_AlertAnonymous_Model_Email</email>
-                    <mysql4_price_collection>Potoky_AlertAnonymous_Model_Mysql4_Price_Collection</mysql4_price_collection>
+                    <price>Potoky_AlertAnonymous_Model_Price</price>
+                    <observer>Potoky_AlertAnonymous_Model_Observer</observer>
                 </rewrite>
             </productalert>
         </models>
