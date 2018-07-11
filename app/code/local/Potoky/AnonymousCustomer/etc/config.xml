@@ -5,6 +5,13 @@
             <version>0.1.0</version>
         </Potoky_AnonymousCustomer>
     </modules>
+    <default>
+        <anonymous>
+            <cascade_delete>
+                <when>Never</when>
+            </cascade_delete>
+        </anonymous>
+    </default>
     <global>
         <models>
             <anonymouscustomer>
@@ -51,7 +58,7 @@
                 <observers>
                     <anonymouscustomer_create>
                         <class>Potoky_AnonymousCustomer_Model_Observer</class>
-                        <method>moveToRegistered</method>
+                        <method>regularCustomerRegistered</method>
                     </anonymouscustomer_create>
                 </observers>
             </customer_save_after>
@@ -59,7 +66,7 @@
                 <observers>
                     <anonymouscustomer_remove>
                         <class>Potoky_AnonymousCustomer_Model_Observer</class>
-                        <method>onDeleteCascade</method>
+                        <method>regularCustomerDeleted</method>
                     </anonymouscustomer_remove>
                 </observers>
             </customer_delete_after>

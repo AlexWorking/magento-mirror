@@ -17,7 +17,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         $websiteId = Mage::app()->getWebsite()->getId();
         Mage::unregister('potoky_alertanonymous');
 
-        $customer = Mage::helper('anonymouscustomer/anonymus')
+        $customer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
         if ($id = $customer->getId()) {
             Mage::register('potoky_alertanonymous',
@@ -28,7 +28,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             );
             return;
         }
-        $anonymousCustomer = Mage::helper('anonymouscustomer/anonymus')
+        $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
         if ($id = $anonymousCustomer->getId()) {
             Mage::register('potoky_alertanonymous',
