@@ -2,27 +2,22 @@
 
 class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
 {
-    /*
-     * The id of the last unregistered customer created for alert
-     *
-     * @var int
-     */
-    private $lastId;
-
     protected function _construct()
     {
         $registry = (Mage::registry('potoky_alertanonymous')) ? Mage::registry('potoky_alertanonymous') : null;
-        if(null !== $registry) {
-            $this->_init('alertanonymous/price');
-            $this->lastId = isset($registry['last_anonymous_id']) ? $registry['last_anonymous_id'] : null;
-        } else {
+
+        if ($registry === null || $registry['parent_construct'] === true) {
             parent::_construct();
+        } else {
+            $this->_init('alertanonymous/price');
         }
     }
 
-    public function setCustomerId(int $value = null)
+    public function setCustomerId(int $value)
     {
-        $value = (null !== $this->lastId) ? $this->lastId : $value;
+        if($value == null) {
+            $value =  Mage::registry('potoky_alertanonymous')['id'];
+        }
 
         return parent::setCustomerId($value);
     }

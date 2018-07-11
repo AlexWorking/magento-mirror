@@ -31,6 +31,10 @@ $table = $installer->getConnection()
         'nullable' => 'false',
         'default' => Varien_Db_Ddl_Table::TIMESTAMP_INIT
     ), 'Created At')
+    ->addColumn('registered_at', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, null, array(
+        'nullable' => 'true',
+        'default' => null
+    ), 'Time when this anonymous customer was registered')
     ->addColumn('registration_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
         'unsigned'  => true,
     ), 'Registration Id for a customer with these website_id and email when such one is registered')

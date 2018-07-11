@@ -36,6 +36,11 @@
                     <observer>Potoky_AlertAnonymous_Model_Observer</observer>
                 </rewrite>
             </productalert>
+            <customer>
+                <rewrite>
+                    <customer>Potoky_AlertAnonymous_Model_Customer</customer>
+                </rewrite>
+            </customer>
         </models>
         <helpers>
             <alertanonymous>

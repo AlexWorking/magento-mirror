@@ -19,12 +19,12 @@
                     </anonymous>
                 </entities>
             </anonymouscustomer_mysql4>
-            <customer>
-                <rewrite>
-                    <customer>Potoky_AnonymousCustomer_Model_Customer</customer>
-                </rewrite>
-            </customer>
         </models>
+        <helpers>
+            <anonymouscustomer>
+                <class>Potoky_AnonymousCustomer_Helper</class>
+            </anonymouscustomer>
+        </helpers>
         <resources>
             <anonymouscustomer_write>
                 <connection>
@@ -46,5 +46,23 @@
                 </connection>
             </anonymouscustomer_setup>
         </resources>
+        <events>
+            <customer_save_after>
+                <observers>
+                    <anonymouscustomer_create>
+                        <class>Potoky_AnonymousCustomer_Model_Observer</class>
+                        <method>moveToRegistered</method>
+                    </anonymouscustomer_create>
+                </observers>
+            </customer_save_after>
+            <customer_delete_after>
+                <observers>
+                    <anonymouscustomer_remove>
+                        <class>Potoky_AnonymousCustomer_Model_Observer</class>
+                        <method>onDeleteCascade</method>
+                    </anonymouscustomer_remove>
+                </observers>
+            </customer_delete_after>
+        </events>
     </global>
 </config>
