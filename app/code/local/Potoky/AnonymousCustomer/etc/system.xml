@@ -19,8 +19,8 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <when>
-                            <label>Delete Anonymous in Case:</label>
-                            <comment>Automatically delete Anonymous Customer in case when chosen above event is fired</comment>
+                            <label>Delete Anonymous if Customer is</label>
+                            <comment>Automatically delete Anonymous Customer when the chosen above event happens to the corresponding regular customer.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>anonymouscustomer/delete</source_model>
                             <sort_order>0</sort_order>

@@ -56,18 +56,18 @@
         <events>
             <customer_save_after>
                 <observers>
-                    <anonymouscustomer_create>
+                    <regularcustomer_create>
                         <class>Potoky_AnonymousCustomer_Model_Observer</class>
-                        <method>regularCustomerRegistered</method>
-                    </anonymouscustomer_create>
+                        <method>regularCustomerCreated</method>
+                    </regularcustomer_create>
                 </observers>
             </customer_save_after>
             <customer_delete_after>
                 <observers>
-                    <anonymouscustomer_remove>
+                    <regularcustomer_delete>
                         <class>Potoky_AnonymousCustomer_Model_Observer</class>
                         <method>regularCustomerDeleted</method>
-                    </anonymouscustomer_remove>
+                    </regularcustomer_delete>
                 </observers>
             </customer_delete_after>
         </events>

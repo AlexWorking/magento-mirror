@@ -43,7 +43,8 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         $anonymousCustomer->setWebsiteId($websiteId)
             ->setEmail($email)
             ->setGroupId(1)
-            ->setStoreId(Mage::app()->getStore()->getId());
+            ->setStoreId(Mage::app()->getStore()->getId())
+            ->_setCheckIfRegistered(false);
         try {
             $anonymousCustomer->save();
         } catch (Exception $e) {

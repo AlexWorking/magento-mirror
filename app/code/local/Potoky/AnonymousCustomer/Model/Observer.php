@@ -2,13 +2,12 @@
 
 class Potoky_AnonymousCustomer_Model_Observer
 {
-    public function regularCustomerRegistered(Varien_Event_Observer $observer)
+    public function regularCustomerCreated(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
         $anonymousCustomer = $this->findCorrespondingAnonymous($customer);
         if($id = $anonymousCustomer->getId()) {
-            if (Mage::getStoreConfig('anonymous/cascade_delete/when') ==
-                'Corresponding regular customer is registered') {
+            if (Mage::getStoreConfig('anonymous/cascade_delete/when') == 2) {
                 $this->doToAnonymous($anonymousCustomer, 'delete');
                 return;
             }
@@ -24,8 +23,7 @@ class Potoky_AnonymousCustomer_Model_Observer
         $customer = $observer->getEvent()->getCustomer();
         $anonymousCustomer = $this->findCorrespondingAnonymous($customer);
         if($id = $anonymousCustomer->getId()) {
-            if (Mage::getStoreConfig('anonymous/cascade_delete/when') ==
-                'Corresponding regular customer is deleted') {
+            if (Mage::getStoreConfig('anonymous/cascade_delete/when') == 1) {
                 $this->doToAnonymous($anonymousCustomer, 'delete');
                 return;
             }
@@ -41,7 +39,7 @@ class Potoky_AnonymousCustomer_Model_Observer
         $email = $customer->getEmail();
         $websiteId = $customer->getWebsiteId();
         $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
-            ->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
+            ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
 
         return $anonymousCustomer;
     }

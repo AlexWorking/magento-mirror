@@ -13,12 +13,17 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
         }
     }
 
-    public function setCustomerId(int $value)
+    /**
+     * @param int|null $value
+     * @return $this
+     */
+    public function setCustomerId(int $value = null)
     {
         if($value == null) {
             $value =  Mage::registry('potoky_alertanonymous')['id'];
         }
 
-        return parent::setCustomerId($value);
+        $this->setData(['customer_id' => $value]);
+        return $this;
     }
 }

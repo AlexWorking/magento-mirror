@@ -8,8 +8,42 @@
 
 class Potoky_AnonymousCustomer_Model_Anonymous extends Mage_Core_Model_Abstract
 {
+    private $_checkIfRegistered = true;
+
     protected function _construct()
     {
         $this->_init('anonymouscustomer/anonymous');
+    }
+
+    public function _setCheckIfRegistered($bool)
+    {
+        $this->checkIfRegistered = $bool;
+    }
+
+    public function _getCheckIfRegistered()
+    {
+        return $this->checkIfRegistered;
+    }
+
+    /**
+     * Processing object before save data
+     *
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function _beforeSave()
+    {
+        $parent = parent::_beforeSave();
+        if ($this->isObjectNew() && $this->_getCheckIfRegistered()) {
+            $customer = Mage::helper('anonymouscustomer/entity')->getCustomerEntityByRequest(
+                'customer/customer',
+                $this->getData('email'),
+                $this->getData('website_id')
+            );
+            if ($customer->getId()) {
+                Mage::throwException('A regular Customer with such email and website already exists');
+            }
+        }
+
+        return $parent;
     }
 }
