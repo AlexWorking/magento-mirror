@@ -17,23 +17,24 @@ class Potoky_AnonymousCustomer_Model_Anonymous extends Mage_Core_Model_Abstract
 
     public function _setCheckIfRegistered($bool)
     {
-        $this->checkIfRegistered = $bool;
+        $this->_checkIfRegistered = $bool;
     }
 
     public function _getCheckIfRegistered()
     {
-        return $this->checkIfRegistered;
+        return $this->_checkIfRegistered;
     }
 
     /**
      * Processing object before save data
      *
      * @return Mage_Core_Model_Abstract
+     * @throws Mage_Core_Exception
      */
     protected function _beforeSave()
     {
         $parent = parent::_beforeSave();
-        if ($this->isObjectNew() && $this->_getCheckIfRegistered()) {
+        if ($this->isObjectNew() && $this->_checkIfRegistered) {
             $customer = Mage::helper('anonymouscustomer/entity')->getCustomerEntityByRequest(
                 'customer/customer',
                 $this->getData('email'),
