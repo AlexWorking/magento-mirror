@@ -7,6 +7,10 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 {
     public function preDispatch()
     {
+        if(!Mage::helper('alertanonymous/allow')->isCurrentAnonymousAlertAllowed()) {
+            parent::preDispatch();
+            return;
+        }
         Mage_Core_Controller_Front_Action::preDispatch();
 
         if (Mage::helper('alertanonymous/login')->isLoggedIn()) {
