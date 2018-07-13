@@ -10,4 +10,14 @@ class Potoky_AlertAnonymous_Model_Customer extends Mage_Customer_Model_Customer
             parent::_construct();
         }
     }
+
+    public function getName()
+    {
+        $name = parent::getName();
+        if($name = ',') {
+            $name = 'Dear Customer';
+        }
+
+        return $name;
+    }
 }
