@@ -2,6 +2,13 @@
 
 class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
 {
+    /**
+     * Prefix of model events names
+     *
+     * @var string
+     */
+    protected $_eventPrefix = 'price_alert';
+
     protected function _construct()
     {
         $registry = (Mage::registry('potoky_alertanonymous')) ? Mage::registry('potoky_alertanonymous') : null;

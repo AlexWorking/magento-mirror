@@ -16,6 +16,20 @@
                 </rewrite>
             </productalert>
         </blocks>
+        <template>
+            <email>
+                <catalog_productalert_email_stock_template_anonymous translate="label" module="productalert">
+                    <label>Product stock alert anonymous</label>
+                    <file>product_stock_alert_anonymous.html</file>
+                    <type>html</type>
+                </catalog_productalert_email_stock_template_anonymous>
+                <catalog_productalert_email_price_template_anonymous translate="label" module="productalert">
+                    <label>Product price alert anonymous</label>
+                    <file>product_price_alert_anonymous.html</file>
+                    <type>html</type>
+                </catalog_productalert_email_price_template_anonymous>
+            </email>
+        </template>
         <models>
             <alertanonymous>
                 <class>Potoky_AlertAnonymous_Model</class>
@@ -36,6 +50,11 @@
                     <observer>Potoky_AlertAnonymous_Model_Observer</observer>
                 </rewrite>
             </productalert>
+            <core>
+                <rewrite>
+                    <email_template>Potoky_AlertAnonymous_Model_Email_Template</email_template>
+                </rewrite>
+            </core>
             <customer>
                 <rewrite>
                     <customer>Potoky_AlertAnonymous_Model_Customer</customer>
@@ -70,6 +89,24 @@
         </resources>
     </global>
     <frontend>
+        <events>
+            <price_alert_save_before>
+                <observers>
+                    <anonymous_alert_duplication_avoid>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>avoidDuplication</method>
+                    </anonymous_alert_duplication_avoid>
+                </observers>
+            </price_alert_save_before>
+            <core_session_abstract_add_message>
+                <observers>
+                    <error_message_change>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>rewriteMessage</method>
+                    </error_message_change>
+                </observers>
+            </core_session_abstract_add_message>
+        </events>
         <routers>
             <productalert>
                 <args>

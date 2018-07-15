@@ -46,7 +46,6 @@
                             <show_in_store>1</show_in_store>
                             <depends>
                                 <allow_price>1</allow_price>
-                                <allow_price_anonymous>1</allow_price_anonymous>
                             </depends>
                         </email_price_template_anonymous>
                         <email_stock_template_anonymous translate="label">
@@ -59,7 +58,6 @@
                             <show_in_store>1</show_in_store>
                             <depends>
                                 <allow_stock>1</allow_stock>
-                                <allow_stock_anonymous>1</allow_stock_anonymous>
                             </depends>
                         </email_stock_template_anonymous>
                     </fields>
