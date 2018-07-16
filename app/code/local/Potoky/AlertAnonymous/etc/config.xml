@@ -13,6 +13,7 @@
             <productalert>
                 <rewrite>
                     <product_view>Potoky_AlertAnonymous_Block_Product_View</product_view>
+                    <email_price>Potoky_AlertAnonymous_Block_Email_Price</email_price>
                 </rewrite>
             </productalert>
         </blocks>

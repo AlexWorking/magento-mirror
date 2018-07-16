@@ -7,27 +7,18 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
 {
     public function preDispatch()
     {
+        if (!$unsubscribeHash = $this->getRequest()->getParam('anonymous')) {
+            parent::preDispatch();
+        }
+
         Mage_Core_Controller_Front_Action::preDispatch();
 
-        if (Mage::helper('alertanonymous/login')->isLoggedIn()) {
-            return;
-        }
+        $unsubscribeHash = explode(' ', $unsubscribeHash);
 
-        $email = $this->getRequest()->getParam('email');
-        $websiteId = Mage::app()->getWebsite()->getId();
+        $email = $unsubscribeHash[0];
+        $websiteId = $unsubscribeHash[1];
         Mage::unregister('potoky_alertanonymous');
 
-        $customer = Mage::helper('anonymouscustomer/entity')
-            ->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
-        if ($id = $customer->getId()) {
-            Mage::register('potoky_alertanonymous',
-                [
-                    'id' => $id,
-                    'parent_construct' => true
-                ]
-            );
-            return;
-        }
         $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
         if ($id = $anonymousCustomer->getId()) {
@@ -37,25 +28,6 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
                     'parent_construct' => false
                 ]
             );
-            return;
         }
-
-        $anonymousCustomer->setWebsiteId($websiteId)
-            ->setEmail($email)
-            ->setGroupId(1)
-            ->setStoreId(Mage::app()->getStore()->getId())
-            ->_setCheckIfRegistered(false);
-        try {
-            $anonymousCustomer->save();
-        } catch (Exception $e) {
-            Zend_Debug::dump($e->getMessage());
-        }
-
-        Mage::register('potoky_alertanonymous',
-            [
-                'id' => $anonymousCustomer->getId(),
-                'parent_construct' => false
-            ]
-        );
     }
 }

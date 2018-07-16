@@ -15,7 +15,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         Mage::unregister('potoky_alertanonymous');
         if ($timesDone < 2) {
             Mage::register('potoky_alertanonymous', [
-                'id' => 'anonymous_email_template',
+                'id' => 'anonymous_email',
                 'parent_construct' => false]
             );
             $timesDone++;
