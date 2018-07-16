@@ -7,13 +7,17 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
 {
     public function preDispatch()
     {
-        if (!$unsubscribeHash = $this->getRequest()->getParam('anonymous')) {
+        $unsubscribeHash = $this->getRequest()->getParam('anonymous');
+        if (!$unsubscribeHash || $unsubscribeHash == 'nohash') {
             parent::preDispatch();
         }
 
         Mage_Core_Controller_Front_Action::preDispatch();
 
-        $unsubscribeHash = explode(' ', $unsubscribeHash);
+        $unsubscribeHash = explode(
+            ' ',
+            Mage::helper('core')->decrypt($unsubscribeHash)
+        );
 
         $email = $unsubscribeHash[0];
         $websiteId = $unsubscribeHash[1];

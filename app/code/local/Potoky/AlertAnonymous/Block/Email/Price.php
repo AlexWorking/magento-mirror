@@ -2,7 +2,7 @@
 
 class Potoky_AlertAnonymous_Block_Email_Price extends Mage_ProductAlert_Block_Email_Price
 {
-    private $unsubscribeHash = '';
+    private $unsubscribeHash = 'nohash';
 
     public function setUnsubscribeHash($hash)
     {

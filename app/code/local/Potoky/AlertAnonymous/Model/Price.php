@@ -36,10 +36,10 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
 
     public function deleteCustomer($customerId = null, $websiteId = 0)
     {
-        if ($customerId) {
+        if (!$customerId) {
             $customerId = Mage::registry('potoky_alertanonymous')['id'];
         }
-        $this->getResource()->deleteCustomer($this, $customerId, $websiteId);
-        return $this;
+
+        return $this->getResource()->deleteCustomer($this, $customerId, $websiteId);
     }
 }

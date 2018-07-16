@@ -59,4 +59,9 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
         return $this;
     }
+
+    public function cascadeDeleteAnonymousAlert(Varien_Event_Observer $observer)
+    {
+        $test = $observer->getEvent()->getObject();
+    }
 }
