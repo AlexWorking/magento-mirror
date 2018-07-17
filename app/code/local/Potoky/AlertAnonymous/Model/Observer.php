@@ -3,7 +3,7 @@
 class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Observer
 {
     const ALERT_SAVE_SUCCESS_MESSAGE = 'The alert subscription has been saved.';
-    const ALERT_SAVE_FAILURE_MESSAGE = 'You are already subscribe for this Price alert.';
+    const ALERT_SAVE_FAILURE_MESSAGE = 'Unable to update the alert subscription.';
 
     private $rewriteMessage;
 

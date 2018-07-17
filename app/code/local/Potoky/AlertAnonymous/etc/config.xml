@@ -108,12 +108,12 @@
                 </observers>
             </core_session_abstract_add_message>
             <price_alert_delete_after>
-                <anonymous_alert_cascade_delete>
-                    <observers>
+                <observers>
+                    <anonymous_alert_cascade_delete>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>cascadeDeleteAnonymousAlert</method>
-                    </observers>
-                </anonymous_alert_cascade_delete>
+                    </anonymous_alert_cascade_delete>
+                </observers>
             </price_alert_delete_after>
         </events>
         <routers>
