@@ -107,14 +107,22 @@
                     </error_message_change>
                 </observers>
             </core_session_abstract_add_message>
-            <price_alert_delete_after>
+            <price_alert_delete_before>
                 <observers>
-                    <anonymous_alert_cascade_delete>
+                    <anonymous_alert_cascade_delete_price>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
-                        <method>cascadeDeleteAnonymousAlert</method>
-                    </anonymous_alert_cascade_delete>
+                        <method>cascadeDelete</method>
+                    </anonymous_alert_cascade_delete_price>
                 </observers>
-            </price_alert_delete_after>
+            </price_alert_delete_before>
+            <priceAll_alert_delete_before>
+                <observers>
+                    <anonymous_alert_cascade_delete_priceAll>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>cascadeDelete</method>
+                    </anonymous_alert_cascade_delete_priceAll>
+                </observers>
+            </priceAll_alert_delete_before>
         </events>
         <routers>
             <productalert>

@@ -26,8 +26,8 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
      */
     public function setCustomerId(int $value = null)
     {
-        if($value == null) {
-            $value =  Mage::registry('potoky_alertanonymous')['id'];
+        if($registryValue = Mage::registry('potoky_alertanonymous')['id']) {
+            $value =  $registryValue;
         }
 
         $this->setData(['customer_id' => $value]);
@@ -36,9 +36,10 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
 
     public function deleteCustomer($customerId = null, $websiteId = 0)
     {
-        if (!$customerId) {
-            $customerId = Mage::registry('potoky_alertanonymous')['id'];
+        if ($registryCustomerId = Mage::registry('potoky_alertanonymous')['id']) {
+            $customerId = $registryCustomerId;
         }
+        Mage::dispatchEvent('priceAll_alert_delete_before');
 
         return $this->getResource()->deleteCustomer($this, $customerId, $websiteId);
     }

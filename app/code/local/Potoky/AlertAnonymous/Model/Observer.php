@@ -60,8 +60,32 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $this;
     }
 
-    public function cascadeDeleteAnonymousAlert(Varien_Event_Observer $observer)
+    public function cascadeDelete(Varien_Event_Observer $observer)
     {
-        $test = $observer->getEvent()->getObject();
+        if (!$controller = Mage::registry('potoky_alertanonymous')['controller']) {
+            return;
+        }
+        Mage::unregister('potoky_alertanonymous');
+        $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
+            ->getCustomerEntityByRequest(
+                'anonymouscustomer/anonymous',
+                $controller->getCustomerIdentifiers()[0],
+                $controller->getCustomerIdentifiers()[1]
+            );
+        if ($id = $anonymousCustomer->getId()) {
+            Mage::register('potoky_alertanonymous',
+                [
+                    'id' => $id,
+                    'parent_construct' => false
+                ]
+            );
+
+            $actionName = explode('_', $observer->getEvent()->getName())[0];
+            try{
+                $controller->$actionName();
+            } catch (Exception $e) {
+                return;
+            }
+        }
     }
 }

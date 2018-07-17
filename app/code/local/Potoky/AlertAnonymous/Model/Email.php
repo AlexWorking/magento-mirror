@@ -13,11 +13,9 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     protected function _getPriceBlock()
     {
         $parent = parent::_getPriceBlock();
-        if (Mage::registry('potoky_alertanonymous')['id'] == 'anonymous_email') {
-            $parent->setUnsubscribeHash(Mage::helper('core')->encrypt(
-                $this->_customer->getEmail() . ' ' . $this->_customer->getWebsiteId()
+        $parent->setUnsubscribeHash(Mage::helper('core')->encrypt(
+            $this->_customer->getEmail() . ' ' . $this->_customer->getWebsiteId()
             ));
-        }
 
         return $parent;
     }
