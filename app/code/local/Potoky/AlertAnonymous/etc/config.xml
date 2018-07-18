@@ -123,6 +123,14 @@
                     </anonymous_alert_cascade_delete_priceAll>
                 </observers>
             </priceall_alert_delete_before>
+            <customer_save_after>
+                <observers>
+                    <alerts_transfer>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>copyAlertsToCoreTables</method>
+                    </alerts_transfer>
+                </observers>
+            </customer_save_after>
         </events>
         <routers>
             <productalert>

@@ -5,8 +5,6 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     const XML_PATH_EMAIL_PRICE_TEMPLATE = 'catalog/productalert/email_price_template_anonymous';
     const XML_PATH_EMAIL_STOCK_TEMPLATE = 'catalog/productalert/email_stock_template_anonymous';
 
-    public static $noDuplicatePriceSend = [];
-
     /**
      * Retrieve price block
      *
@@ -23,19 +21,35 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     }
 
     /**
-     * Add product (price change) to collection
+     * Set customer by id
      *
-     * @param Mage_Catalog_Model_Product $product
+     * @param int $customerId
      * @return Mage_ProductAlert_Model_Email
      */
-    public function addPriceProduct(Mage_Catalog_Model_Product $product)
+    public function setCustomerId($customerId)
     {
-        if(Mage::registry('potoky_alertanonymous')['parent_construct'] !== false) {
-            self::$noDuplicatePriceSend[$this->_customer->getWebsiteId()][$this->_customer->getEmail()][$product->getId()] = true;
-            $this->_priceProducts[$product->getId()] = $product;
+        $customer = Mage::getModel('customer/customer')->load($customerId);
+        if ($customer->getRegistrationId()) {
+            $this->_customer = $customer;
+        } else {
+            $this->_customer = null;
         }
-        elseif (!self::$noDuplicatePriceSend[$this->_customer->getWebsiteId()][$this->_customer->getEmail()][$product->getId()]) {
-            $this->_priceProducts[$product->getId()] = $product;
+
+        return $this;
+    }
+
+    /**
+     * Set customer model
+     *
+     * @param Mage_Customer_Model_Customer $customer
+     * @return Mage_ProductAlert_Model_Email
+     */
+    public function setCustomer(Mage_Customer_Model_Customer $customer)
+    {
+        if ($customer->getRegistrationId()) {
+            $this->_customer = $customer;
+        } else {
+            $this->_customer = null;
         }
 
         return $this;

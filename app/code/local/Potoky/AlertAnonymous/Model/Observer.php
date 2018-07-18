@@ -5,6 +5,8 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     const ALERT_SAVE_SUCCESS_MESSAGE = 'The alert subscription has been saved.';
     const ALERT_SAVE_FAILURE_MESSAGE = 'Unable to update the alert subscription.';
 
+
+    public static $alertTypes = ['price'];
     private $rewriteMessage;
 
     public function process()
@@ -36,6 +38,9 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $this;
     }
 
+    /*
+     * To be REDONE
+     */
     private function extractNecessaryFields($alertType, $alert)
     {
         $alert->loadByParam();
@@ -85,6 +90,49 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                 $controller->$actionName();
             } catch (Exception $e) {
                 return;
+            }
+        }
+    }
+
+    public function copyAlertsToCoreTables(Varien_Event_Observer $observer)
+    {
+        if (Mage::getStoreConfig('customer/cascade_delete/when' == 'created')) {
+            return;
+        }
+        $customer = $observer->getEvent()->getCustomer();
+        $email = $customer->getEmail();
+        $websiteId = $customer->getWebsiteId();
+        $anonymousCustomerId = Mage::helper('anonymouscustomer/entity')
+            ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId)
+            ->getId();
+        Mage::unregister('potoky_alertanonymous');
+        foreach (self::$alertTypes as $alertype) {
+            Mage::register('potoky_alertanonymous',
+                [
+                    'id' => $anonymousCustomerId,
+                    'parent_construct' => false,
+                ]
+            );
+            $collection = Mage::getModel('alertanonymous/' . $alertype)
+                ->getCollection()
+                ->addFieldToFilter('customer_id', $anonymousCustomerId)
+                ->addFieldToFilter('website_id', $websiteId);
+            Mage::unregister('potoky_alertanonymous');
+            foreach ($collection as $alert) {
+                $coreAlert = Mage::getModel('productalert/' . $alertype);
+                $coreAlert->setData([
+                    'customer_id' => $alert->getCustomerId(),
+                    'product_id'  => $alert->getProductId(),
+                    'website_id'  => $alert->getWebsiteId(),
+                    'add_date'    => $alert->getAddDate(),
+                    'send_date'   => $alert->getSendDate(),
+                    'status'      => $alert->getStatus(),
+                ]);
+                try{
+                    $coreAlert->save();
+                } catch(Exception $e) {
+                    Mage::logException($e);
+                }
             }
         }
     }
