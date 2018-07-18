@@ -80,7 +80,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                 ]
             );
 
-            $actionName = explode('_', $observer->getEvent()->getName())[0];
+            $actionName = explode('_', $observer->getEvent()->getName())[0] . 'action';
             try{
                 $controller->$actionName();
             } catch (Exception $e) {

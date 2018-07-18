@@ -39,8 +39,21 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
         if ($registryCustomerId = Mage::registry('potoky_alertanonymous')['id']) {
             $customerId = $registryCustomerId;
         }
-        Mage::dispatchEvent('priceAll_alert_delete_before');
+        Mage::dispatchEvent('priceall_alert_delete_before');
 
         return $this->getResource()->deleteCustomer($this, $customerId, $websiteId);
+    }
+
+    protected function _beforeSave()
+    {
+
+        if (Mage::registry('potoky_alertanonymous')['parent_construct'] === false) {
+            $anonymousCustomer = Mage::getModel('anonymouscustomer/anonymous')->load($this->getCustomerId());
+            $email = $anonymousCustomer->getEmail();
+            if(Potoky_AlertAnonymous_Model_Email::$noDuplicatePriceSend[$this->getWebsiteId()][$email][$this->getProductId()]) {
+                $this->_dataSaveAllowed = false;
+            }
+        }
+        return parent::_beforeSave();
     }
 }
