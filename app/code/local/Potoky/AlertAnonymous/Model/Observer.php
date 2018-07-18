@@ -117,11 +117,11 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                 ->getCollection()
                 ->addFieldToFilter('customer_id', $anonymousCustomerId)
                 ->addFieldToFilter('website_id', $websiteId);
-            Mage::unregister('potoky_alertanonymous');
             foreach ($collection as $alert) {
+                Mage::unregister('potoky_alertanonymous');
                 $coreAlert = Mage::getModel('productalert/' . $alertype);
                 $coreAlert->setData([
-                    'customer_id' => $alert->getCustomerId(),
+                    'customer_id' => $customer->getId(),
                     'product_id'  => $alert->getProductId(),
                     'website_id'  => $alert->getWebsiteId(),
                     'add_date'    => $alert->getAddDate(),
