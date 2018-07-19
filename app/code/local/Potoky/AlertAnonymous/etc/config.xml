@@ -111,18 +111,18 @@
                 <observers>
                     <anonymous_alert_cascade_delete_price>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
-                        <method>cascadeDelete</method>
+                        <method>cascadeDeletePrice</method>
                     </anonymous_alert_cascade_delete_price>
                 </observers>
             </price_alert_delete_before>
-            <priceall_alert_delete_before>
+            <price_all_alert_delete_before>
                 <observers>
                     <anonymous_alert_cascade_delete_priceAll>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
-                        <method>cascadeDelete</method>
+                        <method>cascadeDeletePriceAll</method>
                     </anonymous_alert_cascade_delete_priceAll>
                 </observers>
-            </priceall_alert_delete_before>
+            </price_all_alert_delete_before>
             <customer_save_after>
                 <observers>
                     <alerts_transfer>

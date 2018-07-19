@@ -37,7 +37,7 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
         if ($registryCustomerId = Mage::registry('potoky_alertanonymous')['id']) {
             $customerId = $registryCustomerId;
         }
-        Mage::dispatchEvent('priceall_alert_delete_before');
+        Mage::dispatchEvent('price_all_alert_delete_before');
 
         return $this->getResource()->deleteCustomer($this, $customerId, $websiteId);
     }

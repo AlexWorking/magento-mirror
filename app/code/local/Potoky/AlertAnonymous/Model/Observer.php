@@ -17,7 +17,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         Mage::unregister('potoky_alertanonymous');
         if ($timesDone < 2) {
             Mage::register('potoky_alertanonymous', [
-                'id' => 'anonymous_email',
+                'context' => 'cron',
                 'parent_construct' => false]
             );
             $timesDone++;
@@ -30,7 +30,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     public function avoidDuplication(Varien_Event_Observer $observer)
     {
         $alert = $observer->getEvent()->getObject();
-        $data = $this->extractNecessaryFields('price', clone $alert);
+        $data = $this->extractAlertRelatedData('price', clone $alert);
         if($data['status'] === "0" && $alert->getPrice() == $data['price']) {
             $this->rewriteMessage = Mage::helper('productalert')->__('You are already subscribed for this Price alert.');
         }
@@ -39,11 +39,20 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     }
 
     /*
-     * To be REDONE
+     * To be REDONE (?)
      */
-    private function extractNecessaryFields($alertType, $alert)
+    private function extractAlertRelatedData($alertType, $alert)
     {
-        $alert->loadByParam();
+        $data = [];
+        if (!$alert->getId()) {
+            $alert->loadByParam();
+        }
+        $data['customer_id'] = $alert->getCustomerId();
+        $data['website_id'] = $alert->getWebsiteId();
+        $data['product_id'] = $alert->getProductId();
+        $data['email'] = Mage::getModel('customer/customer')
+            ->load($data['customer_id'])
+            ->getEmail();
         $data['price'] = $alert->getData($alertType);
         $data['status'] = $alert->getData('status');
 
@@ -65,17 +74,41 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $this;
     }
 
-    public function cascadeDelete(Varien_Event_Observer $observer)
+    public function cascadeDeletePrice(Varien_Event_Observer $observer)
     {
-        if (!$controller = Mage::registry('potoky_alertanonymous')['controller']) {
+        if (Mage::registry('potoky_alertanonymous')['parent_construct'] === false) {
             return;
         }
+
+        $alert = $observer->getEvent()->getObject();
+        $this->processDelete(
+            $this->extractAlertRelatedData('price', $alert),
+            'price'
+        );
+    }
+
+    public function cascadeDeletePriceAll(Varien_Event_Observer $observer)
+    {
+        if (Mage::registry('potoky_alertanonymous')['parent_construct'] === false) {
+            return;
+        }
+
+        $data = [];
+        $customerId = Mage::registry('potoky_alertanonymous')['id'];
+        $customer = Mage::getModel('customer/customer')->load($customerId);
+        $data['email'] = $customer->getEmail();
+        $data['website_id'] = $customer->getWebsiteId();
+        $this->processDelete($data, 'priceAll');   
+    }
+
+    private function processDelete($data, $actionName)
+    {
         Mage::unregister('potoky_alertanonymous');
         $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest(
                 'anonymouscustomer/anonymous',
-                $controller->getCustomerIdentifiers()[0],
-                $controller->getCustomerIdentifiers()[1]
+                $data['email'],
+                $data['website_id']
             );
         if ($id = $anonymousCustomer->getId()) {
             Mage::register('potoky_alertanonymous',
@@ -84,14 +117,23 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                     'parent_construct' => false
                 ]
             );
-
-            $actionName = explode('_', $observer->getEvent()->getName())[0] . 'action';
-            try{
-                $controller->$actionName();
-            } catch (Exception $e) {
-                return;
+            $modelName = (strstr($actionName, 'All') !== 'All') ? $actionName : strstr($actionName, 'All', true);
+            if ($modelName === $actionName) {
+                $anonymousAlert = $model  = Mage::getModel('productalert/' . $modelName)
+                    ->setCustomerId($id)
+                    ->setProductId($data['product_id'])
+                    ->setWebsiteId($data['website_id'])
+                    ->loadByParam();
+                $anonymousAlert->delete();
+            } else {
+                Mage::getModel('productalert/' . $modelName)->deleteCustomer(
+                    $id,
+                    $data['website_id']
+                );
             }
         }
+
+        return $this;
     }
 
     public function copyAlertsToCoreTables(Varien_Event_Observer $observer)
@@ -117,16 +159,17 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                 ->getCollection()
                 ->addFieldToFilter('customer_id', $anonymousCustomerId)
                 ->addFieldToFilter('website_id', $websiteId);
-            foreach ($collection as $alert) {
+            foreach ($collection as $anonymousAlert) {
                 Mage::unregister('potoky_alertanonymous');
                 $coreAlert = Mage::getModel('productalert/' . $alertype);
                 $coreAlert->setData([
                     'customer_id' => $customer->getId(),
-                    'product_id'  => $alert->getProductId(),
-                    'website_id'  => $alert->getWebsiteId(),
-                    'add_date'    => $alert->getAddDate(),
-                    'send_date'   => $alert->getSendDate(),
-                    'status'      => $alert->getStatus(),
+                    'product_id'  => $anonymousAlert->getProductId(),
+                    'price'       => $anonymousAlert->getPrice(),
+                    'website_id'  => $anonymousAlert->getWebsiteId(),
+                    'add_date'    => $anonymousAlert->getAddDate(),
+                    'send_date'   => $anonymousAlert->getSendDate(),
+                    'status'      => $anonymousAlert->getStatus(),
                 ]);
                 try{
                     $coreAlert->save();

@@ -29,7 +29,7 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     public function setCustomerId($customerId)
     {
         $customer = Mage::getModel('customer/customer')->load($customerId);
-        if ($customer->getRegistrationId()) {
+        if (!$customer->getRegistrationId()) {
             $this->_customer = $customer;
         } else {
             $this->_customer = null;
@@ -46,7 +46,7 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
      */
     public function setCustomer(Mage_Customer_Model_Customer $customer)
     {
-        if ($customer->getRegistrationId()) {
+        if (!$customer->getRegistrationId()) {
             $this->_customer = $customer;
         } else {
             $this->_customer = null;
