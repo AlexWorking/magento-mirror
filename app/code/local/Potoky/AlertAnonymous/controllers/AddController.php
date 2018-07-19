@@ -19,34 +19,23 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
         $email = $this->getRequest()->getParam('email');
         $websiteId = Mage::app()->getWebsite()->getId();
-        Mage::unregister('potoky_alertanonymous');
 
         $customer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
         if ($id = $customer->getId()) {
-            Mage::register('potoky_alertanonymous',
-                [
-                    'id' => $id,
-                    'parent_construct' => true
-                ]
-            );
+            Mage::helper('alertanonymous/registry')->setRegistry(null, $customer, true);
             return;
         }
         $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
         if ($id = $anonymousCustomer->getId()) {
-            Mage::register('potoky_alertanonymous',
-                [
-                    'id' => $id,
-                    'parent_construct' => false
-                ]
-            );
+            Mage::helper('alertanonymous/registry')->setRegistry(null, $anonymousCustomer, false);
             return;
         }
 
         $anonymousCustomer->setWebsiteId($websiteId)
             ->setEmail($email)
-            ->setGroupId(1)
+            ->setGroupId(0)
             ->setStoreId(Mage::app()->getStore()->getId())
             ->_setCheckIfRegistered(false);
         try {
@@ -55,11 +44,6 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             Zend_Debug::dump($e->getMessage());
         }
 
-        Mage::register('potoky_alertanonymous',
-            [
-                'id' => $anonymousCustomer->getId(),
-                'parent_construct' => false
-            ]
-        );
+        Mage::helper('alertanonymous/registry')->setRegistry(null, $anonymousCustomer, false);
     }
 }

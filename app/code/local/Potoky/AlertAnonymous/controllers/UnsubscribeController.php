@@ -20,21 +20,13 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
             Mage::helper('core')->decrypt($unsubscribeHash)
         );
 
-
         $email = $this->customerIdentifiers[0];
         $websiteId = $this->customerIdentifiers[1];;
-        Mage::unregister('potoky_alertanonymous');
 
         $customer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
         if ($id = $customer->getId()) {
-            Mage::register('potoky_alertanonymous',
-                [
-                    'id' => $id,
-                    'parent_construct' => true,
-                    'controller' => $this
-                ]
-            );
+            Mage::helper('alertanonymous/registry')->setRegistry(null, $customer, true);
             parent::preDispatch();
             return;
         }
@@ -42,12 +34,7 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
         $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
             ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
         if ($id = $anonymousCustomer->getId()) {
-            Mage::register('potoky_alertanonymous',
-                [
-                    'id' => $id,
-                    'parent_construct' => false
-                ]
-            );
+            Mage::helper('alertanonymous/registry')->setRegistry(null, $anonymousCustomer, false);
         }
 
         Mage_Core_Controller_Front_Action::preDispatch();

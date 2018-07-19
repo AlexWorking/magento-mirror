@@ -113,7 +113,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         if ($id = $anonymousCustomer->getId()) {
             Mage::register('potoky_alertanonymous',
                 [
-                    'id' => $id,
+                    'customer_entity' => $anonymousCustomer,
                     'parent_construct' => false
                 ]
             );
@@ -151,7 +151,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         foreach (self::$alertTypes as $alertype) {
             Mage::register('potoky_alertanonymous',
                 [
-                    'id' => $anonymousCustomerId,
+                    'customer_entity' => $anonymousCustomerId,
                     'parent_construct' => false,
                 ]
             );
