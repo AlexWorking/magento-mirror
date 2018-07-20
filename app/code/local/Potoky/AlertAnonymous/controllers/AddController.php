@@ -9,9 +9,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
     public function preDispatch()
     {
-        Mage::helper('alertanonymous')->setupHelpers();
-
-        if(!self::$helpers['allowed']->isCurrentAlertAllowedForAnonymous()) {
+        if(!self::$helpers['allow']->isCurrentAlertAllowedForAnonymous()) {
             parent::preDispatch();
             return;
         }
@@ -48,4 +46,5 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
         self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
     }
+
 }
