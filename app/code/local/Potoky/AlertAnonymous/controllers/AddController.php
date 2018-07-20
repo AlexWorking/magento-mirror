@@ -9,29 +9,29 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
     public function preDispatch()
     {
-        if(!Mage::helper('alertanonymous/allow')->isCurrentAnonymousAlertAllowed()) {
+        Mage::helper('alertanonymous')->setupHelpers();
+
+        if(!self::$helpers['allowed']->isCurrentAlertAllowedForAnonymous()) {
             parent::preDispatch();
             return;
         }
         Mage_Core_Controller_Front_Action::preDispatch();
 
-        if (Mage::helper('alertanonymous/login')->isLoggedIn()) {
+        if (self::$helpers['login']->isLoggedIn()) {
             return;
         }
 
         $email = $this->getRequest()->getParam('email');
         $websiteId = Mage::app()->getWebsite()->getId();
 
-        $customer = Mage::helper('anonymouscustomer/entity')
-            ->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
-        if ($id = $customer->getId()) {
-            Mage::helper('alertanonymous/registry')->setRegistry(null, $customer, true);
+        $customer = self::$helpers['entity']->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
+        if ($customer->getId()) {
+            self::$helpers['registry']->setRegistry(null, $customer, true);
             return;
         }
-        $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
-            ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
-        if ($id = $anonymousCustomer->getId()) {
-            Mage::helper('alertanonymous/registry')->setRegistry(null, $anonymousCustomer, false);
+        $anonymousCustomer = self::$helpers['entity']->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
+        if ($anonymousCustomer->getId()) {
+            self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
             return;
         }
 
@@ -46,6 +46,6 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             Zend_Debug::dump($e->getMessage());
         }
 
-        Mage::helper('alertanonymous/registry')->setRegistry(null, $anonymousCustomer, false);
+        self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
     }
 }

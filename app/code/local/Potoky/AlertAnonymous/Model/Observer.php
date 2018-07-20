@@ -5,7 +5,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     const ALERT_SAVE_SUCCESS_MESSAGE = 'The alert subscription has been saved.';
     const ALERT_SAVE_FAILURE_MESSAGE = 'Unable to update the alert subscription.';
 
-
+    public static $helpers = [];
     public static $alertTypes = ['price'];
     private $rewriteMessage;
 
@@ -14,12 +14,8 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $parent = parent::process();
 
         static $timesDone = 1;
-        Mage::unregister('potoky_alertanonymous');
         if ($timesDone < 2) {
-            Mage::register('potoky_alertanonymous', [
-                'context' => 'cron',
-                'parent_construct' => false]
-            );
+           self::$helpers['registry']->setRegistry('cron', null, false);
             $timesDone++;
             $this->process();
         }
@@ -50,9 +46,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $data['customer_id'] = $alert->getCustomerId();
         $data['website_id'] = $alert->getWebsiteId();
         $data['product_id'] = $alert->getProductId();
-        $data['email'] = Mage::getModel('customer/customer')
-            ->load($data['customer_id'])
-            ->getEmail();
+        $data['email'] = self::$helpers['registry']->getRegistry('customer_entity')->getEmail();
         $data['price'] = $alert->getData($alertType);
         $data['status'] = $alert->getData('status');
 
@@ -76,7 +70,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
     public function cascadeDeletePrice(Varien_Event_Observer $observer)
     {
-        if (Mage::registry('potoky_alertanonymous')['parent_construct'] === false) {
+        if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
             return;
         }
 
@@ -89,12 +83,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
     public function cascadeDeletePriceAll(Varien_Event_Observer $observer)
     {
-        if (Mage::registry('potoky_alertanonymous')['parent_construct'] === false) {
+        if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
             return;
         }
 
         $data = [];
-        $customerId = Mage::registry('potoky_alertanonymous')['id'];
+        $customerId = self::$helpers['registry']->getRegistry('customer_entity')->getId();
         $customer = Mage::getModel('customer/customer')->load($customerId);
         $data['email'] = $customer->getEmail();
         $data['website_id'] = $customer->getWebsiteId();
@@ -103,20 +97,13 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
     private function processDelete($data, $actionName)
     {
-        Mage::unregister('potoky_alertanonymous');
-        $anonymousCustomer = Mage::helper('anonymouscustomer/entity')
-            ->getCustomerEntityByRequest(
+        $anonymousCustomer = self::$helpers['entity']->getCustomerEntityByRequest(
                 'anonymouscustomer/anonymous',
                 $data['email'],
                 $data['website_id']
-            );
+        );
         if ($id = $anonymousCustomer->getId()) {
-            Mage::register('potoky_alertanonymous',
-                [
-                    'customer_entity' => $anonymousCustomer,
-                    'parent_construct' => false
-                ]
-            );
+            self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
             $modelName = (strstr($actionName, 'All') !== 'All') ? $actionName : strstr($actionName, 'All', true);
             if ($modelName === $actionName) {
                 $anonymousAlert = $model  = Mage::getModel('productalert/' . $modelName)
@@ -144,23 +131,16 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $customer = $observer->getEvent()->getCustomer();
         $email = $customer->getEmail();
         $websiteId = $customer->getWebsiteId();
-        $anonymousCustomerId = Mage::helper('anonymouscustomer/entity')
-            ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId)
-            ->getId();
-        Mage::unregister('potoky_alertanonymous');
+        $anonymousCustomer = self::$helpers['entity']
+            ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
         foreach (self::$alertTypes as $alertype) {
-            Mage::register('potoky_alertanonymous',
-                [
-                    'customer_entity' => $anonymousCustomerId,
-                    'parent_construct' => false,
-                ]
-            );
+            self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
             $collection = Mage::getModel('alertanonymous/' . $alertype)
                 ->getCollection()
-                ->addFieldToFilter('customer_id', $anonymousCustomerId)
+                ->addFieldToFilter('customer_id', $anonymousCustomer->getId())
                 ->addFieldToFilter('website_id', $websiteId);
             foreach ($collection as $anonymousAlert) {
-                Mage::unregister('potoky_alertanonymous');
+                self::$helpers['registry']->setRegistry();
                 $coreAlert = Mage::getModel('productalert/' . $alertype);
                 $coreAlert->setData([
                     'customer_id' => $customer->getId(),

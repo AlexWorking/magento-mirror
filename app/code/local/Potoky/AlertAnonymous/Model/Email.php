@@ -5,6 +5,8 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     const XML_PATH_EMAIL_PRICE_TEMPLATE = 'catalog/productalert/email_price_template_anonymous';
     const XML_PATH_EMAIL_STOCK_TEMPLATE = 'catalog/productalert/email_stock_template_anonymous';
 
+    public static $helpers = [];
+
     /**
      * Retrieve price block
      *
@@ -13,7 +15,7 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     protected function _getPriceBlock()
     {
         $parent = parent::_getPriceBlock();
-        $parent->setUnsubscribeHash(Mage::helper('core')->encrypt(
+        $parent->setUnsubscribeHash(self::$helpers['data_1']->encrypt(
             $this->_customer->getEmail() . ' ' . $this->_customer->getWebsiteId()
             ));
 

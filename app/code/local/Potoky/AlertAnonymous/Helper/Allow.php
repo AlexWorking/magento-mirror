@@ -2,7 +2,7 @@
 
 class Potoky_AlertAnonymous_Helper_Allow extends Mage_Core_Helper_Abstract
 {
-    public function isCurrentAnonymousAlertAllowed($templateId = null)
+    public function isCurrentAlertAllowedForAnonymous($templateId = null)
     {
         if($templateId === null) {
             $urlParts = explode('/', Mage::helper('core/url')->getCurrentUrl());

@@ -25,8 +25,8 @@
  */
 ?>
 <?php /* @var $this Mage_ProductAlert_Block_Product_View */
-    if (Mage::helper('alertanonymous/login')->isLoggedIn() ||
-        !Mage::helper('alertanonymous/allow')->isCurrentAnonymousAlertAllowed($this->getTemplateId())): ?>
+    if (self::$helpers['login']->isLoggedIn() ||
+        !self::$helpers['allow']->isCurrentAlertAllowedForAnonymous($this->getTemplateId())): ?>
 <p class="<?php echo $this->getHtmlClass() ?>">
     <?php else: ?>
 <p class="<?php echo $this->getHtmlClass() ?>" id="<?= 'alertanonymous-' . $this->getTemplateId() ?>" onclick="potokyAlertAnonymous.createForm(this.id, '<?= $this->escapeHtml($this->getSignupUrl()); ?>', event)">

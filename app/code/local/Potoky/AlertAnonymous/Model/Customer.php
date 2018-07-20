@@ -2,11 +2,11 @@
 
 class Potoky_AlertAnonymous_Model_Customer extends Mage_Customer_Model_Customer
 {
-    private $parentConstruct;
+    public static $helpers = [];
 
     function _construct()
     {
-        if (Mage::helper('alertanonymous/registry')->getRegistry('parent_construct') === false) {
+        if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
             $this->_init('anonymouscustomer/anonymous');
         } else {
             parent::_construct();
@@ -16,7 +16,7 @@ class Potoky_AlertAnonymous_Model_Customer extends Mage_Customer_Model_Customer
     public function getName()
     {
         $name = parent::getName();
-        if(Mage::registry('potoky_alertanonymous')['parent_construct'] === false) {
+        if(self::$helpers['registry']->getRegistry('parent_construct') === false) {
             $name = 'Dear Customer';
         }
 
