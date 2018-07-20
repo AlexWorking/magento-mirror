@@ -5,6 +5,8 @@ require_once(
     DS.'AddController.php');
 class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddController
 {
+    public static $helpers;
+
     public function preDispatch()
     {
         if(!Mage::helper('alertanonymous/allow')->isCurrentAnonymousAlertAllowed()) {

@@ -6,7 +6,7 @@ class Potoky_AlertAnonymous_Helper_Registry extends Mage_Core_Helper_Abstract
     {
         Mage::unregister('potoky_alertanonymous');
 
-        if (!$context && !$customerEntity && !$parentConstruct) {
+        if ($context !== null && $customerEntity !== null && $parentConstruct !== null) {
             return;
         }
 
@@ -36,10 +36,5 @@ class Potoky_AlertAnonymous_Helper_Registry extends Mage_Core_Helper_Abstract
                     return null;
             }
         }
-    }
-
-    public function checkRegistry($context = null, $customerEntity = null, $parentConstruct = null)
-    {
-        $registry = Mage::registry('potoky_alertanonymous');
     }
 }
