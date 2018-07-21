@@ -9,6 +9,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
     public function preDispatch()
     {
+        Mage::helper('alertanonymous')->setUpHelpers($this);
         if(!self::$helpers['allow']->isCurrentAlertAllowedForAnonymous()) {
             parent::preDispatch();
             return;
@@ -24,12 +25,12 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
         $customer = self::$helpers['entity']->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
         if ($customer->getId()) {
-            self::$helpers['registry']->setRegistry(null, $customer, true);
+            self::$helpers['registry']->setRegistry('add', $customer, true);
             return;
         }
         $anonymousCustomer = self::$helpers['entity']->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
         if ($anonymousCustomer->getId()) {
-            self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
+            self::$helpers['registry']->setRegistry('add', $anonymousCustomer, false);
             return;
         }
 
@@ -44,7 +45,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             Zend_Debug::dump($e->getMessage());
         }
 
-        self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
+        self::$helpers['registry']->setRegistry('add', $anonymousCustomer, false);
     }
 
 }

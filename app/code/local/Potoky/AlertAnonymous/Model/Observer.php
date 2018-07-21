@@ -9,6 +9,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     public static $alertTypes = ['price'];
     private $rewriteMessage;
 
+    public function __construct(){
+        if (empty(self::$helpers)) {
+            Mage::helper('alertanonymous')->setUpHelpers($this);
+        }
+    }
+
     public function process()
     {
         $parent = parent::process();
@@ -25,10 +31,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
     public function avoidDuplication(Varien_Event_Observer $observer)
     {
-        $alert = $observer->getEvent()->getObject();
-        $data = $this->extractAlertRelatedData('price', clone $alert);
-        if($data['status'] === "0" && $alert->getPrice() == $data['price']) {
-            $this->rewriteMessage = Mage::helper('productalert')->__('You are already subscribed for this Price alert.');
+        if (self::$helpers['registry'] == 'add') {
+            $alert = $observer->getEvent()->getObject();
+            $data = $this->extractAlertRelatedData('price', clone $alert);
+            if($data['status'] === "0" && $alert->getPrice() == $data['price']) {
+                $this->rewriteMessage = Mage::helper('productalert')->__('You are already subscribed for this Price alert.');
+            }
         }
 
         return $this;
@@ -125,9 +133,6 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
     public function copyAlertsToCoreTables(Varien_Event_Observer $observer)
     {
-        if (Mage::getStoreConfig('customer/cascade_delete/when' == 'created')) {
-            return;
-        }
         $customer = $observer->getEvent()->getCustomer();
         $email = $customer->getEmail();
         $websiteId = $customer->getWebsiteId();
