@@ -7,14 +7,6 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
 
     public static $helpers = [];
 
-    public function _construct()
-    {
-        parent::_construct();
-        if (empty(self::$helpers)) {
-            Mage::helper('alertanonymous')->setUpHelpers($this);
-        }
-    }
-
     /**
      * Retrieve price block
      *

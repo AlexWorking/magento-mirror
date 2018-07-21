@@ -2,51 +2,48 @@
 
 class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    public static $helpers = [];
-
-    private $classHelperMapping = [
-        'Potoky_AlertAnonymous_AddController'         => [
-            'allow'    => 'alertanonymous/allow',
-            'login'    => 'alertanonymous/login',
-            'entity'   => 'anonymouscustomer/entity',
-            'registry' => 'alertanonymous/registry'
-        ],
-        'Potoky_AlertAnonymous_UnsubscribeController' => [
-            'data_1'   => 'core',
-            'entity'   => 'anonymouscustomer/entity',
-            'registry' => 'alertanonymous/registry'
-        ],
-        'Potoky_AlertAnonymous_Model_Email_Template'  => [
-            'registry' => 'alertanonymous/registry'
-        ],
-        'Potoky_AlertAnonymous_Model_Customer'        => [
-            'registry' => 'alertanonymous/registry'
-        ],
-        'Potoky_AlertAnonymous_Model_Email'           => [
-            'data_1'   => 'core'
-        ],
-        'Potoky_AlertAnonymous_Model_Observer'        => [
-            'registry' => 'alertanonymous/registry',
-            'entity'   => 'anonymouscustomer/entity'
-        ],
-        'Potoky_AlertAnonymous_Model_Price'           => [
-            'registry' => 'alertanonymous/registry'
-        ],
-        'Potoky_AlertAnonymous_Block_Product_View'    => [
-            'allow'    => 'alertanonymous/allow',
-            'login'    => 'alertanonymous/login'
-        ]
+    public static $helpers = [
+        'data'     => 'alertanonymous',
+        'allow'    => 'alertanonymous/allow',
+        'login'    => 'alertanonymous/login',
+        'registry' => 'alertanonymous/registry',
+        'data_1'   => 'core',
+        'data_2'   => 'anonymouscustomer',
+        'entity'   => 'anonymouscustomer/entity',
+    ];
+    private $controllerMapping = [
+        'Potoky_AlertAnonymous_AddController'         => ['allow', 'login', 'entity', 'registry'],
+        'Potoky_AlertAnonymous_UnsubscribeController' => ['data_1', 'entity', 'registry']
     ];
 
+    private $modelAndBlockMapping = [
+        'Potoky_AlertAnonymous_Model_Email_Template'  => ['registry'],
+        'Potoky_AlertAnonymous_Model_Customer'        => ['registry'],
+        'Potoky_AlertAnonymous_Model_Email'           => ['data_1'],
+        'Potoky_AlertAnonymous_Model_Observer'        => ['registry', 'entity'],
+        'Potoky_AlertAnonymous_Model_Price'           => ['registry'],
+        'Potoky_AlertAnonymous_Block_Product_View'    => ['allow', 'login']
+    ];
 
-    public function setUpHelpers($classInstance)
+    public function initHelpers(){
+        foreach (self::$helpers as $name => $uri)
+        {
+            $class = Mage::helper($uri);
+        }
+    }
+
+    public function setUpHelpers($controller = null)
     {
-        $className = get_class($classInstance);
-        foreach ($this->classHelperMapping[$className] as $helperName => $rout) {
-            if(!isset(self::$helpers[$helperName])) {
-                self::$helpers[$helperName] = Mage::helper($rout);
+        if ($controller) {
+            foreach ($this->controllerMapping[$controller] as $helperName) {
+                $controller::$helpers[$helperName] = & self::$helpers[$helperName];
             }
-            $classInstance::$helpers[$helperName] = & self::$helpers[$helperName];
+        }
+
+        foreach ($this->modelAndBlockMapping as $className) {
+            foreach ($className as $helperName) {
+                $className::$helpers[$helperName] = & self::$helpers[$helperName];
+            }
         }
     }
 }
