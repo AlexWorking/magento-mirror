@@ -25,8 +25,8 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
      */
     public function setCustomerId(int $value = null)
     {
-        if($registryValue = self::$helpers['registry']->getRegistry('customer_entity')->getId()) {
-            $value =  $registryValue;
+        if($registryValue = self::$helpers['registry']->getRegistry('customer_entity')) {
+            $value =  $registryValue->getId();
         }
 
         $this->setData(['customer_id' => $value]);
@@ -35,21 +35,15 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
 
     public function deleteCustomer($customerId = null, $websiteId = 0)
     {
-        if ($registryCustomerId = self::$helpers['registry']->getRegistry('customer_entity')->getId()) {
-            $customerId = $registryCustomerId;
+        if ($registryCustomerId = self::$helpers['registry']->getRegistry('customer_entity')) {
+            $customerId = $registryCustomerId->getId();
         }
         Mage::dispatchEvent('price_all_alert_delete_before');
 
         return $this->getResource()->deleteCustomer($this, $customerId, $websiteId);
     }
 
-    protected function _beforeSave()
-    {
-        $anonymousCustomer = Mage::getModel('anonymouscustomer/anonymous')->load($this->getCusomerId());
-        if($anonymousCustomer && $anonymousCustomer->getRegistrationId()) {
-            $this->_dataSaveAllowed = false;
-        }
-
-        return parent::_beforeSave();
+    public function _setDataSaveAllowed($bool){
+        $this->_dataSaveAllowed = $bool;
     }
 }

@@ -18,25 +18,25 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     public function process()
     {
         $parent = parent::process();
-
-        static $timesDone = 1;
-        if ($timesDone < 2) {
-           self::$helpers['registry']->setRegistry('cron', null, false);
-            $timesDone++;
-            $this->process();
-        }
+        self::$helpers['registry']->setRegistry('cron', null, false);
+        parent::process();
 
         return $parent;
     }
 
     public function avoidDuplication(Varien_Event_Observer $observer)
     {
-        if (self::$helpers['registry'] == 'add') {
-            $alert = $observer->getEvent()->getObject();
+        $alert = $observer->getEvent()->getObject();
+        if (self::$helpers['registry']->getRegistry('context') == 'add') {
             $data = $this->extractAlertRelatedData('price', clone $alert);
             if($data['status'] === "0" && $alert->getPrice() == $data['price']) {
-                $this->rewriteMessage = Mage::helper('productalert')->__('You are already subscribed for this Price alert.');
+                $this->rewriteMessage = self::$helpers['data']->__('You are already subscribed for this Price alert.');
             }
+        }
+
+        $anonymousCustomer = Mage::getModel('anonymouscustomer/anonymous')->load($alert->getCustomerId());
+        if($anonymousCustomer && $anonymousCustomer->getRegistrationId()) {
+            $alert->_setDataSaveAllowed(false);
         }
 
         return $this;
@@ -67,8 +67,8 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
             $messages = Mage::getSingleton('catalog/session')->getMessages();
             $lastAddedMessage =$messages->getLastAddedMessage();
             $code = $lastAddedMessage->getCode();
-            if($code == self::ALERT_SAVE_SUCCESS_MESSAGE ||
-                $code == self::ALERT_SAVE_FAILURE_MESSAGE) {
+            if($code == self::$helpers['data_2']->__(self::ALERT_SAVE_SUCCESS_MESSAGE) ||
+                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_FAILURE_MESSAGE)) {
                 $lastAddedMessage->setCode($this->rewriteMessage);
             }
         }
@@ -138,6 +138,9 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $websiteId = $customer->getWebsiteId();
         $anonymousCustomer = self::$helpers['entity']
             ->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
+        if(!$anonymousCustomer->getId()) {
+            return $this;
+        }
         foreach (self::$alertTypes as $alertype) {
             self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
             $collection = Mage::getModel('alertanonymous/' . $alertype)

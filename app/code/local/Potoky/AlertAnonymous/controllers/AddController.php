@@ -17,11 +17,20 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         Mage_Core_Controller_Front_Action::preDispatch();
 
         if (self::$helpers['login']->isLoggedIn()) {
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
+            self::$helpers['registry']->setRegistry('add', $customer, true);
             return;
         }
 
         $email = $this->getRequest()->getParam('email');
         $websiteId = Mage::app()->getWebsite()->getId();
+        if(!$email || !$websiteId) {
+            Mage::getSingleton('customer/session')
+                ->addError(self::$helpers['data']->
+                __('Please reload the page and try again'));
+
+            return;
+        }
 
         $customer = self::$helpers['entity']->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
         if ($customer->getId()) {

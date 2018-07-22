@@ -6,7 +6,7 @@ class Potoky_AlertAnonymous_Helper_Registry extends Mage_Core_Helper_Abstract
     {
         Mage::unregister('potoky_alertanonymous');
 
-        if ($context !== null && $customerEntity !== null && $parentConstruct !== null) {
+        if ($context === null && $customerEntity === null && $parentConstruct === null) {
             return;
         }
 

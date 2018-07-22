@@ -88,9 +88,15 @@
                 </connection>
             </alertanonymous_setup>
         </resources>
-    </global>
-    <frontend>
         <events>
+            <customer_save_after>
+                <observers>
+                    <alerts_transfer>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>copyAlertsToCoreTables</method>
+                    </alerts_transfer>
+                </observers>
+            </customer_save_after>
             <price_alert_save_before>
                 <observers>
                     <anonymous_alert_duplication_avoid>
@@ -99,6 +105,10 @@
                     </anonymous_alert_duplication_avoid>
                 </observers>
             </price_alert_save_before>
+        </events>
+    </global>
+    <frontend>
+        <events>
             <core_session_abstract_add_message>
                 <observers>
                     <error_message_change>
@@ -123,14 +133,6 @@
                     </anonymous_alert_cascade_delete_priceAll>
                 </observers>
             </price_all_alert_delete_before>
-            <customer_save_after>
-                <observers>
-                    <alerts_transfer>
-                        <class>Potoky_AlertAnonymous_Model_Observer</class>
-                        <method>copyAlertsToCoreTables</method>
-                    </alerts_transfer>
-                </observers>
-            </customer_save_after>
         </events>
         <routers>
             <productalert>
