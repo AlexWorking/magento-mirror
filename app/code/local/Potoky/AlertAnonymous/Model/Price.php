@@ -12,6 +12,10 @@ class Potoky_AlertAnonymous_Model_Price extends Mage_ProductAlert_Model_Price
 
     protected function _construct()
     {
+        if (empty(self::$helpers)) {
+            Mage::helper('alertanonymous')->setUpHelpers($this);
+        }
+
         if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
             $this->_init('alertanonymous/price');
         } else {

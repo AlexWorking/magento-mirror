@@ -48,6 +48,7 @@
                 <rewrite>
                     <email>Potoky_AlertAnonymous_Model_Email</email>
                     <price>Potoky_AlertAnonymous_Model_Price</price>
+                    <stock>Potoky_AlertAnonymous_Model_Stock</stock>
                     <observer>Potoky_AlertAnonymous_Model_Observer</observer>
                 </rewrite>
             </productalert>

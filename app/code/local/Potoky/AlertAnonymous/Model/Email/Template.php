@@ -4,6 +4,13 @@ class Potoky_AlertAnonymous_Model_Email_Template extends Mage_Core_Model_Email_T
 {
     public static $helpers;
 
+    protected function _construct(){
+        parent::_construct();
+        if (empty(self::$helpers)) {
+            Mage::helper('alertanonymous')->setUpHelpers($this);
+        }
+    }
+
     public function sendTransactional($templateId, $sender, $email, $name, $vars=array(), $storeId=null) {
         if (self::$helpers['registry']->getRegistry('context') === 'cron') {
             if ($templateId == Mage::getStoreConfig(Mage_ProductAlert_Model_Email::XML_PATH_EMAIL_PRICE_TEMPLATE, $storeId)) {

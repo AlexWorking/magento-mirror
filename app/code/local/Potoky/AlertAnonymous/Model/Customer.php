@@ -6,6 +6,10 @@ class Potoky_AlertAnonymous_Model_Customer extends Mage_Customer_Model_Customer
 
     function _construct()
     {
+        if (empty(self::$helpers)) {
+            Mage::helper('alertanonymous')->setUpHelpers($this);
+        }
+
         if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
             $this->_init('anonymouscustomer/anonymous');
         } else {

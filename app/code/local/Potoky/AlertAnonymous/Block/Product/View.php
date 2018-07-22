@@ -11,6 +11,13 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
      */
     private $templateId = null;
 
+    protected function _construct(){
+        parent::_construct();
+        if (empty(self::$helpers)) {
+            Mage::helper('alertanonymous')->setUpHelpers($this);
+        }
+    }
+
     /**
      * Sets Id to the self template
      *
