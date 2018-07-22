@@ -103,6 +103,33 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $this->processDelete($data, 'priceAll');   
     }
 
+    public function cascadeDeleteStock(Varien_Event_Observer $observer)
+    {
+        if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
+            return;
+        }
+
+        $alert = $observer->getEvent()->getObject();
+        $this->processDelete(
+            $this->extractAlertRelatedData('stock', $alert),
+            'stock'
+        );
+    }
+
+    public function cascadeDeleteStockAll(Varien_Event_Observer $observer)
+    {
+        if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
+            return;
+        }
+
+        $data = [];
+        $customerId = self::$helpers['registry']->getRegistry('customer_entity')->getId();
+        $customer = Mage::getModel('customer/customer')->load($customerId);
+        $data['email'] = $customer->getEmail();
+        $data['website_id'] = $customer->getWebsiteId();
+        $this->processDelete($data, 'stockAll');
+    }
+
     private function processDelete($data, $actionName)
     {
         $anonymousCustomer = self::$helpers['entity']->getCustomerEntityByRequest(
@@ -153,12 +180,16 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                 $coreAlert->setData([
                     'customer_id' => $customer->getId(),
                     'product_id'  => $anonymousAlert->getProductId(),
-                    'price'       => $anonymousAlert->getPrice(),
                     'website_id'  => $anonymousAlert->getWebsiteId(),
                     'add_date'    => $anonymousAlert->getAddDate(),
                     'send_date'   => $anonymousAlert->getSendDate(),
                     'status'      => $anonymousAlert->getStatus(),
                 ]);
+                if ($alertype === 'price') {
+                    $coreAlert->setData([
+                        'price' => $anonymousAlert->getPrice()
+                    ]);
+                }
                 try{
                     $coreAlert->save();
                 } catch(Exception $e) {
@@ -166,5 +197,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                 }
             }
         }
+
+        return $this;
     }
 }

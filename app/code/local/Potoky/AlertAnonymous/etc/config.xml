@@ -14,21 +14,22 @@
                 <rewrite>
                     <product_view>Potoky_AlertAnonymous_Block_Product_View</product_view>
                     <email_price>Potoky_AlertAnonymous_Block_Email_Price</email_price>
+                    <email_stock>Potoky_AlertAnonymous_Block_Email_Stock</email_stock>
                 </rewrite>
             </productalert>
         </blocks>
         <template>
             <email>
-                <catalog_productalert_email_stock_template_anonymous translate="label" module="productalert">
-                    <label>Product stock alert anonymous</label>
-                    <file>product_stock_alert_anonymous.html</file>
-                    <type>html</type>
-                </catalog_productalert_email_stock_template_anonymous>
                 <catalog_productalert_email_price_template_anonymous translate="label" module="productalert">
                     <label>Product price alert anonymous</label>
                     <file>product_price_alert_anonymous.html</file>
                     <type>html</type>
                 </catalog_productalert_email_price_template_anonymous>
+                <catalog_productalert_email_stock_template_anonymous translate="label" module="productalert">
+                    <label>Product stock alert anonymous</label>
+                    <file>product_stock_alert_anonymous.html</file>
+                    <type>html</type>
+                </catalog_productalert_email_stock_template_anonymous>
             </email>
         </template>
         <models>
@@ -42,6 +43,9 @@
                     <price>
                         <table>anonymous_alerts_price</table>
                     </price>
+                    <stock>
+                        <table>anonymous_alerts_stock</table>
+                    </stock>
                 </entities>
             </alertanonymous_mysql4>
             <productalert>
@@ -106,6 +110,14 @@
                     </anonymous_alert_duplication_avoid>
                 </observers>
             </price_alert_save_before>
+            <stock_alert_save_before>
+                <observers>
+                    <anonymous_alert_duplication_avoid>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>avoidDuplication</method>
+                    </anonymous_alert_duplication_avoid>
+                </observers>
+            </stock_alert_save_before>
         </events>
     </global>
     <frontend>
@@ -134,6 +146,22 @@
                     </anonymous_alert_cascade_delete_priceAll>
                 </observers>
             </price_all_alert_delete_before>
+            <stock_alert_delete_before>
+                <observers>
+                    <anonymous_alert_cascade_delete_stock>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>cascadeDeleteStock</method>
+                    </anonymous_alert_cascade_delete_stock>
+                </observers>
+            </stock_alert_delete_before>
+            <stock_all_alert_delete_before>
+                <observers>
+                    <anonymous_alert_cascade_delete_stockAll>
+                        <class>Potoky_AlertAnonymous_Model_Observer</class>
+                        <method>cascadeDeleteStockAll</method>
+                    </anonymous_alert_cascade_delete_stockAll>
+                </observers>
+            </stock_all_alert_delete_before>
         </events>
         <routers>
             <productalert>
