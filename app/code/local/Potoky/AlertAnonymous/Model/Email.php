@@ -30,6 +30,21 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     }
 
     /**
+     * Retrieve stock block
+     *
+     * @return Mage_ProductAlert_Block_Email_Stock
+     */
+    protected function _getStockBlock()
+    {
+        $parent = parent::_getStockBlock();
+        $parent->setUnsubscribeHash(self::$helpers['data_1']->encrypt(
+            $this->_customer->getEmail() . ' ' . $this->_customer->getWebsiteId()
+        ));
+
+        return $parent;
+    }
+
+    /**
      * Set customer by id
      *
      * @param int $customerId

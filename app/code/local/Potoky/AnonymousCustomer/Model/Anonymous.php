@@ -8,6 +8,12 @@
 
 class Potoky_AnonymousCustomer_Model_Anonymous extends Mage_Core_Model_Abstract
 {
+    /**
+     * When set to true it will not allow to create an anonymous customer if
+     * the appropriate regular customer (with the same email and website) id allready exists
+     *
+     * @var bool
+     */
     private $_checkIfRegistered = true;
 
     protected function _construct()

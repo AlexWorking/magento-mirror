@@ -2,6 +2,12 @@
 
 class Potoky_AnonymousCustomer_Model_Delete extends Mage_Core_Model_Abstract
 {
+    /**
+     * Retrieve event options when the anonymous customer shouold be deleted
+     * in case these events happen to the appropriate regular customer
+     *
+     * @return array
+     */
     public function toOptionArray()
     {
         return array(
