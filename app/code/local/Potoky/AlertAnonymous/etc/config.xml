@@ -97,6 +97,7 @@
             <customer_save_after>
                 <observers>
                     <alerts_transfer>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>copyAlertsToCoreTables</method>
                     </alerts_transfer>
@@ -105,6 +106,7 @@
             <price_alert_save_before>
                 <observers>
                     <anonymous_alert_duplication_avoid>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>avoidDuplication</method>
                     </anonymous_alert_duplication_avoid>
@@ -113,6 +115,7 @@
             <stock_alert_save_before>
                 <observers>
                     <anonymous_alert_duplication_avoid>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>avoidDuplication</method>
                     </anonymous_alert_duplication_avoid>
@@ -125,6 +128,7 @@
             <core_session_abstract_add_message>
                 <observers>
                     <error_message_change>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>rewriteMessage</method>
                     </error_message_change>
@@ -133,6 +137,7 @@
             <price_alert_delete_before>
                 <observers>
                     <anonymous_alert_cascade_delete_price>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>cascadeDeletePrice</method>
                     </anonymous_alert_cascade_delete_price>
@@ -141,6 +146,7 @@
             <price_all_alert_delete_before>
                 <observers>
                     <anonymous_alert_cascade_delete_priceAll>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>cascadeDeletePriceAll</method>
                     </anonymous_alert_cascade_delete_priceAll>
@@ -149,6 +155,7 @@
             <stock_alert_delete_before>
                 <observers>
                     <anonymous_alert_cascade_delete_stock>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>cascadeDeleteStock</method>
                     </anonymous_alert_cascade_delete_stock>
@@ -157,6 +164,7 @@
             <stock_all_alert_delete_before>
                 <observers>
                     <anonymous_alert_cascade_delete_stockAll>
+                        <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
                         <method>cascadeDeleteStockAll</method>
                     </anonymous_alert_cascade_delete_stockAll>

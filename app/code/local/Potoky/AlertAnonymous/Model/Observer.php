@@ -2,11 +2,14 @@
 
 class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Observer
 {
-    const ALERT_SAVE_SUCCESS_MESSAGE = 'The alert subscription has been saved.';
-    const ALERT_SAVE_FAILURE_MESSAGE = 'Unable to update the alert subscription.';
+    const ALERT_SAVE_SUCCESS_MESSAGE_PRICE = 'The alert subscription has been saved.';
+    const ALERT_SAVE_FAILURE_MESSAGE_PRICE = 'Unable to update the alert subscription.';
+    const ALERT_SAVE_SUCCESS_MESSAGE_STOCK = 'Alert subscription has been saved.';
+    const ALERT_SAVE_FAILURE_MESSAGE_STOCK = 'Unable to update the alert subscription.';
 
     public static $helpers = [];
-    public static $alertTypes = ['price'];
+
+    private $alertTypes = ['price', 'stock'];
     private $rewriteMessage;
 
     public function __construct(){
@@ -28,9 +31,14 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     {
         $alert = $observer->getEvent()->getObject();
         if (self::$helpers['registry']->getRegistry('context') == 'add') {
-            $data = $this->extractAlertRelatedData('price', clone $alert);
-            if($data['status'] === "0" && $alert->getPrice() == $data['price']) {
-                $this->rewriteMessage = self::$helpers['data']->__('You are already subscribed for this Price alert.');
+            $data = $this->extractAlertRelatedData(clone $alert);
+            if($data['status'] === "0") {
+                if($data['alert_instance'] == 'stock') {
+                    $this->rewriteMessage = self::$helpers['data']->__('You are already subscribed for this Stock alert.');
+                }
+                elseif ($alert->getPrice() == $data['price']) {
+                    $this->rewriteMessage = self::$helpers['data']->__('You are already subscribed for this Price alert.');
+                }
             }
         }
 
@@ -45,17 +53,24 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     /*
      * To be REDONE (?)
      */
-    private function extractAlertRelatedData($alertType, $alert)
+    private function extractAlertRelatedData($alert)
     {
         $data = [];
+
         if (!$alert->getId()) {
             $alert->loadByParam();
+        }
+
+        if ($alert instanceof Mage_ProductAlert_Model_Price) {
+            $data['price'] = $alert->getData('price');
+            $data['alert_instance'] = 'price';
+        } elseif ($alert instanceof Mage_ProductAlert_Model_Stock) {
+            $data['alert_instance'] = 'stock';
         }
         $data['customer_id'] = $alert->getCustomerId();
         $data['website_id'] = $alert->getWebsiteId();
         $data['product_id'] = $alert->getProductId();
         $data['email'] = self::$helpers['registry']->getRegistry('customer_entity')->getEmail();
-        $data['price'] = $alert->getData($alertType);
         $data['status'] = $alert->getData('status');
 
         return $data;
@@ -67,8 +82,10 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
             $messages = Mage::getSingleton('catalog/session')->getMessages();
             $lastAddedMessage =$messages->getLastAddedMessage();
             $code = $lastAddedMessage->getCode();
-            if($code == self::$helpers['data_2']->__(self::ALERT_SAVE_SUCCESS_MESSAGE) ||
-                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_FAILURE_MESSAGE)) {
+            if($code == self::$helpers['data_2']->__(self::ALERT_SAVE_SUCCESS_MESSAGE_PRICE) ||
+                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_FAILURE_MESSAGE_PRICE) ||
+                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_SUCCESS_MESSAGE_STOCK) ||
+                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_FAILURE_MESSAGE_STOCK)) {
                 $lastAddedMessage->setCode($this->rewriteMessage);
             }
         }
@@ -84,7 +101,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
         $alert = $observer->getEvent()->getObject();
         $this->processDelete(
-            $this->extractAlertRelatedData('price', $alert),
+            $this->extractAlertRelatedData($alert),
             'price'
         );
     }
@@ -111,7 +128,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
 
         $alert = $observer->getEvent()->getObject();
         $this->processDelete(
-            $this->extractAlertRelatedData('stock', $alert),
+            $this->extractAlertRelatedData($alert),
             'stock'
         );
     }
@@ -168,7 +185,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         if(!$anonymousCustomer->getId()) {
             return $this;
         }
-        foreach (self::$alertTypes as $alertype) {
+        foreach ($this->alertTypes as $alertype) {
             self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
             $collection = Mage::getModel('alertanonymous/' . $alertype)
                 ->getCollection()
@@ -186,9 +203,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                     'status'      => $anonymousAlert->getStatus(),
                 ]);
                 if ($alertype === 'price') {
-                    $coreAlert->setData([
-                        'price' => $anonymousAlert->getPrice()
-                    ]);
+                    $coreAlert->setData('price', $anonymousAlert->getPrice());
                 }
                 try{
                     $coreAlert->save();

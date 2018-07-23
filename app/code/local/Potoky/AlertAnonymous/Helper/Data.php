@@ -35,6 +35,9 @@ class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
         'Potoky_AlertAnonymous_Model_Price'           => [
             'registry' => 'alertanonymous/registry'
         ],
+        'Potoky_AlertAnonymous_Model_Stock'           => [
+            'registry' => 'alertanonymous/registry'
+        ],
         'Potoky_AlertAnonymous_Block_Product_View'    => [
             'allow'    => 'alertanonymous/allow',
             'login'    => 'alertanonymous/login'
