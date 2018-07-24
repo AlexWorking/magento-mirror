@@ -17,6 +17,12 @@ class Potoky_AlertAnonymous_Model_Customer extends Mage_Customer_Model_Customer
         }
     }
 
+    /**
+     * Swap the name of the customer ftom '' to Dear Customer
+     * if it is an anonymous customer.
+     *
+     * @return string
+     */
     public function getName()
     {
         $name = parent::getName();

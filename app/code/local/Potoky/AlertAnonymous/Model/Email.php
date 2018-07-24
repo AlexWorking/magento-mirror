@@ -15,7 +15,7 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     }
 
     /**
-     * Retrieve price block
+     * Retrieve price block adding to hashed unsubscribe info
      *
      * @return Mage_ProductAlert_Block_Email_Price
      */
@@ -30,7 +30,7 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     }
 
     /**
-     * Retrieve stock block
+     * Retrieve price block adding to hashed unsubscribe info
      *
      * @return Mage_ProductAlert_Block_Email_Stock
      */
@@ -45,7 +45,8 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     }
 
     /**
-     * Set customer by id
+     * Set customer by id. Set it to null if its an anonymous customer
+     * that has a corresponding regular customer
      *
      * @param int $customerId
      * @return Mage_ProductAlert_Model_Email
@@ -63,7 +64,8 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     }
 
     /**
-     * Set customer model
+     * Set customer model. Set it to null if its an anonymous customer
+     * that has a corresponding regular customer
      *
      * @param Mage_Customer_Model_Customer $customer
      * @return Mage_ProductAlert_Model_Email

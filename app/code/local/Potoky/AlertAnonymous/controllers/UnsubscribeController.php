@@ -7,24 +7,17 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
 {
     public static $helpers;
 
-    private $customerIdentifiers;
-
-    public function getCustomerIdentifiers()
-    {
-        return $this->customerIdentifiers;
-    }
-
     public function preDispatch()
     {
         Mage::helper('alertanonymous')->setUpHelpers($this);
         $unsubscribeHash = $this->getRequest()->getParam('anonymous');
-        $this->customerIdentifiers = explode(
+        $customerIdentifiers = explode(
             ' ',
             self::$helpers['data_1']->decrypt($unsubscribeHash)
         );
 
-        $email = $this->customerIdentifiers[0];
-        $websiteId = $this->customerIdentifiers[1];;
+        $email = $customerIdentifiers[0];
+        $websiteId = $customerIdentifiers[1];;
 
         $customer = self::$helpers['entity']->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
         if ($customer->getId()) {

@@ -108,7 +108,7 @@
                     <anonymous_alert_duplication_avoid>
                         <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
-                        <method>avoidDuplication</method>
+                        <method>avoidUnneededActions</method>
                     </anonymous_alert_duplication_avoid>
                 </observers>
             </price_alert_save_before>
@@ -117,7 +117,7 @@
                     <anonymous_alert_duplication_avoid>
                         <type>singleton</type>
                         <class>Potoky_AlertAnonymous_Model_Observer</class>
-                        <method>avoidDuplication</method>
+                        <method>avoidUnneededActions</method>
                     </anonymous_alert_duplication_avoid>
                 </observers>
             </stock_alert_save_before>

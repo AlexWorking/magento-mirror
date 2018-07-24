@@ -10,6 +10,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
     public static $helpers = [];
 
     private $alertTypes = ['price', 'stock'];
+
     private $rewriteMessage;
 
     public function __construct(){
@@ -18,6 +19,11 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         }
     }
 
+    /**
+     * Run process send product alerts
+     *
+     * @return Mage_ProductAlert_Model_Observer
+     */
     public function process()
     {
         $parent = parent::process();
@@ -27,7 +33,15 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $parent;
     }
 
-    public function avoidDuplication(Varien_Event_Observer $observer)
+    /**
+     * Avoid success/failure message appearance when other needed message
+     * is set to appear and avoid saving anonymous alerts
+     * when the corresponding regular alerts already exist
+     *
+     * @param Varien_Event_Observer $observer
+     * @return $this
+     */
+    public function avoidUnneededActions(Varien_Event_Observer $observer)
     {
         $alert = $observer->getEvent()->getObject();
         if (self::$helpers['registry']->getRegistry('context') == 'add') {
@@ -40,6 +54,9 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                     $this->rewriteMessage = self::$helpers['data']->__('You are already subscribed for this Price alert.');
                 }
             }
+        }
+        elseif (self::$helpers['registry']->getRegistry('context') == 'skipAdding') {
+            $this->rewriteMessage = self::$helpers['data']->__('Please reload the page and try again');
         }
 
         $anonymousCustomer = Mage::getModel('anonymouscustomer/anonymous')->load($alert->getCustomerId());

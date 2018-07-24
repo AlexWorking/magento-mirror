@@ -2,6 +2,13 @@
 
 class Potoky_AlertAnonymous_Helper_Registry extends Mage_Core_Helper_Abstract
 {
+    /**
+     * Set Mage::registry for this module's key
+     *
+     * @param null $context
+     * @param null $customerEntity
+     * @param null $parentConstruct
+     */
     public function setRegistry($context = null, $customerEntity = null, $parentConstruct = null)
     {
         Mage::unregister('potoky_alertanonymous');
@@ -18,6 +25,12 @@ class Potoky_AlertAnonymous_Helper_Registry extends Mage_Core_Helper_Abstract
 
     }
 
+    /**
+     * Get Mage::registry values for this module's key
+     *
+     * @param null $key
+     * @return mixed|null
+     */
     public function getRegistry($key = null)
     {
         $registry = Mage::registry('potoky_alertanonymous');

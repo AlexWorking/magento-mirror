@@ -9,12 +9,17 @@
 class Potoky_AlertAnonymous_Helper_Login extends Mage_Core_Helper_Abstract
 {
     /**
-     * Shows whether the customer is logged in or not
+     * Show whether the customer is logged in or not
      *
      * @var boolean
      */
     private static $loggedIn;
 
+    /**
+     * Show whether Current customer is logged in
+     *
+     * @return bool
+     */
     public function isLoggedIn()
     {
         if (!isset(self::$loggedIn)) {

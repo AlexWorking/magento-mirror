@@ -2,8 +2,19 @@
 
 class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    /**
+     * Array of helper objects used in current module
+     *
+     * @var array
+     */
     public static $helpers = [];
 
+    /**
+     * Array that shows helpers with their URIs used by each class
+     * of the module that uses helpers
+     *
+     * @var array
+     */
     private $classHelperMapping = [
         'Potoky_AlertAnonymous_AddController'         => [
             'allow'    => 'alertanonymous/allow',
@@ -44,7 +55,12 @@ class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
         ]
     ];
 
-
+    /**
+     * Create links for self::$helpers from the corresponding classes
+     * passed as argument
+     *
+     * @var $classInstance
+     */
     public function setUpHelpers($classInstance)
     {
         $className = get_class($classInstance);

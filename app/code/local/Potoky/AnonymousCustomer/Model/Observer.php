@@ -2,6 +2,12 @@
 
 class Potoky_AnonymousCustomer_Model_Observer
 {
+    /**
+     * Initiate anonymous customer creation/deletion when corresponding
+     * regular customer is created
+     *
+     * @var Varien_Event_Observer $observer
+     */
     public function regularCustomerCreated(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
@@ -18,6 +24,12 @@ class Potoky_AnonymousCustomer_Model_Observer
         }
     }
 
+    /**
+     * Initiate anonymous customer creation/deletion when corresponding
+     * regular customer is deleted
+     *
+     * @var Varien_Event_Observer $observer
+     */
     public function regularCustomerDeleted(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
@@ -34,6 +46,11 @@ class Potoky_AnonymousCustomer_Model_Observer
         }
     }
 
+    /**
+     * Find anonymous customer corresponding to regular customer
+     *
+     * @var $customer
+     */
     private function findCorrespondingAnonymous($customer)
     {
         $email = $customer->getEmail();
@@ -44,6 +61,13 @@ class Potoky_AnonymousCustomer_Model_Observer
         return $anonymousCustomer;
     }
 
+    /**
+     * Process anonymous customer save/delete depending on events
+     * happening on regular customer
+     *
+     * @var $anonymousCustomer
+     * @var $action
+     */
     private function doToAnonymous($anonymousCustomer, $action)
     {
         try {

@@ -7,7 +7,7 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
     /**
      * The id (if set) of the self template highest level DOM element
      *
-     * @var
+     * @var string
      */
     private $templateId = null;
 
@@ -19,7 +19,7 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
     }
 
     /**
-     * Sets Id to the self template
+     * Gets Id to the self template
      *
      * @return string
      */
@@ -30,6 +30,7 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
 
     /**
      * Check whether the stock alert data can be shown and prepare related data
+     * adding related template id before
      *
      * @return void
      */
@@ -42,6 +43,7 @@ class Potoky_AlertAnonymous_Block_Product_View extends Mage_ProductAlert_Block_P
 
     /**
      * Check whether the price alert data can be shown and prepare related data
+     * adding related template id before
      *
      * @return void
      */

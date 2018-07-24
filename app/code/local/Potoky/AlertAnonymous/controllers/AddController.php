@@ -10,24 +10,35 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
     public function preDispatch()
     {
         Mage::helper('alertanonymous')->setUpHelpers($this);
+
+        $email = $this->getRequest()->getParam('email');
+
         if(!self::$helpers['allow']->isCurrentAlertAllowedForAnonymous()) {
-            parent::preDispatch();
+            if ($email != null) {
+                self::$helpers['registry']->setRegistry('skipAdding', null, null);
+            } else {
+                parent::preDispatch();
+            }
+
             return;
         }
         Mage_Core_Controller_Front_Action::preDispatch();
 
         if (self::$helpers['login']->isLoggedIn()) {
-            $customer = Mage::getSingleton('customer/session')->getCustomer();
-            self::$helpers['registry']->setRegistry('add', $customer, true);
+            if ($email != null) {
+                self::$helpers['registry']->setRegistry('skipAdding', null, null);
+            } else {
+                $customer = Mage::getSingleton('customer/session')->getCustomer();
+                self::$helpers['registry']->setRegistry('add', $customer, true);
+            }
+
             return;
         }
 
-        $email = $this->getRequest()->getParam('email');
         $websiteId = Mage::app()->getWebsite()->getId();
+
         if(!$email || !$websiteId) {
-            Mage::getSingleton('customer/session')
-                ->addError(self::$helpers['data']->
-                __('Please reload the page and try again'));
+            self::$helpers['registry']->setRegistry('skipAdding', null, null);
 
             return;
         }
@@ -37,6 +48,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             self::$helpers['registry']->setRegistry('add', $customer, true);
             return;
         }
+
         $anonymousCustomer = self::$helpers['entity']->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
         if ($anonymousCustomer->getId()) {
             self::$helpers['registry']->setRegistry('add', $anonymousCustomer, false);
