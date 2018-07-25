@@ -67,8 +67,11 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $this;
     }
 
-    /*
-     * To be REDONE (?)
+    /**
+     * Extract Alert concerning data
+     *
+     * @var Mage_ProductAlert_Model_Price | Mage_ProductAlert_Model_Stock $alert
+     * @return array $data
      */
     private function extractAlertRelatedData($alert)
     {
@@ -93,6 +96,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $data;
     }
 
+    /**
+     * Riwrite success/failire core module message with $this->>rewriteMessage if set
+     *
+     * @param Varien_Event_Observer $observer
+     * @return $this
+     */
     public function rewriteMessage(Varien_Event_Observer $observer)
     {
         if (isset($this->rewriteMessage)) {
@@ -110,6 +119,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $this;
     }
 
+    /**
+     * Aunomatically delete Anonymous Customer price alert when
+     * corresponding Regular Customer price alert is deleted
+     *
+     * @param Varien_Event_Observer $observer
+     */
     public function cascadeDeletePrice(Varien_Event_Observer $observer)
     {
         if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
@@ -123,6 +138,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         );
     }
 
+    /**
+     * Aunomatically delete all Anonymous Customer price alerts when
+     * corresponding Regular Customer price alerts are deleted
+     *
+     * @param Varien_Event_Observer $observer
+     */
     public function cascadeDeletePriceAll(Varien_Event_Observer $observer)
     {
         if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
@@ -137,6 +158,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $this->processDelete($data, 'priceAll');   
     }
 
+    /**
+     * Aunomatically delete Anonymous Customer stock alert when
+     * corresponding Regular Customer stock alert is deleted
+     *
+     * @param Varien_Event_Observer $observer
+     */
     public function cascadeDeleteStock(Varien_Event_Observer $observer)
     {
         if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
@@ -150,6 +177,12 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         );
     }
 
+    /**
+     * Aunomatically delete all Anonymous Customer stock alerts when
+     * corresponding Regular Customer stock alerts are deleted
+     *
+     * @param Varien_Event_Observer $observer
+     */
     public function cascadeDeleteStockAll(Varien_Event_Observer $observer)
     {
         if (self::$helpers['registry']->getRegistry('parent_construct') === false) {
@@ -164,6 +197,13 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $this->processDelete($data, 'stockAll');
     }
 
+    /**
+     * Processes cascade deletes
+     *
+     * @param $data
+     * @param $actionName
+     * @return $this
+     */
     private function processDelete($data, $actionName)
     {
         $anonymousCustomer = self::$helpers['entity']->getCustomerEntityByRequest(
@@ -192,6 +232,13 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         return $this;
     }
 
+    /**
+     * Copy alerts of the Anonymous Customer to Core Alert tables when
+     * regular the corresponding regular customer is created
+     *
+     * @param Varien_Event_Observer $observer
+     * @return $this
+     */
     public function copyAlertsToCoreTables(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
