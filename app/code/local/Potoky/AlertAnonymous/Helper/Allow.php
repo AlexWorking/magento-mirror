@@ -17,6 +17,15 @@ class Potoky_AlertAnonymous_Helper_Allow extends Mage_Core_Helper_Abstract
             $templateId = $urlParts[$alertKey];
         }
 
-        return Mage::getStoreConfig(sprintf('catalog/productalert/allow_%s_anonymous', $templateId));
+        $coreAlertAllowed = Mage::getStoreConfig(sprintf(
+            'catalog/productalert/allow_%s',
+            $templateId
+        ));
+        $anonymousAlertAllowed = Mage::getStoreConfig(sprintf(
+            'catalog/productalert/allow_%s_anonymous',
+            $templateId
+        ));
+
+        return $coreAlertAllowed * $anonymousAlertAllowed;
     }
 }

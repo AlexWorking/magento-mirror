@@ -15,9 +15,12 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
         if(!self::$helpers['allow']->isCurrentAlertAllowedForAnonymous()) {
             if ($email != null) {
+                Mage_Core_Controller_Front_Action::preDispatch();
                 self::$helpers['registry']->setRegistry('skipAdding', null, null);
             } else {
                 parent::preDispatch();
+                $customer = Mage::getSingleton('customer/session')->getCustomer();
+                self::$helpers['registry']->setRegistry('add', $customer, true);
             }
 
             return;

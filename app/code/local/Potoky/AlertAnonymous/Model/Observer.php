@@ -56,6 +56,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
             }
         }
         elseif (self::$helpers['registry']->getRegistry('context') == 'skipAdding') {
+            $alert->_setDataSaveAllowed(false);
             $this->rewriteMessage = self::$helpers['data']->__('Please reload the page and try again');
         }
 
