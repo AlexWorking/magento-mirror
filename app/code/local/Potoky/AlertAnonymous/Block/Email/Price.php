@@ -7,16 +7,16 @@ class Potoky_AlertAnonymous_Block_Email_Price extends Mage_ProductAlert_Block_Em
      *
      * @var string
      */
-    private $unsubscribeHash = 'nohash';
+    private $unsubscribeInfo = 'noinfo';
 
     /**
      * Sets hashed unsubscribe info
      *
      * @var $hash
      */
-    public function setUnsubscribeHash($hash)
+    public function setUnsubscribeInfo($info)
     {
-        $this->unsubscribeHash = $hash;
+        $this->unsubscribeInfo = $info;
     }
 
     /**
@@ -27,7 +27,7 @@ class Potoky_AlertAnonymous_Block_Email_Price extends Mage_ProductAlert_Block_Em
     protected function _getUrlParams()
     {
         $parent = parent::_getUrlParams();
-        $parent['anonymous'] = $this->unsubscribeHash;
+        $parent['unsubscribe'] = $this->unsubscribeInfo;
 
         return $parent;
     }

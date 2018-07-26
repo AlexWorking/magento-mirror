@@ -24,7 +24,6 @@ class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
             'data'     => 'alertanonymous'
         ],
         'Potoky_AlertAnonymous_UnsubscribeController' => [
-            'data_1'   => 'core',
             'entity'   => 'anonymouscustomer/entity',
             'registry' => 'alertanonymous/registry'
         ],
@@ -33,9 +32,6 @@ class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
         ],
         'Potoky_AlertAnonymous_Model_Customer'        => [
             'registry' => 'alertanonymous/registry'
-        ],
-        'Potoky_AlertAnonymous_Model_Email'           => [
-            'data_1'   => 'core'
         ],
         'Potoky_AlertAnonymous_Model_Observer'        => [
             'registry' => 'alertanonymous/registry',

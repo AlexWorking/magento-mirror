@@ -22,7 +22,7 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     protected function _getPriceBlock()
     {
         $parent = parent::_getPriceBlock();
-        $parent->setUnsubscribeHash(self::$helpers['data_1']->encrypt(
+        $parent->setUnsubscribeInfo(rawurlencode(
             $this->_customer->getEmail() . ' ' . $this->_customer->getWebsiteId()
             ));
 
@@ -37,7 +37,7 @@ class Potoky_AlertAnonymous_Model_Email extends Mage_ProductAlert_Model_Email
     protected function _getStockBlock()
     {
         $parent = parent::_getStockBlock();
-        $parent->setUnsubscribeHash(self::$helpers['data_1']->encrypt(
+        $parent->setUnsubscribeInfo(rawurlencode(
             $this->_customer->getEmail() . ' ' . $this->_customer->getWebsiteId()
         ));
 
