@@ -9,6 +9,8 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
     public function preDispatch()
     {
+        $theme = Mage::getSingleton('core/design_package')
+            ->getSkinBaseDir(array('_area' => 'frontend'));
         Mage::helper('alertanonymous')->setUpHelpers($this);
 
         $email = $this->getRequest()->getParam('email');

@@ -39,9 +39,7 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
         }
 
         $anonymousCustomer = self::$helpers['entity']->getCustomerEntityByRequest('anonymouscustomer/anonymous', $email, $websiteId);
-        if ($id = $anonymousCustomer->getId()) {
-            self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
-        }
+        self::$helpers['registry']->setRegistry(null, $anonymousCustomer, false);
 
         Mage_Core_Controller_Front_Action::preDispatch();
     }
