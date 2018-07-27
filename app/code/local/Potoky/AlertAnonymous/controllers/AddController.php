@@ -9,8 +9,6 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
 
     public function preDispatch()
     {
-        $theme = Mage::getSingleton('core/design_package')
-            ->getSkinBaseDir(array('_area' => 'frontend'));
         Mage::helper('alertanonymous')->setUpHelpers($this);
 
         $email = $this->getRequest()->getParam('email');
@@ -19,7 +17,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
             if ($email != null) {
                 Mage_Core_Controller_Front_Action::preDispatch();
                 Mage::getSingleton('catalog/session')
-                    ->addError('The page has been reloaded as some of its links were expired.');
+                    ->addError('Action Failed. The page has been reloaded as some of its links were expired.');
                 $this->setFlag('', 'no-dispatch', true);
                 $this->_redirectReferer();
             } else {
@@ -35,7 +33,7 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         if (Mage::getSingleton('customer/session')->isLoggedIn()) {
             if ($email != null) {
                 Mage::getSingleton('catalog/session')
-                    ->addError('The page has been reloaded as some of its links were expired.');
+                    ->addError('Action Failed. The page has been reloaded as some of its links were expired.');
                 $this->setFlag('', 'no-dispatch', true);
                 $this->_redirectReferer();
             } else {
