@@ -55,10 +55,6 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
                 }
             }
         }
-        elseif (self::$helpers['registry']->getRegistry('context') == 'skipAdding') {
-            $alert->_setDataSaveAllowed(false);
-            $this->rewriteMessage = self::$helpers['data']->__('Please reload the page and try again');
-        }
 
         $anonymousCustomer = Mage::getModel('anonymouscustomer/anonymous')->load($alert->getCustomerId());
         if($anonymousCustomer && $anonymousCustomer->getRegistrationId()) {
@@ -109,10 +105,10 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
             $messages = Mage::getSingleton('catalog/session')->getMessages();
             $lastAddedMessage =$messages->getLastAddedMessage();
             $code = $lastAddedMessage->getCode();
-            if($code == self::$helpers['data_2']->__(self::ALERT_SAVE_SUCCESS_MESSAGE_PRICE) ||
-                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_FAILURE_MESSAGE_PRICE) ||
-                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_SUCCESS_MESSAGE_STOCK) ||
-                $code == self::$helpers['data_2']->__(self::ALERT_SAVE_FAILURE_MESSAGE_STOCK)) {
+            if($code == self::$helpers['data_1']->__(self::ALERT_SAVE_SUCCESS_MESSAGE_PRICE) ||
+                $code == self::$helpers['data_1']->__(self::ALERT_SAVE_FAILURE_MESSAGE_PRICE) ||
+                $code == self::$helpers['data_1']->__(self::ALERT_SAVE_SUCCESS_MESSAGE_STOCK) ||
+                $code == self::$helpers['data_1']->__(self::ALERT_SAVE_FAILURE_MESSAGE_STOCK)) {
                 $lastAddedMessage->setCode($this->rewriteMessage);
             }
         }

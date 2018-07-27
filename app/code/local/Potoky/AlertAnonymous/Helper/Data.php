@@ -18,7 +18,6 @@ class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
     private $classHelperMapping = [
         'Potoky_AlertAnonymous_AddController'         => [
             'allow'    => 'alertanonymous/allow',
-            'login'    => 'alertanonymous/login',
             'entity'   => 'anonymouscustomer/entity',
             'registry' => 'alertanonymous/registry',
             'data'     => 'alertanonymous'
@@ -37,7 +36,7 @@ class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
             'registry' => 'alertanonymous/registry',
             'entity'   => 'anonymouscustomer/entity',
             'data'     => 'alertanonymous',
-            'data_2'     => 'productalert',
+            'data_1'     => 'productalert',
         ],
         'Potoky_AlertAnonymous_Model_Price'           => [
             'registry' => 'alertanonymous/registry'
@@ -47,7 +46,6 @@ class Potoky_AlertAnonymous_Helper_Data extends Mage_Core_Helper_Abstract
         ],
         'Potoky_AlertAnonymous_Block_Product_View'    => [
             'allow'    => 'alertanonymous/allow',
-            'login'    => 'alertanonymous/login'
         ]
     ];
 

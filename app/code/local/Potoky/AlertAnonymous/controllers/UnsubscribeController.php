@@ -20,9 +20,21 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
         $websiteId = $customerIdentifiers[1];;
 
         $customer = self::$helpers['entity']->getCustomerEntityByRequest('customer/customer', $email, $websiteId);
-        if ($customer->getId()) {
-            self::$helpers['registry']->setRegistry(null, $customer, true);
+        if ($customerId = $customer->getId()) {
             parent::preDispatch();
+            $session = Mage::getSingleton('customer/session');
+            $sessionId = $session->getId();
+            if (!$sessionId || $customerId == $sessionId) {
+                self::$helpers['registry']->setRegistry(null, $customer, true);
+            } else {
+                $session->setId(null);
+                $session->addNotice(
+                    'Please log in with the credentials of the Customer You\'ve been trying to unsubscribe and repeat the trial.'
+                );
+                $this->setFlag('', 'no-dispatch', true);
+                $this->_redirect('customer/account/');
+            }
+
             return;
         }
 

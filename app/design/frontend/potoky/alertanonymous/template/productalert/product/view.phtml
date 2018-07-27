@@ -25,7 +25,7 @@
  */
 ?>
 <?php /* @var $this Mage_ProductAlert_Block_Product_View | Potoky_AlertAnonymous_Block_Product_View */
-    if (Potoky_AlertAnonymous_Block_Product_View::$helpers['login']->isLoggedIn() ||
+    if (Mage::getSingleton('customer/session')->isLoggedIn() ||
         !Potoky_AlertAnonymous_Block_Product_View::$helpers['allow']->isCurrentAlertAllowedForAnonymous($this->getTemplateId())): ?>
 <p class="<?php echo $this->getHtmlClass() ?>">
     <?php else: ?>

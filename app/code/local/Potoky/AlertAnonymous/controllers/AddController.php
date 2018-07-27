@@ -16,7 +16,10 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         if(!self::$helpers['allow']->isCurrentAlertAllowedForAnonymous()) {
             if ($email != null) {
                 Mage_Core_Controller_Front_Action::preDispatch();
-                self::$helpers['registry']->setRegistry('skipAdding', null, null);
+                Mage::getSingleton('catalog/session')
+                    ->addError('The page has been reloaded as some of its links were expired.');
+                $this->setFlag('', 'no-dispatch', true);
+                $this->_redirectReferer();
             } else {
                 parent::preDispatch();
                 $customer = Mage::getSingleton('customer/session')->getCustomer();
@@ -27,9 +30,12 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         }
         Mage_Core_Controller_Front_Action::preDispatch();
 
-        if (self::$helpers['login']->isLoggedIn()) {
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) {
             if ($email != null) {
-                self::$helpers['registry']->setRegistry('skipAdding', null, null);
+                Mage::getSingleton('catalog/session')
+                    ->addError('The page has been reloaded as some of its links were expired.');
+                $this->setFlag('', 'no-dispatch', true);
+                $this->_redirectReferer();
             } else {
                 $customer = Mage::getSingleton('customer/session')->getCustomer();
                 self::$helpers['registry']->setRegistry('add', $customer, true);
@@ -41,7 +47,8 @@ class Potoky_AlertAnonymous_AddController extends Mage_ProductAlert_AddControlle
         $websiteId = Mage::app()->getWebsite()->getId();
 
         if(!$email || !$websiteId) {
-            self::$helpers['registry']->setRegistry('skipAdding', null, null);
+            Mage::getSingleton('catalog/session')
+                ->addError('The page has been reloaded as some of its links were expired.');
 
             return;
         }
