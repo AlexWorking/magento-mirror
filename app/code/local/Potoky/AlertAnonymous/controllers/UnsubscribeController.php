@@ -29,8 +29,7 @@ class Potoky_AlertAnonymous_UnsubscribeController extends Mage_ProductAlert_Unsu
             } else {
                 $session->setId(null);
                 $session->addNotice(
-                    'Please log in with the credentials of the Customer You\'ve been trying to unsubscribe and repeat the trial.'
-                );
+                    'There was logged in a Customer another that that You\'ve been trying to unsubscribe. You need to repeat the trial.');
                 $this->setFlag('', 'no-dispatch', true);
                 $this->_redirect('customer/account/');
             }
