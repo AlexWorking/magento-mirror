@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Potoky_ItemBanner>
+            <version>0.1.0</version>
+        </Potoky_ItemBanner>
+    </modules>
+    <global>
+        <blocks>
+            <itembanner>
+                <class>Potoky_ItemBanner_Block</class>
+            </itembanner>
+        </blocks>
+        <helpers>
+            <itembanner>
+                <class>Potoky_ItemBanner_Helper</class>
+            </itembanner>
+        </helpers>
+    </global>
+</config>

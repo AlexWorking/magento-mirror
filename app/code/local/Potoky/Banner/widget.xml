@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<widgets>
+      <CwWidget_topsearches type="CwWidget/topsearches">
+        <name>Top Searching Terms</name>
+        <description type="desc">Lists Top Searches</description>
+      </CwWidget_topsearches>
+</widgets>
