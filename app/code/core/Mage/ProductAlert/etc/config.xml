@@ -144,7 +144,6 @@
     <crontab>
         <jobs>
             <catalog_product_alert>
-                <schedule><cron_expr>*/1 * * * *</cron_expr></schedule>
                 <run>
                     <model>productalert/observer::process</model>
                 </run>
