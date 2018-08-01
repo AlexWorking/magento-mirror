@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<widgets>
+     <itembanner_banner type="itembanner/banner">
+       <name>Banner inserted into products</name>
+       <description type="desc">Depending on set position appears in place of a product block in the product list or grid</description>
+     </itembanner_banner>
+</widgets>
