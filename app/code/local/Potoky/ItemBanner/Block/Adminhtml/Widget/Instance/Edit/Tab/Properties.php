@@ -35,8 +35,8 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
     protected function _preparelayout()
     {
 
-        $this->setWidgetType($this->getWidgetInstance()->getType())
-            ->setWidgetValues($this->getWidgetInstance()->getWidgetParameters());
+        //$this->setWidgetType($this->getWidgetInstance()->getType())
+        //    ->setWidgetValues($this->getWidgetInstance()->getWidgetParameters());
         return parent::_prepareLayout();
     }
 }
