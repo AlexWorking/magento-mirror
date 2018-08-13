@@ -27,4 +27,15 @@
             </itembanner>
         </models>
     </global>
+    <frontend>
+        <routers>
+            <widget>
+                <args>
+                    <modules>
+                        <Potoky_ItemBanner before="Mage_Widget">Potoky_ItemBanner</Potoky_ItemBanner>
+                    </modules>
+                </args>
+            </widget>
+        </routers>
+    </frontend>
 </config>
