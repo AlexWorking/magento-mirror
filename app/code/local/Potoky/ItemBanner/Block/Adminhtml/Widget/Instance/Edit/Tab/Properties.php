@@ -26,17 +26,13 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
         return $parent;
     }*/
 
-    /**
-     * Prepare block children and data.
-     * Set widget type and widget parameters if available
-     *
-     * @return Mage_Widget_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties
-     */
-    protected function _preparelayout()
+    public function getForm()
     {
-
-        //$this->setWidgetType($this->getWidgetInstance()->getType())
-        //    ->setWidgetValues($this->getWidgetInstance()->getWidgetParameters());
-        return parent::_prepareLayout();
+        if ($this->_form instanceof Varien_Data_Form) {
+            return $this->_form;
+        }
+        $form = new Varien_Data_Form(array('enctype' => 'multipart/form-data'));
+        $this->setForm($form);
+        return $form;
     }
 }
