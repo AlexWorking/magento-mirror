@@ -26,13 +26,18 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
         return $parent;
     }*/
 
-    public function getForm()
+    /**
+     * Add field to Options form based on option configuration
+     *
+     * @param Varien_Object $parameter
+     * @return Varien_Data_Form_Element_Abstract
+     */
+    protected function _addField($parameter)
     {
-        if ($this->_form instanceof Varien_Data_Form) {
-            return $this->_form;
-        }
-        $form = new Varien_Data_Form(array('enctype' => 'multipart/form-data'));
-        $this->setForm($form);
-        return $form;
+        if($parent = parent::_addField($parameter)) {
+            $parent->setValue('OK');
+        };
+
+        return $parent;
     }
 }

@@ -38,4 +38,13 @@
             </adminhtml>s
         </routers>
     </admin>
+    <adminhtml>
+        <layout>
+            <updates>
+                <itembanner>
+                    <file>itembanner.xml</file>
+                </itembanner>
+            </updates>
+        </layout>
+    </adminhtml>
 </config>

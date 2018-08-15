@@ -7,9 +7,9 @@
             <image>
                 <label>Image For Banner</label>
                 <visible>1</visible>
-                <required>1</required>
+                <required>0</required>
                 <type>image</type>
-                <note>(*.jpg, *.png, *.gif)</note>
+                <note>*.jpg, *.png, *.gif</note>
             </image>
         </parameters>
     </itembanner_banner>

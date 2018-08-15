@@ -11,29 +11,22 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
     {
         if($post_data = $this->getRequest()->getPost());
         try {
-            if ((bool) $post_data['image']['delete'] == 1) {
-                $post_data['iconimage'] = '';
+            if ((bool) $post_data['parmeters']['image']['delete'] == 1) {
+                $post_data['parmeters']['image'] = '';
             } else {
-                unset($post_data['image']);
+                unset($post_data['parmeters']['image']);
                 if (isset($_FILES)) {
-                    if ($_FILES['parameters[image]']['name']) {
-                        if ($this->getRequest()->getParam("id")) {
-                            $model = Mage::getModel("service/service")->load($this->getRequest()->getParam("id"));
-                            if ($model->getData('iconimage')) {
-                                $io = new Varien_Io_File();
-                                $io->rm(Mage::getBaseDir('media') . DS . implode(DS, explode('/', $model->getData('iconimage'))));
-                            }
-                        }
-                        $path = Mage::getBaseDir('media') . DS . 'service' . DS . 'service' . DS;
-                        $uploader = new Varien_File_Uploader('iconimage');
+                    if ($_FILES['parameters']['name']) {
+                        $path = Mage::getBaseDir('media') . DS . 'itembanner' . DS;
+                        $uploader = new Varien_File_Uploader('parameters[image]');
                         $uploader->setAllowedExtensions(array('jpg', 'png', 'gif'));
                         $uploader->setAllowRenameFiles(true);
                         $uploader->setFilesDispersion(false);
-                        $destFile = $path . $_FILES['iconimage']['name'];
+                        $destFile = $path . $_FILES['parameters']['name']['image'];
                         $filename = $uploader->getNewFileName($destFile);
                         $uploader->save($path, $filename);
 
-                        $post_data['iconimage'] = 'service/service/' . $filename;
+                        $post_data['parmeters']['image'] = $_FILES['parameters']['name'];
                     }
                 }
             }
