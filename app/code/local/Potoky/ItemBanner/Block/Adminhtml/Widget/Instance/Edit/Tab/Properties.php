@@ -27,16 +27,16 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
     }*/
 
     /**
-     * Add field to Options form based on option configuration
+     * Fieldset getter/instantiation
      *
-     * @param Varien_Object $parameter
-     * @return Varien_Data_Form_Element_Abstract
+     * @return Varien_Data_Form_Element_Fieldset
      */
-    protected function _addField($parameter)
+    public function getMainFieldset()
     {
-        if($parent = parent::_addField($parameter)) {
-            $parent->setValue('OK');
-        };
+        $parent = parent::getMainFieldset();
+        if ($this->getWidgetType() == 'itembanner/banner') {
+            $parent->addType('image', 'Potoky_ItemBanner_Block_Adminhtml_Widget_Helper_Image');
+        }
 
         return $parent;
     }

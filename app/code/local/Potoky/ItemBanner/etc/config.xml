@@ -35,7 +35,7 @@
                         <itembanner before="Mage_Widget">Potoky_ItemBanner_Adminhtml</itembanner>
                     </modules>
                 </args>
-            </adminhtml>s
+            </adminhtml>
         </routers>
     </admin>
     <adminhtml>

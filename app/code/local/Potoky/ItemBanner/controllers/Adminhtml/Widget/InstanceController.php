@@ -7,37 +7,45 @@ require_once(
     DS . 'InstanceController.php');
 class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_Adminhtml_Widget_InstanceController
 {
-    public function saveAction()
+    /**
+     * Prepare widget parameters
+     *
+     * @return array
+     */
+    protected function _prepareParameters()
     {
-        if($post_data = $this->getRequest()->getPost());
-        try {
-            if ((bool) $post_data['parmeters']['image']['delete'] == 1) {
-                $post_data['parmeters']['image'] = '';
-            } else {
-                unset($post_data['parmeters']['image']);
-                if (isset($_FILES)) {
-                    if ($_FILES['parameters']['name']) {
-                        $path = Mage::getBaseDir('media') . DS . 'itembanner' . DS;
-                        $uploader = new Varien_File_Uploader('parameters[image]');
-                        $uploader->setAllowedExtensions(array('jpg', 'png', 'gif'));
-                        $uploader->setAllowRenameFiles(true);
-                        $uploader->setFilesDispersion(false);
-                        $destFile = $path . $_FILES['parameters']['name']['image'];
-                        $filename = $uploader->getNewFileName($destFile);
-                        $uploader->save($path, $filename);
+        if(Mage::registry('current_widget_instance') &&
+            Mage::registry('current_widget_instance')->getType() == 'itembanner/banner' &&
+            $uploaded = $this->imageUpload()) {
 
-                        $post_data['parmeters']['image'] = $_FILES['parameters']['name'];
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-            $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
-            return;
+            return array('image' => $uploaded);
         }
 
-        parent::saveAction();
+        return parent::_prepareParameters();
+    }
 
+    private function imageUpload()
+    {
+        $path = Mage::getBaseDir('media') . DS . 'itembanner' . DS;
+        try {
+            $uploader = new Mage_Core_Model_File_Uploader('parameters[image]');
+            $uploader->setAllowedExtensions(array('jpg','jpeg','gif','png'));
+            $uploader->setAllowRenameFiles(true);
+            /*$uploader->addValidateCallback(
+                Mage_Core_Model_File_Validator_Image::NAME,
+                new Mage_Core_Model_File_Validator_Image(),
+                "validate"
+            );*/
+            $result = $uploader->save($path);
 
+        } catch (Exception $e) {
+            if ($e->getCode() != Mage_Core_Model_File_Uploader::TMP_NAME_EMPTY) {
+                Mage::logException($e);
+            }
+
+            return false;
+        }
+
+        return $result['file'];
     }
 }
