@@ -16,7 +16,7 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Helper_Image extends Varien_Data_
         return $parent;
     }
 
-    protected function _getDeleteCheckbox()
+    /*protected function _getDeleteCheckbox()
     {
         if ($this->getName() == 'parameters[image]' &&
             $this->getLabel() == 'Image For Banner') {
@@ -24,5 +24,5 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Helper_Image extends Varien_Data_
         }
 
         return parent::_getDeleteCheckbox();
-    }
+    }*/
 }

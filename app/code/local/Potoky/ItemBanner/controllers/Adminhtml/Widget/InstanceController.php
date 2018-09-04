@@ -14,14 +14,24 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
      */
     protected function _prepareParameters()
     {
-        if(Mage::registry('current_widget_instance') &&
-            Mage::registry('current_widget_instance')->getType() == 'itembanner/banner' &&
-            $uploaded = $this->imageUpload()) {
+        $parent = parent::_prepareParameters();
 
-            return array('image' => $uploaded);
+        $currentWidgetInstance = Mage::registry('current_widget_instance');
+        if($currentWidgetInstance &&
+            $currentWidgetInstance->getType() == 'itembanner/banner') {
+            if ($parent['image']['delete']) {
+                //TODO disable widget
+                return [];
+            }
+            elseif ($uploaded = $this->imageUpload()) {
+                return array('image' => $uploaded);
+            }
+            elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
+                return array('image' => $image);
+            }
         }
 
-        return parent::_prepareParameters();
+        return $parent;
     }
 
     private function imageUpload()
@@ -31,11 +41,11 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             $uploader = new Mage_Core_Model_File_Uploader('parameters[image]');
             $uploader->setAllowedExtensions(array('jpg','jpeg','gif','png'));
             $uploader->setAllowRenameFiles(true);
-            /*$uploader->addValidateCallback(
+            $uploader->addValidateCallback(
                 Mage_Core_Model_File_Validator_Image::NAME,
                 new Mage_Core_Model_File_Validator_Image(),
                 "validate"
-            );*/
+            );
             $result = $uploader->save($path);
 
         } catch (Exception $e) {
