@@ -47,4 +47,13 @@
             </updates>
         </layout>
     </adminhtml>
+    <frontend>
+        <layout>
+            <updates>
+                <itembanner>
+                    <file>itembanner.xml</file>
+                </itembanner>
+            </updates>
+        </layout>
+    </frontend>
 </config>
