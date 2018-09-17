@@ -13,7 +13,6 @@
             <widget>
                 <rewrite>
                     <adminhtml_widget_instance_edit_tab_properties>Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties</adminhtml_widget_instance_edit_tab_properties>
-                    <adminhtml_widget_instance_edit_tab_main_layout>Potoky_Itembanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Main_Layout</adminhtml_widget_instance_edit_tab_main_layout>
                 </rewrite>
             </widget>
         </blocks>
@@ -26,11 +25,6 @@
             <itembanner>
                 <class>Potoky_ItemBanner_Model</class>
             </itembanner>
-            <widget>
-                <rewrite>
-                    <widget_instance>Potoky_Itembanner_Model_Widget_Instance</widget_instance>
-                </rewrite>
-            </widget>
         </models>
     </global>
     <admin>
@@ -52,5 +46,16 @@
                 </itembanner>
             </updates>
         </layout>
+        <events>
+            <widget_widget_instance_save_before>
+                <observers>
+                    <adding_search_handles>
+                        <type>singleton</type>
+                        <class>Potoky_ItemBanner_Model_Observer</class>
+                        <method>addSearchHandles</method>
+                    </adding_search_handles>
+                </observers>
+            </widget_widget_instance_save_before>
+        </events>
     </adminhtml>
 </config>
