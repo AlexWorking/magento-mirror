@@ -8,9 +8,16 @@ class Potoky_ItemBanner_Model_Observer
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function addSearchHandles($observer)
+    public function additionalBeforeSave($observer)
     {
         $widgetInstance = $observer->getEvent()->getObject();
+
+        return $this;
+    }
+
+
+    public function addSearchHandles($widgetInstance)
+    {
         if($widgetInstance->getType() != "itembanner/banner") {
 
             return $this;
@@ -26,6 +33,26 @@ class Potoky_ItemBanner_Model_Observer
         unset($pageGroup);
         $widgetInstance->setData('page_groups', $pageGroups);
 
+        if (!$widgetInstance->getId()) {
+            $itemBannerInfo = Mage::getModel('itembanner/bannerinfo')->getCollection()
+                ->addFieldToFilter('is_active',array('eq'=>true))
+                ->selectFirstItem();
+            if ($itemBannerInfo->getId()) {
+                $itemBannerInfo->setData('is_active', false);
+                $itemBannerInfo->save();
+            }
+        }
+
         return $this;
+    }
+
+    /**
+     * To be written
+     *
+     * @param Varien_Event_Observer $observer
+     * @return $this
+     */
+    private function disactivate($widgetInstance) {
+
     }
 }
