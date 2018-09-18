@@ -24,8 +24,24 @@
         <models>
             <itembanner>
                 <class>Potoky_ItemBanner_Model</class>
+                <resourceModel>itembanner_resource</resourceModel>
             </itembanner>
+            <itembanner_resource>
+                <class>Potoky_ItemBanner_Model_Resource</class>
+                <entities>
+                    <bannerinfo>
+                        <table>banner_info</table>
+                    </bannerinfo>
+                </entities>
+            </itembanner_resource>
         </models>
+        <resources>
+            <itembanner_setup>
+                <setup>
+                    <module>Potoky_ItemBanner</module>
+                </setup>
+            </itembanner_setup>
+        </resources>
     </global>
     <admin>
         <routers>
@@ -56,6 +72,15 @@
                     </additional_before_save_actions>
                 </observers>
             </widget_widget_instance_save_before>
+            <widget_widget_instance_save_after>
+                <observers>
+                    <itembanner_info_to_db>
+                        <type>singleton</type>
+                        <class>Potoky_ItemBanner_Model_Observer</class>
+                        <method>registerInfoToDb</method>
+                    </itembanner_info_to_db>
+                </observers>
+            </widget_widget_instance_save_after>
         </events>
     </adminhtml>
 </config>
