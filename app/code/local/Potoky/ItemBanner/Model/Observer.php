@@ -55,7 +55,7 @@ class Potoky_ItemBanner_Model_Observer
     {
         $itemBannerInfo = Mage::getModel('itembanner/bannerinfo')->getCollection()
             ->addFieldToFilter('is_active',array('eq'=>true))
-            ->selectFirstItem();
+            ->getFirstItem();
 
         if ($widgetInstance->getId() != $itemBannerInfo->getId()) {
             $itemBannerInfo->setData('is_active', false);
