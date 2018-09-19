@@ -15,11 +15,11 @@
                 <label>Template</label>
                 <visible>1</visible>
                 <type>select</type>
-                <value/>
+                <value>itembanner.phtml</value>
                 <values>
                     <default translate="label">
-                        <value/>
-                        <label>No Template Needed</label>
+                        <value>itembanner.phtml</value>
+                        <label>Itembanner Block Default Template</label>
                     </default>
                 </values>
                 <sort_order>10</sort_order>

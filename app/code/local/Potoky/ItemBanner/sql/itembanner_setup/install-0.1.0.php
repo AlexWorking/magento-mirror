@@ -25,6 +25,12 @@ $table = $installer->getConnection()
     ), 'The number the banner link has been clicked')
     ->addColumn('is_active', Varien_Db_Ddl_Table::TYPE_BOOLEAN,null, array(
         'default' => true
-    ), 'Is the current widget instance active or not');
+    ), 'Is the current widget instance active or not')
+    ->addIndex($installer->getIdxName('itembanner/bannerinfo', array('instance_id'), Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE),
+        array('instance_id'),
+        array('type' => Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE))
+    ->addForeignKey($installer->getFkName('itembanner/bannerinfo', 'instance_id', 'widget/widget_instance', 'instance_id'),
+        'instance_id', $installer->getTable('widget/widget_instance'), 'instance_id',
+        Varien_Db_Ddl_Table::ACTION_CASCADE);
 $installer->getConnection()->createTable($table);
 $installer->endSetup();

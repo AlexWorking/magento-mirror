@@ -30,8 +30,17 @@ class Potoky_ItemBanner_Model_Observer
         $widgetInstance = $observer->getEvent()->getObject();
 
         $itemBannerInfo = Mage::getModel('itembanner/bannerinfo');
-        $itemBannerInfo ->setData('instance_id', $widgetInstance->getId());
-        $itemBannerInfo->save();
+        if ($widgetInstance->isObjectNew()) {
+            $itemBannerInfo ->setData('instance_id', $widgetInstance->getId());
+            $itemBannerInfo->save();
+        } else {
+            $correspondingRecord = $itemBannerInfo->load($widgetInstance->getId(), 'instance_id');
+            if ($correspondingRecord->getId() && !$correspondingRecord->getIsActive()) {
+                $correspondingRecord->setData('is_active', true);
+                $correspondingRecord->save();
+            }
+        }
+
         return $this;
     }
 
@@ -53,13 +62,13 @@ class Potoky_ItemBanner_Model_Observer
 
     private function deactivate($widgetInstance)
     {
-        $itemBannerInfo = Mage::getModel('itembanner/bannerinfo')->getCollection()
-            ->addFieldToFilter('is_active',array('eq'=>true))
-            ->getFirstItem();
+        $itemBannerInfo = Mage::getModel('itembanner/bannerinfo')->load(true, 'is_active');
 
-        if ($widgetInstance->getId() != $itemBannerInfo->getId()) {
-            $itemBannerInfo->setData('is_active', false);
-            $itemBannerInfo->save();
+        if ($infoId = $itemBannerInfo->getId()) {
+            if ($widgetInstance->isObjectNew() || $widgetInstance->getId() != $itemBannerInfo->getInstanceId()) {
+                $itemBannerInfo->setData('is_active', false);
+                $itemBannerInfo->save();
+            }
         }
 
         return $this;
