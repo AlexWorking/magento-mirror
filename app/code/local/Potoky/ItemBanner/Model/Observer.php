@@ -29,6 +29,10 @@ class Potoky_ItemBanner_Model_Observer
     {
         $widgetInstance = $observer->getEvent()->getObject();
 
+        if($widgetInstance->getType() != "itembanner/banner") {
+            return $this;
+        }
+
         $itemBannerInfo = Mage::getModel('itembanner/bannerinfo');
         if ($widgetInstance->isObjectNew()) {
             $itemBannerInfo ->setData('instance_id', $widgetInstance->getId());
