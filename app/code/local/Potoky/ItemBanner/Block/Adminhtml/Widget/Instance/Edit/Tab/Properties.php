@@ -36,6 +36,7 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
         $parent = parent::getMainFieldset();
         if ($this->getWidgetType() == 'itembanner/banner') {
             $parent->addType('image', 'Potoky_ItemBanner_Block_Adminhtml_Widget_Helper_Image');
+            $parent->addType('select', 'Varien_Data_Form_Element_Select');
         }
 
         return $parent;

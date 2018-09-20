@@ -4,6 +4,13 @@
             <name>Banner inserted into products</name>
             <description type="desc">Depending on set position appears in place of a product block in the product list or grid</description>
         <parameters>
+            <is_active>
+                <label>Is This Widget Instance Active</label>
+                <visible>1</visible>
+                <default>0</default>
+                <type>select</type>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </is_active>
             <image>
                 <label>Image For Banner</label>
                 <visible>1</visible>
@@ -15,7 +22,6 @@
                 <label>Template</label>
                 <visible>1</visible>
                 <type>select</type>
-                <value>itembanner.phtml</value>
                 <values>
                     <default translate="label">
                         <value>itembanner.phtml</value>

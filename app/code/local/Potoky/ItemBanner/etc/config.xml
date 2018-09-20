@@ -26,6 +26,11 @@
                 <class>Potoky_ItemBanner_Model</class>
                 <resourceModel>itembanner_resource</resourceModel>
             </itembanner>
+            <widget>
+                <rewrite>
+                    <widget_instance>Potoky_Itembanner_Model_Widget_Instance</widget_instance>
+                </rewrite>
+            </widget>
             <itembanner_resource>
                 <class>Potoky_ItemBanner_Model_Resource</class>
                 <entities>
@@ -62,25 +67,5 @@
                 </itembanner>
             </updates>
         </layout>
-        <events>
-            <widget_widget_instance_save_before>
-                <observers>
-                    <additional_before_save_actions>
-                        <type>singleton</type>
-                        <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>additionalBeforeSave</method>
-                    </additional_before_save_actions>
-                </observers>
-            </widget_widget_instance_save_before>
-            <widget_widget_instance_save_after>
-                <observers>
-                    <itembanner_info_to_db>
-                        <type>singleton</type>
-                        <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>registerInfoToDb</method>
-                    </itembanner_info_to_db>
-                </observers>
-            </widget_widget_instance_save_after>
-        </events>
     </adminhtml>
 </config>

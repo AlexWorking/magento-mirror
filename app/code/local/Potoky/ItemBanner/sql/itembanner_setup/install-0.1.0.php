@@ -23,6 +23,9 @@ $table = $installer->getConnection()
         'nullable'  => false,
         'default'   => '0'
     ), 'The number the banner link has been clicked')
+    ->addColumn('names_in_layout', Varien_Db_Ddl_Table::TYPE_TEXT, null, array(
+        'nullable'  => false,
+    ), 'Current Widget Instance Block Names in Layout')
     ->addColumn('is_active', Varien_Db_Ddl_Table::TYPE_BOOLEAN,null, array(
         'default' => true
     ), 'Is the current widget instance active or not')
