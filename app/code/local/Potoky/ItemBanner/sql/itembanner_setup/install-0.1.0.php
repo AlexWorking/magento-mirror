@@ -23,8 +23,11 @@ $table = $installer->getConnection()
         'nullable'  => false,
         'default'   => '0'
     ), 'The number the banner link has been clicked')
+    ->addColumn('page_groups', Varien_Db_Ddl_Table::TYPE_TEXT, null, array(
+        'nullable'  => false,
+    ), 'Current Widget Instance Page Groups to help save instance model without controller')
     ->addColumn('is_active', Varien_Db_Ddl_Table::TYPE_BOOLEAN,null, array(
-        'default' => true
+        'default' => false
     ), 'Is the current widget instance active or not')
     ->addIndex($installer->getIdxName('itembanner/bannerinfo', array('instance_id'), Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE),
         array('instance_id'),

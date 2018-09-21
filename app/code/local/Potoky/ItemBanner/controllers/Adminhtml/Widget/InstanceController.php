@@ -21,13 +21,13 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             $currentWidgetInstance->getType() == 'itembanner/banner') {
             if ($parent['image']['delete']) {
                 //TODO disable widget
-                return [];
+                $parent['image'] = null;
             }
             elseif ($uploaded = $this->imageUpload()) {
-                return array('image' => $uploaded);
+                $parent['image'] = $uploaded;
             }
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
-                return array('image' => $image);
+                $parent['image'] = $image;
             }
         }
 

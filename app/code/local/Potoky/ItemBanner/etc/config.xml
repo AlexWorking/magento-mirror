@@ -83,4 +83,17 @@
             </widget_widget_instance_save_after>
         </events>
     </adminhtml>
+    <frontend>
+        <events>
+            <controller_action_layout_generate_blocks_after>
+                <observers>
+                    <template_only_to_active>
+                        <type>singleton</type>
+                        <class>Potoky_ItemBanner_Model_Observer</class>
+                        <method>manageTemplateReset</method>
+                    </template_only_to_active>
+                </observers>
+            </controller_action_layout_generate_blocks_after>
+        </events>
+    </frontend>
 </config>
