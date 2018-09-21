@@ -4,6 +4,13 @@ class Potoky_ItemBanner_Model_Observer
 {
     /**
      * To be written
+     * 
+     * @var 
+     */
+    private $savedPostData;
+
+    /**
+     * To be written
      *
      * @param Varien_Event_Observer $observer
      * @return $this
@@ -13,8 +20,18 @@ class Potoky_ItemBanner_Model_Observer
         /* @var $widgetInstance Mage_Widget_Model_Widget_Instance */
         $widgetInstance = $observer->getEvent()->getObject();
 
-        if($widgetInstance->getType() == "itembanner/banner") {
-            $this->addSearchHandles($widgetInstance)->deactivate($widgetInstance);
+        if(!$widgetInstance->getType() == "itembanner/banner") {
+
+            return $this;
+        }
+
+        if ($this->savedPostData) {
+            $savedPostData = unserialize($this->savedPostData);
+            $widgetInstance->setData('page_groups', $savedPostData[0]);
+            $widgetInstance->setData('page_group_ids', $savedPostData[1]);
+            unset($this->savedPostData);
+        } else {
+            $this->addSearchHandles($widgetInstance)->manageDeactivation($widgetInstance);
         }
 
         return $this;
@@ -40,7 +57,10 @@ class Potoky_ItemBanner_Model_Observer
             $itemBannerInfo ->setData([
                 'instance_id' => $widgetInstance->getId(),
                 'is_active'   => $widgetInstance->getWidgetParameters()['is_active'],
-                'page_groups' => 'test'
+                'saved_post_data' => serialize([
+                    $widgetInstance->getData('page_groups'),
+                    $widgetInstance->getData('page_group_ids')
+                ])
             ]);
         } else {
             $itemBannerInfo->load($widgetInstance->getId(), 'instance_id');
@@ -94,14 +114,8 @@ class Potoky_ItemBanner_Model_Observer
         return $this;
     }
 
-    private function deactivate($widgetInstance)
+    private function manageDeactivation($widgetInstance)
     {
-        static $skipDeactivate = false;
-
-        if($skipDeactivate) {
-            $skipDeactivate = false;
-            return $this;
-        }
         /* @var $itemBannerInfo Potoky_ItemBanner_Model_Bannerinfo */
         $itemBannerInfo = Mage::helper('itembanner')->getActiveInstanceInfo();
 
@@ -113,13 +127,11 @@ class Potoky_ItemBanner_Model_Observer
                 $parameters = $previousActiveInstance->getWidgetParameters();
                 $parameters['is_active'] = 0;
                 $previousActiveInstance->setData('widget_parameters', $parameters);
-                $previousActiveInstance->setData(
-                    'page_groups',
-                    unserialize($itemBannerInfo->getData('page_groups'))
-                );
-                $skipDeactivate = true;
+                $this->savedPostData = $itemBannerInfo->getData('saved_post_data');
                 $previousActiveInstance->save();
             }
         }
+
+        return $this;
     }
 }
