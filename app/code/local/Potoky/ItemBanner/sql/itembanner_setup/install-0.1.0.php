@@ -23,9 +23,6 @@ $table = $installer->getConnection()
         'nullable'  => false,
         'default'   => '0'
     ), 'The number the banner link has been clicked')
-    ->addColumn('saved_post_data', Varien_Db_Ddl_Table::TYPE_TEXT, null, array(
-        'nullable'  => false,
-    ), 'Current Widget Instance Page Groups to help save instance model without controller')
     ->addColumn('is_active', Varien_Db_Ddl_Table::TYPE_BOOLEAN,null, array(
         'default' => false
     ), 'Is the current widget instance active or not')

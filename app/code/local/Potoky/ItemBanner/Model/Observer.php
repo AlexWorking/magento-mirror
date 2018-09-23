@@ -7,7 +7,7 @@ class Potoky_ItemBanner_Model_Observer
      * 
      * @var 
      */
-    private $savedPostData;
+    private $saveWithoutController;
 
     /**
      * To be written
@@ -20,19 +20,25 @@ class Potoky_ItemBanner_Model_Observer
         /* @var $widgetInstance Mage_Widget_Model_Widget_Instance */
         $widgetInstance = $observer->getEvent()->getObject();
 
-        if(!$widgetInstance->getType() == "itembanner/banner") {
+        if($widgetInstance->getType() != "itembanner/banner") {
 
             return $this;
         }
 
-        if ($this->savedPostData) {
-            $savedPostData = unserialize($this->savedPostData);
-            $widgetInstance->setData('page_groups', $savedPostData[0]);
-            $widgetInstance->setData('page_group_ids', $savedPostData[1]);
-            unset($this->savedPostData);
+        if ($this->saveWithoutController) {
+            $pageCroups = $widgetInstance->getOrigData('page_groups');
+            $pageCroupIds = [];
+            foreach ($pageCroups as &$pageCroup) {
+                $pageCroup['layout_handle_updates'][] = $pageCroup['layout_handle'];
+                $pageCroupIds[] = $pageCroup['page_id'];
+            }
+            unset($pageCroup);
+            $widgetInstance->setData('page_groups', $pageCroups);
+            $widgetInstance->setData('page_group_ids', $pageCroupIds);
         } else {
-            $this->addSearchHandles($widgetInstance)->manageDeactivation($widgetInstance);
+            $this->manageDeactivation($widgetInstance);
         }
+        $this->addSearchHandles($widgetInstance);
 
         return $this;
     }
@@ -56,11 +62,7 @@ class Potoky_ItemBanner_Model_Observer
         if ($widgetInstance->isObjectNew()) {
             $itemBannerInfo ->setData([
                 'instance_id' => $widgetInstance->getId(),
-                'is_active'   => $widgetInstance->getWidgetParameters()['is_active'],
-                'saved_post_data' => serialize([
-                    $widgetInstance->getData('page_groups'),
-                    $widgetInstance->getData('page_group_ids')
-                ])
+                'is_active'   => $widgetInstance->getWidgetParameters()['is_active']
             ]);
         } else {
             $itemBannerInfo->load($widgetInstance->getId(), 'instance_id');
@@ -80,7 +82,7 @@ class Potoky_ItemBanner_Model_Observer
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function manageTemplateReset($observer)
+    public function removeInactiveItemBanners($observer)
     {
         $layout = $observer->getLayout();
         $itemBanners = Potoky_ItemBanner_Block_Banner::$allOfTheType;
@@ -91,6 +93,8 @@ class Potoky_ItemBanner_Model_Observer
                 if (!$block->getParentBlock() instanceof Mage_Catalog_Block_Product_List ||
                     !$block->getData('is_active')) {
                     $layout->unsetBlock($itemBanner);
+                } else {
+                    $itemBanners['active'] = $itemBanner;
                 }
             }
         }
@@ -127,7 +131,7 @@ class Potoky_ItemBanner_Model_Observer
                 $parameters = $previousActiveInstance->getWidgetParameters();
                 $parameters['is_active'] = 0;
                 $previousActiveInstance->setData('widget_parameters', $parameters);
-                $this->savedPostData = $itemBannerInfo->getData('saved_post_data');
+                $this->saveWithoutController = true;
                 $previousActiveInstance->save();
             }
         }
