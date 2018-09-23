@@ -90,7 +90,7 @@ class Potoky_ItemBanner_Model_Observer
                 $block = $layout->getBlock($itemBanner);
                 if (!$block->getParentBlock() instanceof Mage_Catalog_Block_Product_List ||
                     !$block->getData('is_active')) {
-                    $block->setTemplate('');
+                    $layout->unsetBlock($itemBanner);
                 }
             }
         }
