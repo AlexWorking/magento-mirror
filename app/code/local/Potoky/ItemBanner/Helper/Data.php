@@ -2,21 +2,27 @@
 
 class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    /**
-     * @var Potoky_ItemBanner_Model_Bannerinfo
-     */
-    public $activeInstanceInfo;
-
-    public function getActiveInstanceInfo()
+    public function toBeDeactivated($field = null)
     {
-        if (!isset($this->activeInstanceInfo)) {
-            $this->activeInstanceInfo = Mage::getModel('itembanner/bannerinfo')->load(true, 'is_active');
+        $collection = Mage::getModel('itembanner/bannerinfo')->getCollection();
+        if (in_array($field, ['grid', 'list'])) {
+            $toBeDeactivated = $collection
+                ->addFieldToFilter('position_in_' . $field)
+                ->addFieldToFilter('active_for_' . $field)
+                ->getFirstItem();
         }
-        return $this->activeInstanceInfo;
+        elseif ($field) {
+            $toBeDeactivated = $collection
+                ->addFieldToFilter('is_active');
+        } else {
+            return false;
+        }
+
+        return $toBeDeactivated;
     }
 
     public function getNamesOfActiveBlock()
     {
-        return $this->getActiveInstanceInfo()->getData('names_in_layout');
+        return $this->toBeDeactivated()->getData('names_in_layout');
     }
 }

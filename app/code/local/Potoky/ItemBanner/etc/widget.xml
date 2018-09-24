@@ -5,12 +5,38 @@
             <description type="desc">Depending on set position appears in place of a product block in the product list or grid</description>
         <parameters>
             <is_active>
-                <label>Is This Widget Instance Active</label>
+                <label>Is This Banner Active</label>
                 <visible>1</visible>
                 <default>0</default>
                 <type>select</type>
                 <source_model>adminhtml/system_config_source_yesno</source_model>
             </is_active>
+            <position_grid>
+                <label>The Position of the Banner in the Grid</label>
+                <visible>1</visible>
+                <type>text</type>
+                <note>Position in Grid</note>
+            </position_grid>
+            <active_for_grid>
+                <label>Will This Banner Appear in Grid Mode</label>
+                <visible>1</visible>
+                <default>1</default>
+                <type>select</type>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </active_for_grid>
+            <position_list>
+                <label>The Position of the Banner in the List</label>
+                <visible>1</visible>
+                <type>text</type>
+                <note>Position in List</note>
+            </position_list>
+            <active_for_list>
+                <label>Will This Banner Appear in List Mode</label>
+                <visible>1</visible>
+                <default>1</default>
+                <type>select</type>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </active_for_list>
             <image>
                 <label>Image For Banner</label>
                 <visible>1</visible>
