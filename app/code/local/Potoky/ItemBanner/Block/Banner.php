@@ -15,4 +15,10 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
 
         return parent::setNameInLayout($name);
     }
+
+    public function _getImagePath()
+    {
+        return Mage::getBaseUrl('media') . 'itembanner/' . $this->getData('image');
+    }
+
 }

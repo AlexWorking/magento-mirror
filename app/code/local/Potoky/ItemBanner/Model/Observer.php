@@ -26,23 +26,23 @@ class Potoky_ItemBanner_Model_Observer
         }
 
         if ($this->saveWithoutController) {
-            $origPageCroups = $widgetInstance->getOrigData('page_groups');
-            $pageCroups = [];
-            $pageCroupIds = [];
-            foreach ($origPageCroups as $origPageCroup) {
-                $pageCroups[$origPageCroup]['page_id'] = $origPageCroup['page_id'];
-                $pageCroups[$origPageCroup]['group'] = $origPageCroup['page_group'];
-                $pageCroups[$origPageCroup]['layout_handle'] = $origPageCroup['layout_handle'];
-                $pageCroups[$origPageCroup]['block_reference'] = $origPageCroup['block_reference'];
-                $pageCroups[$origPageCroup]['for'] = $origPageCroup['page_for'];
-                $pageCroups[$origPageCroup]['entities'] = $origPageCroup['entities'];
-                $pageCroups[$origPageCroup]['template'] = $origPageCroup['page_template'];
-                $pageCroups[$origPageCroup]['layout_handle_updates'][] = $origPageCroup['layout_handle'];
+            $origPageGroups = $widgetInstance->getOrigData('page_groups');
+            $pageGroups = [];
+            $pageGroupIds = [];
+            foreach ($origPageGroups as $number => $origPageGroup) {
+                $pageGroups[$number]['page_id'] = $origPageGroup['page_id'];
+                $pageGroups[$number]['group'] = $origPageGroup['page_group'];
+                $pageGroups[$number]['layout_handle'] = $origPageGroup['layout_handle'];
+                $pageGroups[$number]['block_reference'] = $origPageGroup['block_reference'];
+                $pageGroups[$number]['for'] = $origPageGroup['page_for'];
+                $pageGroups[$number]['entities'] = $origPageGroup['entities'];
+                $pageGroups[$number]['template'] = $origPageGroup['page_template'];
+                $pageGroups[$number]['layout_handle_updates'][] = $origPageGroup['layout_handle'];
 
-                $pageCroupIds[] = $origPageCroup['page_id'];
+                $pageGroupIds[] = $origPageGroup['page_id'];
             }
-            $widgetInstance->setData('page_groups', $pageCroups);
-            $widgetInstance->setData('page_group_ids', $pageCroupIds);
+            $widgetInstance->setData('page_groups', $pageGroups);
+            $widgetInstance->setData('page_group_ids', $pageGroupIds);
         } else {
             $this->manageDeactivation($widgetInstance);
         }
@@ -93,16 +93,15 @@ class Potoky_ItemBanner_Model_Observer
     public function removeInactiveItemBanners($observer)
     {
         $layout = $observer->getLayout();
-        $itemBanners = Potoky_ItemBanner_Block_Banner::$allOfTheType;
-        if(!empty($itemBanners)) {
-            foreach ($itemBanners as $itemBanner) {
+        if(!empty(Potoky_ItemBanner_Block_Banner::$allOfTheType)) {
+            foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $itemBanner) {
                 /* @var $block Potoky_ItemBanner_Block_Banner */
                 $block = $layout->getBlock($itemBanner);
                 if (!$block->getParentBlock() instanceof Mage_Catalog_Block_Product_List ||
                     !$block->getData('is_active')) {
                     $layout->unsetBlock($itemBanner);
                 } else {
-                    $itemBanners['active'] = $itemBanner;
+                    Potoky_ItemBanner_Block_Banner::$allOfTheType['active'] = $itemBanner;
                 }
             }
         }
