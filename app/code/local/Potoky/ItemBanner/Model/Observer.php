@@ -128,12 +128,23 @@ class Potoky_ItemBanner_Model_Observer
     private function manageDeactivation($widgetInstance)
     {
         $parameters = $widgetInstance->getWidgetParameters();
-        if ($parameters['is_active']) {
-            $active_for_grid = $parameters['active_for_grid'];
-            $active_for_list = $parameters['active_for_list'];
+        if (!$parameters['is_active']) {
+
+            return $this;
         }
+
+        $toBeDeactivatedIds = Mage::helper('itembanner')->toBeDeactivatedIds([
+            'grid' => [
+                'position'   => $parameters['position_in_grid'],
+                'activeness' => $parameters['active_for_grid']
+            ],
+            'list' => [
+                'position'   => $parameters['position_in_list'],
+                'activeness' => $parameters['active_for_list']
+            ]
+        ]);
+
         /* @var $itemBannerInfo Potoky_ItemBanner_Model_Bannerinfo */
-        $itemBannerInfo = Mage::helper('itembanner')->toBeDeactivated();
 
         if ($itemBannerInfo->getId()) {
             $activeInstanceId = $itemBannerInfo->getInstanceId();

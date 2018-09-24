@@ -11,12 +11,12 @@
                 <type>select</type>
                 <source_model>adminhtml/system_config_source_yesno</source_model>
             </is_active>
-            <position_grid>
+            <position_in_grid>
                 <label>The Position of the Banner in the Grid</label>
                 <visible>1</visible>
                 <type>text</type>
                 <note>Position in Grid</note>
-            </position_grid>
+            </position_in_grid>
             <active_for_grid>
                 <label>Will This Banner Appear in Grid Mode</label>
                 <visible>1</visible>
@@ -24,12 +24,12 @@
                 <type>select</type>
                 <source_model>adminhtml/system_config_source_yesno</source_model>
             </active_for_grid>
-            <position_list>
+            <position_in_list>
                 <label>The Position of the Banner in the List</label>
                 <visible>1</visible>
                 <type>text</type>
                 <note>Position in List</note>
-            </position_list>
+            </position_in_list>
             <active_for_list>
                 <label>Will This Banner Appear in List Mode</label>
                 <visible>1</visible>

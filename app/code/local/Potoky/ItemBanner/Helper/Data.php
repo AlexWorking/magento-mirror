@@ -2,23 +2,24 @@
 
 class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    public function toBeDeactivated($field = null)
+    public function toBeDeactivatedIds(array $infoArray)
     {
-        $collection = Mage::getModel('itembanner/bannerinfo')->getCollection();
-        if (in_array($field, ['grid', 'list'])) {
-            $toBeDeactivated = $collection
-                ->addFieldToFilter('position_in_' . $field)
-                ->addFieldToFilter('active_for_' . $field)
-                ->getFirstItem();
-        }
-        elseif ($field) {
-            $toBeDeactivated = $collection
-                ->addFieldToFilter('is_active');
-        } else {
-            return false;
-        }
+        $activeForGridId = Mage::getModel('itembanner/bannerinfo')
+            ->getCollection()
+            ->addFieldToFilter('position_in_grid', $infoArray['grid']['position'])
+            ->addFieldToFilter('active_for_grid', $infoArray['grid']['activeness'])
+            ->getFirstItem()
+            ->getData('instance_id');
 
-        return $toBeDeactivated;
+        $activeForListId = Mage::getModel('itembanner/bannerinfo')
+            ->getCollection()
+            ->addFieldToFilter('position_in_list', $infoArray['list']['position'])
+            ->addFieldToFilter('active_for_list', $infoArray['list']['activeness'])
+            ->getFirstItem()
+            ->getData('instance_id');
+
+
+        return ['grid' => $activeForGridId, 'list' => $activeForListId];
     }
 
     public function getNamesOfActiveBlock()
