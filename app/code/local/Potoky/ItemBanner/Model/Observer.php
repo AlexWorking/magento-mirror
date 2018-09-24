@@ -26,13 +26,21 @@ class Potoky_ItemBanner_Model_Observer
         }
 
         if ($this->saveWithoutController) {
-            $pageCroups = $widgetInstance->getOrigData('page_groups');
+            $origPageCroups = $widgetInstance->getOrigData('page_groups');
+            $pageCroups = [];
             $pageCroupIds = [];
-            foreach ($pageCroups as &$pageCroup) {
-                $pageCroup['layout_handle_updates'][] = $pageCroup['layout_handle'];
-                $pageCroupIds[] = $pageCroup['page_id'];
+            foreach ($origPageCroups as $origPageCroup) {
+                $pageCroups[$origPageCroup]['page_id'] = $origPageCroup['page_id'];
+                $pageCroups[$origPageCroup]['group'] = $origPageCroup['page_group'];
+                $pageCroups[$origPageCroup]['layout_handle'] = $origPageCroup['layout_handle'];
+                $pageCroups[$origPageCroup]['block_reference'] = $origPageCroup['block_reference'];
+                $pageCroups[$origPageCroup]['for'] = $origPageCroup['page_for'];
+                $pageCroups[$origPageCroup]['entities'] = $origPageCroup['entities'];
+                $pageCroups[$origPageCroup]['template'] = $origPageCroup['page_template'];
+                $pageCroups[$origPageCroup]['layout_handle_updates'][] = $origPageCroup['layout_handle'];
+
+                $pageCroupIds[] = $origPageCroup['page_id'];
             }
-            unset($pageCroup);
             $widgetInstance->setData('page_groups', $pageCroups);
             $widgetInstance->setData('page_group_ids', $pageCroupIds);
         } else {
