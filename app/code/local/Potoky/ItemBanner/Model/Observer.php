@@ -15,7 +15,7 @@ class Potoky_ItemBanner_Model_Observer
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function additionalBeforeSave($observer)
+    public function additionalBeforeSave(Varien_Event_Observer $observer)
     {
         /* @var $widgetInstance Mage_Widget_Model_Widget_Instance */
         $widgetInstance = $observer->getEvent()->getObject();
