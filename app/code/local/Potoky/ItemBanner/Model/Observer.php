@@ -25,28 +25,7 @@ class Potoky_ItemBanner_Model_Observer
             return $this;
         }
 
-        if ($this->saveWithoutController) {
-            $origPageGroups = $widgetInstance->getOrigData('page_groups');
-            $pageGroups = [];
-            $pageGroupIds = [];
-            foreach ($origPageGroups as $number => $origPageGroup) {
-                $pageGroups[$number]['page_id'] = $origPageGroup['page_id'];
-                $pageGroups[$number]['group'] = $origPageGroup['page_group'];
-                $pageGroups[$number]['layout_handle'] = $origPageGroup['layout_handle'];
-                $pageGroups[$number]['block_reference'] = $origPageGroup['block_reference'];
-                $pageGroups[$number]['for'] = $origPageGroup['page_for'];
-                $pageGroups[$number]['entities'] = $origPageGroup['entities'];
-                $pageGroups[$number]['template'] = $origPageGroup['page_template'];
-                $pageGroups[$number]['layout_handle_updates'][] = $origPageGroup['layout_handle'];
-
-                $pageGroupIds[] = $origPageGroup['page_id'];
-            }
-            $widgetInstance->setData('page_groups', $pageGroups);
-            $widgetInstance->setData('page_group_ids', $pageGroupIds);
-        } else {
-            $this->manageDeactivation($widgetInstance);
-        }
-        $this->addSearchHandles($widgetInstance);
+        $this->addSearchHandles($widgetInstance)->manageInstancDisplay($widgetInstance);
 
         return $this;
     }
@@ -125,40 +104,34 @@ class Potoky_ItemBanner_Model_Observer
         return $this;
     }
 
-    private function manageDeactivation($widgetInstance)
+    private function manageInstancDisplay($widgetInstance)
     {
         $parameters = $widgetInstance->getWidgetParameters();
-        if (!$parameters['is_active']) {
-
-            return $this;
-        }
-
-        $toBeDeactivatedIds = Mage::helper('itembanner')->toBeDeactivatedIds([
+        $id = $widgetInstance->getId();
+        $displayArray = unserialize(Mage::getStoreConfig('cms/itembanner/displayed_banners_info'));
+        $displayArray = ($displayArray) ? $displayArray : [
             'grid' => [
-                'position'   => $parameters['position_in_grid'],
-                'activeness' => $parameters['active_for_grid']
+                'active' =>  [],
+                'passive' => []
             ],
             'list' => [
-                'position'   => $parameters['position_in_list'],
-                'activeness' => $parameters['active_for_list']
+                'active' =>  [],
+                'passive' => []
             ]
-        ]);
-
-        /* @var $itemBannerInfo Potoky_ItemBanner_Model_Bannerinfo */
-
-        if ($itemBannerInfo->getId()) {
-            $activeInstanceId = $itemBannerInfo->getInstanceId();
-            if ($widgetInstance->getWidgetParameters()['is_active'] &&
-                $widgetInstance->getId() != $activeInstanceId) {
-                $previousActiveInstance = Mage::getModel('widget/widget_instance')->load($activeInstanceId);
-                $parameters = $previousActiveInstance->getWidgetParameters();
-                $parameters['is_active'] = 0;
-                $previousActiveInstance->setData('widget_parameters', $parameters);
-                $this->saveWithoutController = true;
-                $previousActiveInstance->save();
-            }
+        ];
+        $instanceForCheckId = $displayArray['grid']['active'][$parameters['position_in_grid']];
+        if ($instanceForCheckId && $instanceForCheckId != $id) {
+            $instanceForCheck = Mage::getModel('widget/widget_instance')->load($instanceForCheckId);
+            if ($this->getPriorInstance())
         }
 
-        return $this;
+        $displayArray['grid']['active']$parameters['position_in_grid'] = $id;
+        $displayArray['list']['active']$parameters['position_in_list'] = $id;
+
+        $existingInstances = Mage::getModel('widget/widget_instance')->getCollection();
+        foreach ($existingInstances as $instance) {
+            
+        }
     }
+
 }
