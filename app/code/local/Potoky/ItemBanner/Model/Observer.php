@@ -104,34 +104,27 @@ class Potoky_ItemBanner_Model_Observer
         return $this;
     }
 
-    private function manageInstancDisplay($widgetInstance)
+    private function managePositionArray($widgetInstance)
     {
         $parameters = $widgetInstance->getWidgetParameters();
-        $id = $widgetInstance->getId();
-        $displayArray = unserialize(Mage::getStoreConfig('cms/itembanner/displayed_banners_info'));
-        $displayArray = ($displayArray) ? $displayArray : [
-            'grid' => [
-                'active' =>  [],
-                'passive' => []
-            ],
-            'list' => [
-                'active' =>  [],
-                'passive' => []
-            ]
-        ];
-        $instanceForCheckId = $displayArray['grid']['active'][$parameters['position_in_grid']];
-        if ($instanceForCheckId && $instanceForCheckId != $id) {
-            $instanceForCheck = Mage::getModel('widget/widget_instance')->load($instanceForCheckId);
-            if ($this->getPriorInstance())
+        $storeIds = explode(',', $widgetInstance->getData('store_ids'));
+        $positioningArray = unserialize(Mage::getStoreConfig('cms/itembanner/banners_positioning'));
+        $positioningArray = ($positioningArray) ? $positioningArray : [];
+
+        foreach ($storeIds as $storeId) {
+            if ($parameters['is_active']) {
+                $positioningArray[$storeId]['grid'][$widgetInstance->getId()] = $parameters['position_in_grid'];
+                $positioningArray[$storeId]['list'][$widgetInstance->getId()] = $parameters['position_in_list'];
+            } else {
+                unset($positioningArray[$storeId]['grid'][$widgetInstance->getId()]);
+                unset($positioningArray[$storeId]['list'][$widgetInstance->getId()]);
+            }
         }
 
-        $displayArray['grid']['active']$parameters['position_in_grid'] = $id;
-        $displayArray['list']['active']$parameters['position_in_list'] = $id;
-
-        $existingInstances = Mage::getModel('widget/widget_instance')->getCollection();
-        foreach ($existingInstances as $instance) {
-            
-        }
+        Mage::getModel('core/config')->saveConfig(
+            'cms/itembanner/banners_positioning',
+            serialize($positioningArray)
+        );
     }
 
 }
