@@ -69,20 +69,22 @@ class Potoky_ItemBanner_Model_Observer
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function removeInactiveItemBanners($observer)
+    public function removeNoDisplayBanners($observer)
     {
         $layout = $observer->getLayout();
-        if(!empty(Potoky_ItemBanner_Block_Banner::$allOfTheType)) {
-            foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $itemBanner) {
-                /* @var $block Potoky_ItemBanner_Block_Banner */
-                $block = $layout->getBlock($itemBanner);
-                if (!$block->getParentBlock() instanceof Mage_Catalog_Block_Product_List ||
-                    !$block->getData('is_active')) {
-                    $layout->unsetBlock($itemBanner);
-                } else {
-                    Potoky_ItemBanner_Block_Banner::$allOfTheType['active'] = $itemBanner;
-                }
-            }
+        $positioningArray = unserialize(Mage::getStoreConfig('cms/itembanner/banners_positioning'));
+        if(!$positioningArray) {
+
+            return $this;
+        }
+
+        $posInstArray = [];
+        $storeId = Mage::app()->getStore()->getId();
+        $toolbar = $layout->getBlock('product_list_toolbar');
+        $mode = $toolbar->getCurrentMode();
+        foreach($positioningArray[$storeId][$mode] as $position) {
+            $firstOrder = array_shift($position);
+            $posInstArray[]
         }
 
         return $this;
@@ -106,19 +108,21 @@ class Potoky_ItemBanner_Model_Observer
 
     private function managePositionArray($widgetInstance)
     {
-        $parameters = $widgetInstance->getWidgetParameters();
+        $currentInstanceId = $widgetInstance->getId();
+        $sortOrder = $widgetInstance->getData('sort_order');
         $storeIds = explode(',', $widgetInstance->getData('store_ids'));
+        $parameters = $widgetInstance->getWidgetParameters();
+        $gridPosition = $parameters('position_in_grid');
+        $listPosition = $parameters('position_in_list');
         $positioningArray = unserialize(Mage::getStoreConfig('cms/itembanner/banners_positioning'));
         $positioningArray = ($positioningArray) ? $positioningArray : [];
 
         foreach ($storeIds as $storeId) {
-            if ($parameters['is_active']) {
-                $positioningArray[$storeId]['grid'][$widgetInstance->getId()] = $parameters['position_in_grid'];
-                $positioningArray[$storeId]['list'][$widgetInstance->getId()] = $parameters['position_in_list'];
-            } else {
-                unset($positioningArray[$storeId]['grid'][$widgetInstance->getId()]);
-                unset($positioningArray[$storeId]['list'][$widgetInstance->getId()]);
+            if (!$parameters['is_active']) {
+                continue;
             }
+            $positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][] = $currentInstanceId;
+            $positioningArray[$storeId]['list'][$listPosition][$sortOrder][] = $currentInstanceId;
         }
 
         Mage::getModel('core/config')->saveConfig(

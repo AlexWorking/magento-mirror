@@ -90,7 +90,7 @@
                     <template_only_to_active>
                         <type>singleton</type>
                         <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>removeInactiveItemBanners</method>
+                        <method>removeNoDisplayBanners</method>
                     </template_only_to_active>
                 </observers>
             </controller_action_layout_generate_blocks_after>
