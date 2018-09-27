@@ -77,10 +77,37 @@
                     <itembanner_info_to_db>
                         <type>singleton</type>
                         <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>registerInfoToDb</method>
+                        <method>additionalAfterSave</method>
                     </itembanner_info_to_db>
                 </observers>
             </widget_widget_instance_save_after>
+            <widget_widget_instance_delete_before>
+                <observers>
+                    <update_service_system_confif_data>
+                        <type>singleton</type>
+                        <class>Potoky_ItemBanner_Model_Observer</class>
+                        <method>updateServiceData</method>
+                    </update_service_system_confif_data>
+                </observers>
+            </widget_widget_instance_delete_before>
+            <store_add>
+                <observers>
+                    <add_store_id_to_system_config_service_value>
+                        <type>singleton</type>
+                        <class>Potoky_ItemBanner_Model_Observer</class>
+                        <method>updateServiceData</method>
+                    </add_store_id_to_system_config_service_value>
+                </observers>
+            </store_add>
+            <store_delete>
+                <observers>
+                    <delete_store_id_from_system_config_service_value>
+                        <type>singleton</type>
+                        <class>Potoky_ItemBanner_Model_Observer</class>
+                        <method>updateServiceData</method>
+                    </delete_store_id_from_system_config_service_value>
+                </observers>
+            </store_delete>
         </events>
     </adminhtml>
     <frontend>
@@ -90,7 +117,7 @@
                     <template_only_to_active>
                         <type>singleton</type>
                         <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>removeNoDisplayBanners</method>
+                        <method>prepareDisplayBanners</method>
                     </template_only_to_active>
                 </observers>
             </controller_action_layout_generate_blocks_after>
