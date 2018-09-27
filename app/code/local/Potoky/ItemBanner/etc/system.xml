@@ -11,6 +11,15 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
+                        <all_store_ids>
+                            <label>All Existing Store View Ids</label>
+                            <frontend_type>text</frontend_type>
+                            <default>0</default>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </all_store_ids>
                         <active_banners_positioning>
                             <label>Info on Positions of Currently Displayed Banners</label>
                             <frontend_type>text</frontend_type>
@@ -19,14 +28,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active_banners_positioning>
-                        <all_store_ids>
-                            <label>All Existing Store View Ids</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>1</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </all_store_ids>
                     </fields>
                 </itembanner>
             </groups>

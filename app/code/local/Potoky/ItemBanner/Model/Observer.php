@@ -53,8 +53,7 @@ class Potoky_ItemBanner_Model_Observer
     public function updateServiceData($observer)
     {
         $event = $observer->getEvent();
-        $eventName = $event->getName();
-        switch ($eventName) {
+        switch ($event->getName()) {
             case 'store_add':
                 $this->considerStoreAdd($event->getStore()->getId());
                 break;
@@ -112,31 +111,24 @@ class Potoky_ItemBanner_Model_Observer
 
     private function managePositioningArray($widgetInstance)
     {
-        $currentInstanceId = $widgetInstance->getId();
-        $sortOrder = $widgetInstance->getData('sort_order');
-        $storeIds = explode(
-            ',',
-            ($widgetInstance->getData('store_ids') != 0) ? $widgetInstance->getData('store_ids') : Mage::getStoreConfig('cms/itembanner/all_store_ids')
-        );
-        $parameters = $widgetInstance->getWidgetParameters();
-        $gridPosition = $parameters['position_in_grid'];
-        $listPosition = $parameters['position_in_list'];
-        $positioningArray = unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning'));
+        extract(Mage::helper('itembanner')->getWidgetRelatedData($widgetInstance));
         $positioningArray = ($positioningArray) ? $positioningArray : [];
 
-        foreach ($storeIds as $storeId) {
-            if (!$parameters['is_active']) {
-                $gridKeyToUnset = array_search($currentInstanceId ,$positioningArray[$storeId]['grid'][$gridPosition][$sortOrder]);
-                $listKeyToUnset = array_search($currentInstanceId ,$positioningArray[$storeId]['list'][$listPosition][$sortOrder]);
-                unset($positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][$gridKeyToUnset]);
-                unset($positioningArray[$storeId]['list'][$listPosition][$sortOrder][$listKeyToUnset]);
+        if (!$parameters['is_active']) {
+            foreach ($storeIds as $storeId) {
+                    $gridKeyToUnset = array_search($currentInstanceId ,$positioningArray[$storeId]['grid'][$gridPosition][$sortOrder]);
+                    $listKeyToUnset = array_search($currentInstanceId ,$positioningArray[$storeId]['list'][$listPosition][$sortOrder]);
+                    unset($positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][$gridKeyToUnset]);
+                    unset($positioningArray[$storeId]['list'][$listPosition][$sortOrder][$listKeyToUnset]);
             }
-            $positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][] = $currentInstanceId;
-            $positioningArray[$storeId]['list'][$listPosition][$sortOrder][] = $currentInstanceId;
-            rsort($positioningArray[$storeId]['grid'][$gridPosition]);
-            rsort($positioningArray[$storeId]['list'][$listPosition]);
+        } else {
+            foreach ($storeIds as $storeId) {
+                $positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][] = $currentInstanceId;
+                $positioningArray[$storeId]['list'][$listPosition][$sortOrder][] = $currentInstanceId;
+                rsort($positioningArray[$storeId]['grid'][$gridPosition]);
+                rsort($positioningArray[$storeId]['list'][$listPosition]);
+            }
         }
-
         Mage::getModel('core/config')->saveConfig(
             'cms/itembanner/active_banners_positioning',
             serialize($positioningArray)
@@ -164,16 +156,24 @@ class Potoky_ItemBanner_Model_Observer
     private function considerStoreAdd($storeId)
     {
         $storeIds = Mage::getStoreConfig('cms/itembanner/all_store_ids');
-        $storeIds = (!$storeIds) ? $storeId : sprintf('%s,%s', $storeIds, $storeId);
+        $storeIds = sprintf('%s,%s', $storeIds, $storeId);
 
         Mage::getModel('core/config')->saveConfig('cms/itembanner/all_store_ids', $storeIds);
+
+        $positioningArray = Mage::getStoreConfig('cms/itembanner/active_banners_positioning');
+        $positioningArray = ($positioningArray) ? $positioningArray : [];
+        foreach ($positioningArray[0]['grid'] as $position) {
+            $positioningStoreIdArray = array_keys($positioningArray);
+            foreach ($positioningStoreIdArray as $value) {
+
+            }
+        }
     }
 
     private function considerStoredelete($storeId)
     {
         $storeIds = Mage::getStoreConfig('cms/itembanner/all_store_ids');
-        str_replace($storeId, '', $storeIds);
-        str_replace(',,', ',', $storeIds);
+        str_replace(',' . $storeId, '', $storeIds);
 
         Mage::getModel('core/config')->saveConfig('cms/itembanner/all_store_ids', $storeIds);
     }
