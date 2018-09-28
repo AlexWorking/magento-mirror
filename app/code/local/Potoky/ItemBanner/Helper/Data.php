@@ -2,29 +2,35 @@
 
 class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    public function toBeDeactivatedIds(array $infoArray)
+    public function getAllStoreIds()
     {
-        $activeForGridId = Mage::getModel('itembanner/bannerinfo')
-            ->getCollection()
-            ->addFieldToFilter('position_in_grid', $infoArray['grid']['position'])
-            ->addFieldToFilter('active_for_grid', $infoArray['grid']['activeness'])
-            ->getFirstItem()
-            ->getData('instance_id');
+        $storeIds = Mage::getStoreConfig('cms/itembanner/all_store_ids');
+        if(!$storeIds) {
+            $storeIds = 0;
+        }
+        if($storeIds == 0) {
+            foreach (Mage::app()->getStores() as $store) {
+                $storeIds .= $storeIds . ',' . $store->getId();
+            }
+            Mage::getModel('core/config')->saveConfig('cms/itembanner/all_store_ids', $storeIds);
+        }
 
-        $activeForListId = Mage::getModel('itembanner/bannerinfo')
-            ->getCollection()
-            ->addFieldToFilter('position_in_list', $infoArray['list']['position'])
-            ->addFieldToFilter('active_for_list', $infoArray['list']['activeness'])
-            ->getFirstItem()
-            ->getData('instance_id');
-
-
-        return ['grid' => $activeForGridId, 'list' => $activeForListId];
+        return $storeIds;
     }
 
-    public function getNamesOfActiveBlock()
+    public function getPositioningArray()
     {
-        return $this->toBeDeactivated()->getData('names_in_layout');
+        $positioningArray = unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning'));
+        if(!$positioningArray) {
+            $positioningArray = [];
+            $storeIds = explode(',', $this->getAllStoreIds());
+            foreach ($storeIds as $storeId) {
+                $positioningArray[$storeId] = [];
+            }
+            Mage::getModel('core/config')->saveConfig('cms/itembanner/active_banners_positioning', $positioningArray);
+        }
+
+        return $positioningArray;
     }
 
     public function getWidgetRelatedData($widgetInstance, $ifActiveOnly = true)
@@ -36,17 +42,14 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        return [
+        return [$isActive => [
             'currentInstanceId' => $widgetInstance->getId(),
             'sortOrder'         => $widgetInstance->getData('sort_order'),
-            'storeIds'          => explode(
-                ',',
-                ($widgetInstance->getData('store_ids') != 0) ? $widgetInstance->getData('store_ids') : Mage::getStoreConfig('cms/itembanner/all_store_ids')
-            ),
+            'storeIds'          => ($parameters['store_ids'] == 0) ? explode(',', $this->getAllStoreIds()) : $parameters['store_ids'],
             'gridPosition'      => $parameters['position_in_grid'],
             'listPosition'      => $parameters['position_in_list'],
-            'is_active'         => $isActive,
-            'positioningArray'  => unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning'))
+            'positioningArray'  => $this->getPositioningArray()
+            ]
         ];
     }
 }
