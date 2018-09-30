@@ -8,9 +8,9 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
         if(!$storeIds) {
             $storeIds = 0;
         }
-        if($storeIds == 0) {
+        if($storeIds == "0") {
             foreach (Mage::app()->getStores() as $store) {
-                $storeIds .= $storeIds . ',' . $store->getId();
+                $storeIds .= ',' . $store->getId();
             }
             Mage::getModel('core/config')->saveConfig('cms/itembanner/all_store_ids', $storeIds);
         }
@@ -27,7 +27,10 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
             foreach ($storeIds as $storeId) {
                 $positioningArray[$storeId] = [];
             }
-            Mage::getModel('core/config')->saveConfig('cms/itembanner/active_banners_positioning', $positioningArray);
+            Mage::getModel('core/config')->saveConfig(
+                'cms/itembanner/active_banners_positioning',
+                serialize($positioningArray)
+            );
         }
 
         return $positioningArray;
@@ -45,7 +48,7 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
         return [$isActive => [
             'currentInstanceId' => $widgetInstance->getId(),
             'sortOrder'         => $widgetInstance->getData('sort_order'),
-            'storeIds'          => ($parameters['store_ids'] == 0) ? explode(',', $this->getAllStoreIds()) : $parameters['store_ids'],
+            'storeIds'          => ($parameters['store_ids'][0] == 0) ? explode(',', $this->getAllStoreIds()) : $parameters['store_ids'],
             'gridPosition'      => $parameters['position_in_grid'],
             'listPosition'      => $parameters['position_in_list'],
             'positioningArray'  => $this->getPositioningArray()

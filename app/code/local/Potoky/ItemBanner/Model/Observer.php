@@ -49,7 +49,7 @@ class Potoky_ItemBanner_Model_Observer
                 $this->considerStoreDelete($event->getStore()->getId());
                 break;
             case 'widget_widget_instance_save_after':
-                $this->considerBannerSave($event->getStore()->getId());
+                $this->considerBannerSave($event->getObject());
                 break;
             case 'widget_widget_instance_delete_after':
                 $this->considerBannerDelete($event->getObject());
@@ -67,7 +67,7 @@ class Potoky_ItemBanner_Model_Observer
      */
     public function prepareDisplayBanners($observer)
     {
-        $positioningArray = (unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning'))) ?? [];
+        $positioningArray = (unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning')));
         $layout = $observer->getLayout();
         $positioningArray = unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning'));
         if(!$positioningArray) {
@@ -78,6 +78,9 @@ class Potoky_ItemBanner_Model_Observer
         $posInstArray = [];
         $storeId = Mage::app()->getStore()->getId();
         $toolbar = $layout->getBlock('product_list_toolbar');
+        if(!$toolbar) {
+            return $this;
+        }
         $mode = $toolbar->getCurrentMode();
         foreach($positioningArray[$storeId][$mode] as $position => $orders) {
             $firstOrder = current($orders);
@@ -116,7 +119,10 @@ class Potoky_ItemBanner_Model_Observer
         $positioningArray = Mage::helper('itembanner')->getPositioningArray();
         $positioningArray[$storeId] = $positioningArray[0];
 
-        Mage::getModel('core/config')->saveConfig('cms/itembanner/active_banners_positioning', $positioningArray);
+        Mage::getModel('core/config')->saveConfig(
+            'cms/itembanner/active_banners_positioning',
+            serialize($positioningArray)
+        );
     }
 
     private function considerStoreDelete($storeId)
@@ -129,7 +135,10 @@ class Potoky_ItemBanner_Model_Observer
         $positioningArray = Mage::helper('itembanner')->getPositioningArray();
         unset($positioningArray[$storeId]);
 
-        Mage::getModel('core/config')->saveConfig('cms/itembanner/active_banners_positioning', $positioningArray);
+        Mage::getModel('core/config')->saveConfig(
+            'cms/itembanner/active_banners_positioning',
+            serialize($positioningArray)
+        );
     }
 
     private function considerBannerSave($widgetInstance)
@@ -137,9 +146,9 @@ class Potoky_ItemBanner_Model_Observer
         $data = Mage::helper('itembanner')->getWidgetRelatedData($widgetInstance);
 
         if (!key($data)) {
-            $positioningArray = $this->unsetPositioningArrayElements($data['is_active']);
+            $positioningArray = $this->unsetPositioningArrayElements(current($data));
         } else {
-            $positioningArray = $this->setPositioningArrayElements($data['is_active']);
+            $positioningArray = $this->setPositioningArrayElements(current($data));
         }
 
         Mage::getModel('core/config')->saveConfig(
@@ -169,8 +178,12 @@ class Potoky_ItemBanner_Model_Observer
     {
         extract($data);
         foreach ($storeIds as $storeId) {
-            $positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][] = $currentInstanceId;
-            $positioningArray[$storeId]['list'][$listPosition][$sortOrder][] = $currentInstanceId;
+            if(!$positioningArray[$storeId]['grid'][$gridPosition][$sortOrder]) {
+                $positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][] = $currentInstanceId;
+            }
+            if (!$positioningArray[$storeId]['list'][$listPosition][$sortOrder]) {
+                $positioningArray[$storeId]['list'][$listPosition][$sortOrder][] = $currentInstanceId;
+            }
             rsort($positioningArray[$storeId]['grid'][$gridPosition]);
             rsort($positioningArray[$storeId]['list'][$listPosition]);
         }
