@@ -38,61 +38,10 @@ class Potoky_ItemBanner_Model_Observer
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function updateServiceData($observer)
+    public function registerInfoToDb(Varien_Event_Observer $observer)
     {
-        $event = $observer->getEvent();
-        switch ($event->getName()) {
-            case 'store_add':
-                $this->considerStoreAdd($event->getStore()->getId());
-                break;
-            case 'store_delete':
-                $this->considerStoreDelete($event->getStore()->getId());
-                break;
-            case 'widget_widget_instance_save_after':
-                $this->considerBannerSave($event->getObject());
-                break;
-            case 'widget_widget_instance_delete_after':
-                $this->considerBannerDelete($event->getObject());
-                break;
-        }
+        $widgetInstance = $observer->getEvent()->getObject();
 
-        return $this;
-    }
-
-    /**
-     * To be written
-     *
-     * @param Varien_Event_Observer $observer
-     * @return $this
-     */
-    public function prepareDisplayBanners($observer)
-    {
-        $positioningArray = (unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning')));
-        $layout = $observer->getLayout();
-        $positioningArray = unserialize(Mage::getStoreConfig('cms/itembanner/active_banners_positioning'));
-        if(!$positioningArray) {
-
-            return $this;
-        }
-
-        $posInstArray = [];
-        $storeId = Mage::app()->getStore()->getId();
-        $toolbar = $layout->getBlock('product_list_toolbar');
-        if(!$toolbar) {
-            return $this;
-        }
-        $mode = $toolbar->getCurrentMode();
-        foreach($positioningArray[$storeId][$mode] as $position => $orders) {
-            $firstOrder = current($orders);
-            $firstInstanceId = current($firstOrder);
-            $posInstArray[$position] = $firstInstanceId;
-        }
-        
-        return $this;
-    }
-
-    private function registerInfoToDb($widgetInstance)
-    {
         $itemBannerInfo = Mage::getModel('itembanner/bannerinfo');
         if ($widgetInstance->isObjectNew()) {
             $itemBannerInfo ->setData([
@@ -107,98 +56,119 @@ class Potoky_ItemBanner_Model_Observer
             );
         }
         $itemBannerInfo->save();
+
+        return $this;
     }
 
-    private function considerStoreAdd($storeId)
+    /**
+     * To be written
+     *
+     * @param Varien_Event_Observer $observer
+     * @return $this
+     */
+    public function prepareDisplayBanners($observer)
     {
-        $storeIds = Mage::getStoreConfig('cms/itembanner/all_store_ids');
-        $storeIds = sprintf('%s,%s', $storeIds, $storeId);
+        $layout = $observer->getLayout();
 
-        Mage::getModel('core/config')->saveConfig('cms/itembanner/all_store_ids', $storeIds);
-
-        $positioningArray = Mage::helper('itembanner')->getPositioningArray();
-        $positioningArray[$storeId] = $positioningArray[0];
-
-        Mage::getModel('core/config')->saveConfig(
-            'cms/itembanner/active_banners_positioning',
-            serialize($positioningArray)
-        );
-    }
-
-    private function considerStoreDelete($storeId)
-    {
-        $storeIds = Mage::getStoreConfig('cms/itembanner/all_store_ids');
-        str_replace(',' . $storeId, '', $storeIds);
-
-        Mage::getModel('core/config')->saveConfig('cms/itembanner/all_store_ids', $storeIds);
-
-        $positioningArray = Mage::helper('itembanner')->getPositioningArray();
-        unset($positioningArray[$storeId]);
-
-        Mage::getModel('core/config')->saveConfig(
-            'cms/itembanner/active_banners_positioning',
-            serialize($positioningArray)
-        );
-    }
-
-    private function considerBannerSave($widgetInstance)
-    {
-        $data = Mage::helper('itembanner')->getWidgetRelatedData($widgetInstance);
-
-        if (!key($data)) {
-            $positioningArray = $this->unsetPositioningArrayElements(current($data));
-        } else {
-            $positioningArray = $this->setPositioningArrayElements(current($data));
+        $option = Mage::getStoreConfig('cms/itembanner/rendering_type');
+        $psitioningArray = false;
+        switch ($option) {
+            case 1:
+                $psitioningArray = $this->renderFirstOccupy($layout);
+                break;
+            case 2:
+                $psitioningArray = $this->renderMoveToNext($layout);
+                break;
         }
 
-        Mage::getModel('core/config')->saveConfig(
-            'cms/itembanner/active_banners_positioning',
-            serialize($positioningArray)
-        );
-
-        $this->registerInfoToDb($widgetInstance);
-    }
-
-    private function considerBannerDelete($widgetInstance)
-    {
-        $data = Mage::helper('itembanner')->getWidgetRelatedData($widgetInstance, true);
-        if(!$data) {
-            return;
+        if($psitioningArray) {
+            Mage::unregister('potoky_itembanner');
+            Mage::register('potoky_itembanner', $psitioningArray);
         }
 
-        $positioningArray = $this->unsetPositioningArrayElements($data['is_active']);
-
-        Mage::getModel('core/config')->saveConfig(
-            'cms/itembanner/active_banners_positioning',
-            serialize($positioningArray)
-        );
+        return $this;
     }
 
-    private function setPositioningArrayElements($data)
+    /**
+     * To be written
+     *
+     * @param Mage_Core_Model_Layout $layout
+     * @return array | boolean
+     */
+    private function renderFirstOccupy($layout)
     {
-        extract($data);
-        foreach ($storeIds as $storeId) {
-            if(!$positioningArray[$storeId]['grid'][$gridPosition][$sortOrder]) {
-                $positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][] = $currentInstanceId;
+        $toolbar = $layout->getBlock('product_list_toolbar');
+        if(!$toolbar) {
+            return false;
+        }
+
+        $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
+        $positioningArray = [];
+        $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
+        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
+            $block = $layout->getBlock($blockName);
+            if(!$block->getData('is_active')) {
+                continue;
             }
-            if (!$positioningArray[$storeId]['list'][$listPosition][$sortOrder]) {
-                $positioningArray[$storeId]['list'][$listPosition][$sortOrder][] = $currentInstanceId;
+
+            $position = $block->getData($positionField);
+            if ($occupying = $positioningArray[$position]) {
+                $occupying = $layout->getBlock($occupying)->getData('instance_id');
+                $wishing = $block-> getData('instance_id');
+                if($priorityArray[$occupying] < $priorityArray[$wishing]) {
+                    $layout->unsetBlock($blockName);
+                    continue;
+                }
             }
-            rsort($positioningArray[$storeId]['grid'][$gridPosition]);
-            rsort($positioningArray[$storeId]['list'][$listPosition]);
+            $positioningArray[$position] = $blockName;
         }
 
         return $positioningArray;
     }
 
-    private function unsetPositioningArrayElements($data)
+    /**
+     * To be written
+     *
+     * @param Mage_Core_Model_Layout $layout
+     * @return array | boolean
+     */
+    private function renderMoveToNext($layout)
     {
-        extract($data);
-        foreach ($storeIds as $storeId) {
-            $gridKeyToUnset = array_search($currentInstanceId ,$positioningArray[$storeId]['grid'][$gridPosition][$sortOrder]);
-            $listKeyToUnset = array_search($currentInstanceId ,$positioningArray[$storeId]['list'][$listPosition][$sortOrder]);
-            unset($positioningArray[$storeId]['grid'][$gridPosition][$sortOrder][$gridKeyToUnset]);
-            unset($positioningArray[$storeId]['list'][$listPosition][$sortOrder][$listKeyToUnset]);
+        $toolbar = $layout->getBlock('product_list_toolbar');
+        if(!$toolbar) {
+            return false;
+        }
+
+        $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
+        $positioningArray = [];
+        $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
+        $positionMax = Mage::getStoreConfig('catalog/frontend/grid_per_page');
+        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
+            $block = $layout->getBlock($blockName);
+            if(!$block->getData('is_active')) {
+                continue;
+            }
+
+            $position = $block->getData($positionField);
+            if ($occupying = $positioningArray[$position]) {
+                $occupying = $layout->getBlock($occupying)->getData('instance_id');
+                $wishing = $block-> getData('instance_id');
+                if ($priorityArray[$occupying] < $priorityArray[$wishing]) {
+                    if ($position + 1 <= $positionMax) {
+                        $positioningArray[$position + 1] = $blockName;
+                    } else {
+                        $layout->unsetBlock($blockName);
+                    }
+                    continue;
+                } else {
+                    if ($position + 1 <= $positionMax) {
+                        $positioningArray[$position + 1] = $positioningArray[$position];
+                    } else {
+                        $layout->unsetBlock($positioningArray[$position]);
+                    }
+                }
+            }
+            $positioningArray[$position] = $blockName;
         }
 
         return $positioningArray;

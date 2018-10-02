@@ -29,6 +29,8 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
                 $parent['image'] = $image;
             }
+
+            $parent['instance_id'] = $currentWidgetInstance->getId();
         }
 
         return $parent;

@@ -4,6 +4,11 @@
             <name>Banner inserted into products</name>
             <description type="desc">Depending on set position appears in place of a product block in the product list or grid</description>
         <parameters>
+            <instance_id>
+                <label>Current Instance Id</label>
+                <visible>0</visible>
+                <type>text</type>
+            </instance_id>
             <is_active>
                 <label>Is This Banner Active</label>
                 <visible>1</visible>
