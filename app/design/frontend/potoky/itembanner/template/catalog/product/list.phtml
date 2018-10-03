@@ -38,7 +38,7 @@
     $positioningArray = Mage::registry('potoky_itembanner');
     ksort($positioningArray);
     $bannerBlock = reset($positioningArray);
-    $bannerPosition = key($positioningArray);
+    $bannerPosition = &key($positioningArray);
 ?>
 <?php if(!$_productCollection->count()): ?>
 <p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>
@@ -52,8 +52,12 @@
     <ol class="products-list" id="products-list">
     <?php foreach ($_productCollection as $_product): ?>
         <?php while ($bannerPosition == $position): ?>
-            <li class="item>
-                <?php echo $this->getChildHtml($bannerPosition); ?>
+            <li class="item">
+                <?php
+                    echo $this->getChildHtml($bannerBlock);
+                    next($positioningArray);
+                    $position++;
+                ?>
             </li>
         <?php endwhile; ?>
         <li class="item<?php if( ++$_iterator == sizeof($_productCollection) ): ?> last<?php endif; ?>">
@@ -119,6 +123,7 @@
                 </div>
             </div>
         </li>
+        <?php $position++; ?>
     <?php endforeach; ?>
     </ol>
     <script type="text/javascript">decorateList('products-list', 'none-recursive')</script>
