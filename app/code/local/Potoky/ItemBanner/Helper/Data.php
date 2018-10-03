@@ -11,9 +11,10 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
         $count = count($collection);
 
         $priorityArray = [];
-        $items = $collection->getItems();
-        for ($counter = 0; $counter < $count; $counter++) {
-            $priorityArray[$items[$counter]->getId()] = $counter;
+        $counter = 1;
+
+        foreach ($collection as $item) {
+            $priorityArray[$item->getId()] = $counter++;
         }
 
         return $priorityArray;

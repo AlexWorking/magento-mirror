@@ -51,7 +51,7 @@
     <?php $position = 1; ?>
     <ol class="products-list" id="products-list">
     <?php foreach ($_productCollection as $_product): ?>
-        <?php while ($bannerPosition = $position): ?>
+        <?php while ($bannerPosition == $position): ?>
             <li class="item>
                 <?php echo $this->getChildHtml($bannerPosition); ?>
             </li>
