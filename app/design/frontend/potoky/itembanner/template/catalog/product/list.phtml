@@ -35,10 +35,10 @@
 <?php
     $_productCollection=$this->getLoadedProductCollection();
     $_helper = $this->helper('catalog/output');
-    $positioningArray = Mage::registry('potoky_itembanner');
+    $positioningArray = Mage::registry('potoky_itembanner_psitioningArray');
     ksort($positioningArray);
     $bannerBlock = reset($positioningArray);
-    $bannerPosition = &key($positioningArray);
+    $bannerPosition = key($positioningArray);
 ?>
 <?php if(!$_productCollection->count()): ?>
 <p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>
@@ -56,6 +56,8 @@
                 <?php
                     echo $this->getChildHtml($bannerBlock);
                     next($positioningArray);
+                    $bannerPosition = key($positioningArray);
+                    $bannerBlock = $positioningArray[$bannerPosition];
                     $position++;
                 ?>
             </li>

@@ -68,7 +68,7 @@
                     <additional_before_save_actions>
                         <type>singleton</type>
                         <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>addSearchHandles</method>
+                        <method>additionalBeforeSave</method>
                     </additional_before_save_actions>
                 </observers>
             </widget_widget_instance_save_before>

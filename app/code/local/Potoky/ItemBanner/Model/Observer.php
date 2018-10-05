@@ -7,8 +7,9 @@ class Potoky_ItemBanner_Model_Observer
      *
      * @param Varien_Event_Observer $observer
      * @return $this
+     * @throws Mage_Core_Exception
      */
-    public function addSearchHandles(Varien_Event_Observer $observer)
+    public function additionalBeforeSave(Varien_Event_Observer $observer)
     {
         /* @var $widgetInstance Mage_Widget_Model_Widget_Instance */
         $widgetInstance = $observer->getEvent()->getObject();
@@ -16,6 +17,11 @@ class Potoky_ItemBanner_Model_Observer
         if($widgetInstance->getType() != "itembanner/banner") {
 
             return $this;
+        }
+
+        if (Mage::registry('potoky_itembanner_validation') === false) {
+            Mage::throwException(Mage::helper('itembanner')
+                ->__('At least one original size of the image is less than 800 px. The Widget Instance has not been saved'));
         }
 
         $pageGroups = $widgetInstance->getData('page_groups');
@@ -69,6 +75,10 @@ class Potoky_ItemBanner_Model_Observer
     public function prepareDisplayBanners($observer)
     {
         $layout = $observer->getLayout();
+        if (!Potoky_ItemBanner_Block_Banner::$allOfTheType) {
+
+            return $this;
+        }
 
         $option = Mage::getStoreConfig('cms/itembanner/rendering_type');
         $psitioningArray = false;
@@ -82,8 +92,8 @@ class Potoky_ItemBanner_Model_Observer
         }
 
         if($psitioningArray) {
-            Mage::unregister('potoky_itembanner');
-            Mage::register('potoky_itembanner', $psitioningArray);
+            Mage::unregister('potoky_itembanner_psitioningArray');
+            Mage::register('potoky_itembanner_psitioningArray', $psitioningArray);
         }
 
         return $this;
