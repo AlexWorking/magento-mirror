@@ -9,7 +9,7 @@ class Potoky_ItemBanner_Model_Observer
      * @return $this
      * @throws Mage_Core_Exception
      */
-    public function additionalBeforeSave(Varien_Event_Observer $observer)
+    public function addSearchHandles(Varien_Event_Observer $observer)
     {
         /* @var $widgetInstance Mage_Widget_Model_Widget_Instance */
         $widgetInstance = $observer->getEvent()->getObject();
@@ -17,11 +17,6 @@ class Potoky_ItemBanner_Model_Observer
         if($widgetInstance->getType() != "itembanner/banner") {
 
             return $this;
-        }
-
-        if (Mage::registry('potoky_itembanner_validation') === false) {
-            Mage::throwException(Mage::helper('itembanner')
-                ->__('At least one original size of the image is less than 800 px. The Widget Instance has not been saved'));
         }
 
         $pageGroups = $widgetInstance->getData('page_groups');
