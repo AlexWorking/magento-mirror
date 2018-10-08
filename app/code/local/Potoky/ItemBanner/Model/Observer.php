@@ -110,9 +110,11 @@ class Potoky_ItemBanner_Model_Observer
         $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
         $positioningArray = [];
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
-        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
+        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $key => $blockName) {
             $block = $layout->getBlock($blockName);
             if(!$block->getData('is_active')) {
+                $layout->unsetBlock($blockName);
+                unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                 continue;
             }
 
@@ -122,6 +124,7 @@ class Potoky_ItemBanner_Model_Observer
                 $wishing = $block-> getData('instance_id');
                 if($priorityArray[$occupying] < $priorityArray[$wishing]) {
                     $layout->unsetBlock($blockName);
+                    unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                     continue;
                 }
             }
@@ -148,9 +151,11 @@ class Potoky_ItemBanner_Model_Observer
         $positioningArray = [];
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
         $positionMax = Mage::getStoreConfig('catalog/frontend/grid_per_page');
-        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
+        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $key => $blockName) {
             $block = $layout->getBlock($blockName);
             if(!$block->getData('is_active')) {
+                $layout->unsetBlock($blockName);
+                unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                 continue;
             }
 
@@ -163,6 +168,7 @@ class Potoky_ItemBanner_Model_Observer
                         $positioningArray[$position + 1] = $blockName;
                     } else {
                         $layout->unsetBlock($blockName);
+                        unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                     }
                     continue;
                 } else {
@@ -170,6 +176,7 @@ class Potoky_ItemBanner_Model_Observer
                         $positioningArray[$position + 1] = $positioningArray[$position];
                     } else {
                         $layout->unsetBlock($positioningArray[$position]);
+                        unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                     }
                 }
             }
