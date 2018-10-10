@@ -48,7 +48,7 @@
     <?php // List mode ?>
     <?php if($this->getMode()!='grid'): ?>
     <?php $_iterator = 0; ?>
-    <?php $position = 1; ?>
+    <?php $position = ($this->getToolbarBlock()->getCurrentPage() - 1) * $this->getToolbarBlock()->getLimit() + 1; ?>
     <ol class="products-list" id="products-list">
     <?php foreach ($_productCollection as $_product): ?>
         <?php while ($bannerPosition == $position): ?>
