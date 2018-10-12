@@ -76,19 +76,19 @@ class Potoky_ItemBanner_Model_Observer
         }
 
         $option = Mage::getStoreConfig('cms/itembanner/rendering_type');
-        $psitioningArray = false;
+        $dataForPhtml = false;
         switch ($option) {
             case 1:
-                $psitioningArray = $this->renderFirstOccupy($layout);
+                $dataForPhtml = $this->renderFirstOccupy($layout);
                 break;
             case 2:
-                $psitioningArray = $this->renderMoveToNext($layout);
+                $dataForPhtml = $this->renderMoveToNext($layout);
                 break;
         }
 
-        if($psitioningArray) {
-            Mage::unregister('potoky_itembanner_psitioningArray');
-            Mage::register('potoky_itembanner_psitioningArray', $psitioningArray);
+        if($dataForPhtml) {
+            Mage::unregister('potoky_itembanner');
+            Mage::register('potoky_itembanner', $dataForPhtml);
         }
 
         return $this;
@@ -111,17 +111,24 @@ class Potoky_ItemBanner_Model_Observer
         $positioningArray = [];
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
         $firstNum = ($toolbar->getCurrentPage() - 1) * $toolbar->getLimit() + 1;
-        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $key => $blockName) {
+        $lastNum = $firstNum - 1 + $toolbar->getLimit();
+        $previousPagesBannerQty = 0;
+        $nextPageBannersQty = 0;
+        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
+            $position = $block->getData($positionField);
+
             if(!$block->getData('is_active')) {
-                $layout->unsetBlock($blockName);
-                unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                 continue;
             }
 
-            $position = $block->getData($positionField);
-
             if ($position < $firstNum) {
+                $previousPagesBannerQty++;
+                continue;
+            }
+
+            if ($position > $lastNum) {
+                $nextPageBannersQty++;
                 continue;
             }
 
@@ -129,15 +136,18 @@ class Potoky_ItemBanner_Model_Observer
                 $occupying = $layout->getBlock($occupying)->getData('instance_id');
                 $wishing = $block-> getData('instance_id');
                 if($priorityArray[$occupying] < $priorityArray[$wishing]) {
-                    $layout->unsetBlock($blockName);
-                    unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                     continue;
                 }
             }
             $positioningArray[$position] = $blockName;
         }
+        $data = [
+            'previousPagesBannerQty' => $previousPagesBannerQty,
+            'positioningArray'      => $positioningArray,
+            'nextPageBannersQty'    => $nextPageBannersQty
+        ];
 
-        return $positioningArray;
+        return $data;
     }
 
     /**
@@ -157,18 +167,24 @@ class Potoky_ItemBanner_Model_Observer
         $positioningArray = [];
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
         $firstNum = ($toolbar->getCurrentPage() - 1) * $toolbar->getLimit() + 1;
-        $positionMax = Mage::getStoreConfig('catalog/frontend/grid_per_page');
-        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $key => $blockName) {
+        $lastNum = $firstNum - 1 + $toolbar->getLimit();
+        $previousPagesBannerQty = 0;
+        $nextPageBannersQty = 0;
+        foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
+            $position = $block->getData($positionField);
+            
             if(!$block->getData('is_active')) {
-                $layout->unsetBlock($blockName);
-                unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                 continue;
             }
 
-            $position = $block->getData($positionField);
-
             if ($position < $firstNum) {
+                $previousPagesBannerQty++;
+                continue;
+            }
+
+            if ($position > $lastNum) {
+                $nextPageBannersQty++;
                 continue;
             }
 
@@ -176,25 +192,25 @@ class Potoky_ItemBanner_Model_Observer
                 $occupying = $layout->getBlock($occupying)->getData('instance_id');
                 $wishing = $block-> getData('instance_id');
                 if ($priorityArray[$occupying] < $priorityArray[$wishing]) {
-                    if ($position + 1 <= $positionMax) {
+                    if ($position + 1 <= $lastNum) {
                         $positioningArray[$position + 1] = $blockName;
-                    } else {
-                        $layout->unsetBlock($blockName);
-                        unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                     }
+
                     continue;
                 } else {
-                    if ($position + 1 <= $positionMax) {
+                    if ($position + 1 <= $lastNum) {
                         $positioningArray[$position + 1] = $positioningArray[$position];
-                    } else {
-                        $layout->unsetBlock($positioningArray[$position]);
-                        unset(Potoky_ItemBanner_Block_Banner::$allOfTheType[$key]);
                     }
                 }
             }
             $positioningArray[$position] = $blockName;
         }
+        $data = [
+            'previousPagesBannerQty' => $previousPagesBannerQty,
+            'positioningArray'      => $positioningArray,
+            'nextPageBannersQty'    => $nextPageBannersQty
+        ];
 
-        return $positioningArray;
+        return $data;
     }
 }

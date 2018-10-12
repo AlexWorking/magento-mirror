@@ -34,6 +34,11 @@
                     </bannerinfo>
                 </entities>
             </itembanner_resource>
+            <catalog_resource>
+                <rewrite>
+                    <product_collection>Potoky_ItemBanner_Model_Resource_Product_Collection</product_collection>
+                </rewrite>
+            </catalog_resource>
         </models>
         <resources>
             <itembanner_setup>

@@ -35,7 +35,7 @@
 <?php
     $_productCollection=$this->getLoadedProductCollection();
     $_helper = $this->helper('catalog/output');
-    $positioningArray = Mage::registry('potoky_itembanner_psitioningArray');
+    $positioningArray = Mage::registry('potoky_itembanner')['positioningArray'];
     ksort($positioningArray);
     $bannerBlock = reset($positioningArray);
     $bannerPosition = key($positioningArray);
