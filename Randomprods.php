@@ -16,7 +16,7 @@ for($x=0; $x<=$default; $x++) {
     $productData['website_ids'] = array(1);
     $productData['categories'] = array(23);
     $productData['status'] = 1;
-    $productData['name'] = utf8_encode($sku);
+    $productData['name'] = utf8_encode('Prod - ' . $x);
     $productData['description'] = utf8_encode('This is a Demo Description for the Product: Demo ' . $sku);
     $productData['short_description'] = utf8_encode('This is a short Demo Description for the Product: Demo ' . $sku);
     $productData['price'] = $price;

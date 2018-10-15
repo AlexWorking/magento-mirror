@@ -125,7 +125,12 @@
                 </div>
             </div>
         </li>
-        <?php $position++; ?>
+        <?php
+        $position++;
+        if ($position > ($this->getToolbarBlock()->getLimit()) * $this->getToolbarBlock()->getCurrentPage()) {
+            break;
+        }
+        ?>
     <?php endforeach; ?>
     </ol>
     <script type="text/javascript">decorateList('products-list', 'none-recursive')</script>
