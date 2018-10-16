@@ -111,11 +111,7 @@ class Potoky_ItemBanner_Model_Observer
         $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
         $positioningArray = [];
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
-        $firstNum = ($toolbar->getCurrentPage() - 1) * $toolbar->getLimit() + 1;
-        $lastNum = $firstNum - 1 + (int) $toolbar->getLimit();
         $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $toolbar->getCurrentMode()));
-        $previousPagesBannerQty = 0;
-        $nextPageBannersQty = 0;
         foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
             $position = $block->getData($positionField);
@@ -128,22 +124,17 @@ class Potoky_ItemBanner_Model_Observer
                 continue;
             }
 
-            if ($occupying = $positioningArray[$position]) {
-                $occupying = $layout->getBlock($occupying)->getData('instance_id');
-                $wishing = $block-> getData('instance_id');
-                if($priorityArray[$occupying] < $priorityArray[$wishing]) {
+            if ($occupyingBlockName = $positioningArray[$position]) {
+                $occupyingBlockId = $layout->getBlock($occupyingBlockName)->getData('instance_id');
+                $wishingBlockId = $block-> getData('instance_id');
+                if($priorityArray[$occupyingBlockId] < $priorityArray[$wishingBlockId]) {
                     continue;
                 }
             }
             $positioningArray[$position] = $blockName;
         }
-        $data = [
-            'previousPagesBannerQty' => $previousPagesBannerQty,
-            'positioningArray'      => $positioningArray,
-            'nextPageBannersQty'    => $nextPageBannersQty
-        ];
 
-        return $data;
+        return sort($positioningArray);
     }
 
     /**
@@ -160,14 +151,10 @@ class Potoky_ItemBanner_Model_Observer
             return false;
         }
 
-        $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
         $positioningArray = [];
+        $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
-        $firstNum = ($toolbar->getCurrentPage() - 1) * $toolbar->getLimit() + 1;
-        $lastNum = $firstNum - 1 + (int) $toolbar->getLimit();
         $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $toolbar->getCurrentMode()));
-        $previousPagesBannerQty = 0;
-        $nextPageBannersQty = 0;
         foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
             $position = $block->getData($positionField);
@@ -180,29 +167,32 @@ class Potoky_ItemBanner_Model_Observer
                 continue;
             }
 
-            if ($occupying = $positioningArray[$position]) {
-                $occupying = $layout->getBlock($occupying)->getData('instance_id');
-                $wishing = $block-> getData('instance_id');
-                if ($priorityArray[$occupying] < $priorityArray[$wishing]) {
+            $occupyingBlockName = $positioningArray[$position];
+            while ($occupyingBlockName) {
+                $occupyingBlockId = $layout->getBlock($occupyingBlockName)->getData('instance_id');
+                $wishingBlockId = $block-> getData('instance_id');
+                if ($priorityArray[$occupyingBlockId] < $priorityArray[$wishingBlockId]) {
                     if ($position + 1 <= $maxNum) {
-                        $positioningArray[$position + 1] = $blockName;
+                        $occupyingBlockName = $positioningArray[$position++];
+                        continue;
+                    } else {
+                        continue 2;
                     }
-
-                    continue;
                 } else {
                     if ($position + 1 <= $maxNum) {
-                        $positioningArray[$position + 1] = $positioningArray[$position];
+                        $positioningArray[$position] = $blockName;
+                        $blockName = $occupyingBlockName;
+                        $block = $layout->getBlock($blockName);
+                        $occupyingBlockName = $positioningArray[$position++];
+                        continue;
+                    } else {
+                        continue 2;
                     }
                 }
             }
             $positioningArray[$position] = $blockName;
         }
-        $data = [
-            'previousPagesBannerQty' => $previousPagesBannerQty,
-            'positioningArray'      => $positioningArray,
-            'nextPageBannersQty'    => $nextPageBannersQty
-        ];
 
-        return $data;
+        return sort($positioningArray);
     }
 }
