@@ -39,6 +39,9 @@
     ksort($positioningArray);
     $bannerBlock = reset($positioningArray);
     $bannerPosition = key($positioningArray);
+    $curPage = $this->getToolbarBlock()->getCurrentPage();
+    $limit = $this->getToolbarBlock()->getLimit();
+    $position = ($curPage - 1) * $limit + 1;
 ?>
 <?php if(!$_productCollection->count()): ?>
 <p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>
@@ -48,7 +51,6 @@
     <?php // List mode ?>
     <?php if($this->getMode()!='grid'): ?>
     <?php $_iterator = 0; ?>
-    <?php $position = ($this->getToolbarBlock()->getCurrentPage() - 1) * $this->getToolbarBlock()->getLimit() + 1; ?>
     <ol class="products-list" id="products-list">
     <?php foreach ($_productCollection as $_product): ?>
         <?php while ($bannerPosition == $position): ?>
@@ -58,7 +60,9 @@
                     next($positioningArray);
                     $bannerPosition = key($positioningArray);
                     $bannerBlock = $positioningArray[$bannerPosition];
-                    $position++;
+                    if (++$position > $limit * $curPage) {
+                        break 2;
+                    }
                 ?>
             </li>
         <?php endwhile; ?>
@@ -126,10 +130,9 @@
             </div>
         </li>
         <?php
-        $position++;
-        if ($position > ($this->getToolbarBlock()->getLimit()) * $this->getToolbarBlock()->getCurrentPage()) {
-            break;
-        }
+            if (++$position > $limit * $curPage) {
+                break;
+            }
         ?>
     <?php endforeach; ?>
     </ol>
@@ -143,6 +146,19 @@
     <?php $_columnCount = $this->getColumnCount(); ?>
     <ul class="products-grid products-grid--max-<?php echo $_columnCount; ?>-col">
         <?php $i=0; foreach ($_productCollection as $_product): ?>
+            <?php while ($bannerPosition == $position): ?>
+                <li class="item">
+                    <?php
+                    echo $this->getChildHtml($bannerBlock);
+                    next($positioningArray);
+                    $bannerPosition = key($positioningArray);
+                    $bannerBlock = $positioningArray[$bannerPosition];
+                    if (++$position > $limit * $curPage) {
+                        break 2;
+                    }
+                    ?>
+                </li>
+            <?php endwhile; ?>
             <?php /*if ($i++%$_columnCount==0): ?>
             <?php endif*/ ?>
             <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?>">
@@ -191,6 +207,11 @@
             </li>
             <?php /*if ($i%$_columnCount==0 || $i==$_collectionSize): ?>
             <?php endif*/ ?>
+            <?php
+                if (++$position > $limit * $curPage) {
+                    break;
+                }
+            ?>
         <?php endforeach ?>
     </ul>
     <script type="text/javascript">decorateGeneric($$('ul.products-grid'), ['odd','even','first','last'])</script>

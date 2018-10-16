@@ -23,9 +23,9 @@ class Potoky_ItemBanner_Model_Resource_Product_Collection extends Mage_Catalog_M
                         $prevPageElementNumber = ($parent - 1) * $this->getPageSize();
                         $prevPageProdNumber = $prevPageElementNumber - $data['previousPagesBannerQty'];
                         $parent = (float) ($prevPageProdNumber / $this->getPageSize() + 1);
-                        $float = false;
             }
         }
+        $float = false;
 
         return $parent;
     }

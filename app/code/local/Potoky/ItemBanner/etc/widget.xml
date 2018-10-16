@@ -35,7 +35,7 @@
                 <visible>1</visible>
                 <required>0</required>
                 <type>image</type>
-                <note>*.jpg, *.png, *.gif</note>
+                <note>*.jpg, *.png, *.gif, *.jpeg</note>
             </image>
             <template translate="label">
                 <label>Template</label>

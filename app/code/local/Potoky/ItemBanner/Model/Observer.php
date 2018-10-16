@@ -79,10 +79,10 @@ class Potoky_ItemBanner_Model_Observer
         $dataForPhtml = false;
         switch ($option) {
             case 1:
-                $dataForPhtml = $this->renderFirstOccupy($layout);
+                $dataForPhtml = $this->renderPriorOccupy($layout);
                 break;
             case 2:
-                $dataForPhtml = $this->renderMoveToNext($layout);
+                $dataForPhtml = $this->renderOccupyNext($layout);
                 break;
         }
 
@@ -100,8 +100,9 @@ class Potoky_ItemBanner_Model_Observer
      * @param Mage_Core_Model_Layout $layout
      * @return array | boolean
      */
-    private function renderFirstOccupy($layout)
+    private function renderPriorOccupy($layout)
     {
+        /* @var $toolbar Mage_Catalog_Block_Product_List_Toolbar */
         $toolbar = $layout->getBlock('product_list_toolbar');
         if(!$toolbar) {
             return false;
@@ -111,24 +112,19 @@ class Potoky_ItemBanner_Model_Observer
         $positioningArray = [];
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
         $firstNum = ($toolbar->getCurrentPage() - 1) * $toolbar->getLimit() + 1;
-        $lastNum = $firstNum - 1 + $toolbar->getLimit();
+        $lastNum = $firstNum - 1 + (int) $toolbar->getLimit();
+        $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $toolbar->getCurrentMode()));
         $previousPagesBannerQty = 0;
         $nextPageBannersQty = 0;
         foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
             $position = $block->getData($positionField);
 
-            if(!$block->getData('is_active')) {
+            if (!$block->getData('is_active')) {
                 continue;
             }
 
-            if ($position < $firstNum) {
-                $previousPagesBannerQty++;
-                continue;
-            }
-
-            if ($position > $lastNum) {
-                $nextPageBannersQty++;
+            if ($position > $maxNum) {
                 continue;
             }
 
@@ -156,8 +152,9 @@ class Potoky_ItemBanner_Model_Observer
      * @param Mage_Core_Model_Layout $layout
      * @return array | boolean
      */
-    private function renderMoveToNext($layout)
+    private function renderOccupyNext($layout)
     {
+        /* @var $toolbar Mage_Catalog_Block_Product_List_Toolbar */
         $toolbar = $layout->getBlock('product_list_toolbar');
         if(!$toolbar) {
             return false;
@@ -167,24 +164,19 @@ class Potoky_ItemBanner_Model_Observer
         $positioningArray = [];
         $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
         $firstNum = ($toolbar->getCurrentPage() - 1) * $toolbar->getLimit() + 1;
-        $lastNum = $firstNum - 1 + $toolbar->getLimit();
+        $lastNum = $firstNum - 1 + (int) $toolbar->getLimit();
+        $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $toolbar->getCurrentMode()));
         $previousPagesBannerQty = 0;
         $nextPageBannersQty = 0;
         foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
             $position = $block->getData($positionField);
-            
-            if(!$block->getData('is_active')) {
+
+            if (!$block->getData('is_active')) {
                 continue;
             }
 
-            if ($position < $firstNum) {
-                $previousPagesBannerQty++;
-                continue;
-            }
-
-            if ($position > $lastNum) {
-                $nextPageBannersQty++;
+            if ($position > $maxNum) {
                 continue;
             }
 
@@ -192,13 +184,13 @@ class Potoky_ItemBanner_Model_Observer
                 $occupying = $layout->getBlock($occupying)->getData('instance_id');
                 $wishing = $block-> getData('instance_id');
                 if ($priorityArray[$occupying] < $priorityArray[$wishing]) {
-                    if ($position + 1 <= $lastNum) {
+                    if ($position + 1 <= $maxNum) {
                         $positioningArray[$position + 1] = $blockName;
                     }
 
                     continue;
                 } else {
-                    if ($position + 1 <= $lastNum) {
+                    if ($position + 1 <= $maxNum) {
                         $positioningArray[$position + 1] = $positioningArray[$position];
                     }
                 }
