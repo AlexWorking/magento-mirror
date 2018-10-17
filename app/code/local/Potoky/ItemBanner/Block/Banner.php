@@ -26,11 +26,11 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
     public function _prepareImage()
     {
         $newFilePath = Mage::getBaseDir('media') . DS . 'itembanner' . DS . 'R--' . $this->getData('image');
-        if(!file_exists($newFilePath)) {
+        //if(!file_exists($newFilePath)) {
             $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $this->getData('image'));
-            $image->resize(300, 300);
+            ///$image->resize(1000, 2000);
             $image->save($newFilePath);
-        }
+        //}
 
         return $this->_getImageUrl($newFilePath);
     }
