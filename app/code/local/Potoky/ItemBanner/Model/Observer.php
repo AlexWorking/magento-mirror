@@ -75,20 +75,44 @@ class Potoky_ItemBanner_Model_Observer
             return $this;
         }
 
+        /* @var $toolbar Mage_Catalog_Block_Product_List_Toolbar */
+        $toolbar = $layout->getBlock('product_list_toolbar');
+        if(!$toolbar) {
+            return $this;
+        }
+
         $option = Mage::getStoreConfig('cms/itembanner/rendering_type');
-        $dataForPhtml = false;
+        $positioningArray = false;
         switch ($option) {
             case 1:
-                $dataForPhtml = $this->renderPriorOccupy($layout);
+                $positioningArray = $this->renderPriorOccupy($layout, $toolbar->getCurrentMode());
                 break;
             case 2:
-                $dataForPhtml = $this->renderOccupyNext($layout);
+                $positioningArray = $this->renderOccupyNext($layout, $toolbar->getCurrentMode());
                 break;
         }
 
-        if($dataForPhtml) {
+        if($positioningArray) {
+            $count = count($positioningArray);
+            $firstNum = ($toolbar->getCurrentPage() - 1) * $toolbar->getLimit() + 1;
+            $lastNum = $firstNum - 1 + (int) $toolbar->getLimit();
+            $previousPagesBannerQty = 0;
+            $positions = array_keys($positioningArray);
+            foreach ($positions as $position) {
+                if($position < $firstNum) {
+                    unset($positioningArray[$position]);
+                    $previousPagesBannerQty++;
+                }
+                elseif ($position > $lastNum) {
+                    unset($positioningArray[$position]);
+                }
+            }
             Mage::unregister('potoky_itembanner');
-            Mage::register('potoky_itembanner', $dataForPhtml);
+            Mage::register('potoky_itembanner', [
+                'count'                  => $count,
+                'previousPagesBannerQty' => $previousPagesBannerQty,
+                'positioningArray'       => $positioningArray
+            ]);
         }
 
         return $this;
@@ -100,18 +124,12 @@ class Potoky_ItemBanner_Model_Observer
      * @param Mage_Core_Model_Layout $layout
      * @return array | boolean
      */
-    private function renderPriorOccupy($layout)
+    private function renderPriorOccupy($layout, $mode)
     {
-        /* @var $toolbar Mage_Catalog_Block_Product_List_Toolbar */
-        $toolbar = $layout->getBlock('product_list_toolbar');
-        if(!$toolbar) {
-            return false;
-        }
-
         $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
         $positioningArray = [];
-        $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
-        $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $toolbar->getCurrentMode()));
+        $positionField = sprintf('position_in_%s', $mode);
+        $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $mode));
         foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
             $position = $block->getData($positionField);
@@ -134,7 +152,7 @@ class Potoky_ItemBanner_Model_Observer
             $positioningArray[$position] = $blockName;
         }
 
-        return sort($positioningArray);
+        return $positioningArray;
     }
 
     /**
@@ -143,18 +161,12 @@ class Potoky_ItemBanner_Model_Observer
      * @param Mage_Core_Model_Layout $layout
      * @return array | boolean
      */
-    private function renderOccupyNext($layout)
+    private function renderOccupyNext($layout, $mode)
     {
-        /* @var $toolbar Mage_Catalog_Block_Product_List_Toolbar */
-        $toolbar = $layout->getBlock('product_list_toolbar');
-        if(!$toolbar) {
-            return false;
-        }
-
         $positioningArray = [];
         $priorityArray = Mage::helper('itembanner')->getBannerPriorityArray();
-        $positionField = sprintf('position_in_%s', $toolbar->getCurrentMode());
-        $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $toolbar->getCurrentMode()));
+        $positionField = sprintf('position_in_%s', $mode);
+        $maxNum = 3 * Mage::getStoreConfig(sprintf('catalog/frontend/%s_per_page', $mode));
         foreach (Potoky_ItemBanner_Block_Banner::$allOfTheType as $blockName) {
             $block = $layout->getBlock($blockName);
             $position = $block->getData($positionField);
@@ -173,7 +185,7 @@ class Potoky_ItemBanner_Model_Observer
                 $wishingBlockId = $block-> getData('instance_id');
                 if ($priorityArray[$occupyingBlockId] < $priorityArray[$wishingBlockId]) {
                     if ($position + 1 <= $maxNum) {
-                        $occupyingBlockName = $positioningArray[$position++];
+                        $occupyingBlockName = $positioningArray[++$position];
                         continue;
                     } else {
                         continue 2;
@@ -183,7 +195,7 @@ class Potoky_ItemBanner_Model_Observer
                         $positioningArray[$position] = $blockName;
                         $blockName = $occupyingBlockName;
                         $block = $layout->getBlock($blockName);
-                        $occupyingBlockName = $positioningArray[$position++];
+                        $occupyingBlockName = $positioningArray[++$position];
                         continue;
                     } else {
                         continue 2;
@@ -193,6 +205,6 @@ class Potoky_ItemBanner_Model_Observer
             $positioningArray[$position] = $blockName;
         }
 
-        return sort($positioningArray);
+        return $positioningArray;
     }
 }
