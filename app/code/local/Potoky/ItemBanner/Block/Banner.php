@@ -9,11 +9,27 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
      */
     public static $allOfTheType = [];
 
+    public static $imageSizes = [
+        'grid' => [
+            'width'  => 2000,
+            'height' => 1000
+        ],
+        'list' => [
+            'width'  => 500,
+            'height' => 2000
+        ],
+    ];
+
     public function setNameInLayout($name)
     {
         self::$allOfTheType[] = $name;
 
         return parent::setNameInLayout($name);
+    }
+
+    public static function setMode($mode)
+    {
+        self::$mode = $mode;
     }
 
     public function _getImageUrl($path)
@@ -25,13 +41,24 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
 
     public function _prepareImage()
     {
-        $newFilePath = Mage::getBaseDir('media') . DS . 'itembanner' . DS . 'R--' . $this->getData('image');
+        $mode = (Mage::registry('potoky_itembanner')['mode']) ? Mage::registry('potoky_itembanner')['mode'] : '';
+        $newFilePath = Mage::getBaseDir('media') . DS . 'itembanner' . DS . $mode . DS . $this->getData('image');
         //if(!file_exists($newFilePath)) {
             $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $this->getData('image'));
-            ///$image->resize(1000, 2000);
+            //$sizes = $this->getResizeSizes([$image->getOriginalWidth(), $image->getOriginalHeight()], $mode);
+            $image->keepTransparency(true);
+            $image->quality(100);
+            $image->resize(self::$imageSizes[$mode]['width'], self::$imageSizes[$mode]['height']);
             $image->save($newFilePath);
         //}
 
         return $this->_getImageUrl($newFilePath);
+    }
+
+    private function getResizeSizes(Varien_Image $image, $mode)
+    {
+        if ($mode == 'grid') {
+            $width = $image->getOriginalWidth();
+        }
     }
 }

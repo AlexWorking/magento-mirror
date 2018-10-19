@@ -111,7 +111,8 @@ class Potoky_ItemBanner_Model_Observer
             Mage::register('potoky_itembanner', [
                 'count'                  => $count,
                 'previousPagesBannerQty' => $previousPagesBannerQty,
-                'positioningArray'       => $positioningArray
+                'positioningArray'       => $positioningArray,
+                'mode'                   => $toolbar->getCurrentMode()
             ]);
         }
 

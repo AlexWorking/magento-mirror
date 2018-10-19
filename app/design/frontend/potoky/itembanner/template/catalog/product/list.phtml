@@ -54,7 +54,7 @@
     <ol class="products-list" id="products-list">
     <?php foreach ($_productCollection as $_product): ?>
         <?php while ($bannerPosition == $position): ?>
-            <li class="item">
+            <li class="item<?php if( ++$_iterator == sizeof($_productCollection) ): ?> last<?php endif; ?>">
                 <?php
                     echo $this->getChildHtml($bannerBlock);
                     next($positioningArray);
@@ -147,16 +147,16 @@
     <ul class="products-grid products-grid--max-<?php echo $_columnCount; ?>-col">
         <?php $i=0; foreach ($_productCollection as $_product): ?>
             <?php while ($bannerPosition == $position): ?>
-                <li class="item">
-                    <?php
-                    echo $this->getChildHtml($bannerBlock);
-                    next($positioningArray);
-                    $bannerPosition = key($positioningArray);
-                    $bannerBlock = $positioningArray[$bannerPosition];
-                    if (++$position > $limit * $curPage) {
-                        break 2;
-                    }
-                    ?>
+                <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?>">
+                        <?php
+                        echo $this->getChildHtml($bannerBlock);
+                        next($positioningArray);
+                        $bannerPosition = key($positioningArray);
+                        $bannerBlock = $positioningArray[$bannerPosition];
+                        if (++$position > $limit * $curPage) {
+                            break 2;
+                        }
+                        ?>
                 </li>
             <?php endwhile; ?>
             <?php /*if ($i++%$_columnCount==0): ?>
