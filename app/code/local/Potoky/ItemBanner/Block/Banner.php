@@ -11,12 +11,12 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
 
     public static $imageSizes = [
         'grid' => [
-            'width'  => 2000,
-            'height' => 1000
+            'width'  => 210,
+            'height' => null
         ],
         'list' => [
-            'width'  => 500,
-            'height' => 2000
+            'width'  => 420,
+            'height' => null
         ],
     ];
 
@@ -47,7 +47,6 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
             $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $this->getData('image'));
             //$sizes = $this->getResizeSizes([$image->getOriginalWidth(), $image->getOriginalHeight()], $mode);
             $image->keepTransparency(true);
-            $image->quality(100);
             $image->resize(self::$imageSizes[$mode]['width'], self::$imageSizes[$mode]['height']);
             $image->save($newFilePath);
         //}

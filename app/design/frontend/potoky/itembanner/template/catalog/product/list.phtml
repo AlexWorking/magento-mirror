@@ -147,7 +147,7 @@
     <ul class="products-grid products-grid--max-<?php echo $_columnCount; ?>-col">
         <?php $i=0; foreach ($_productCollection as $_product): ?>
             <?php while ($bannerPosition == $position): ?>
-                <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?>">
+                <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?> potoky-itembanner">
                         <?php
                         echo $this->getChildHtml($bannerBlock);
                         next($positioningArray);
