@@ -15,7 +15,7 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
             'height' => null
         ],
         'list' => [
-            'width'  => 420,
+            'width'  => 960,
             'height' => null
         ],
     ];

@@ -54,7 +54,7 @@
     <ol class="products-list" id="products-list">
     <?php foreach ($_productCollection as $_product): ?>
         <?php while ($bannerPosition == $position): ?>
-            <li class="item<?php if( ++$_iterator == sizeof($_productCollection) ): ?> last<?php endif; ?>">
+            <li class="item<?php if( ++$_iterator == sizeof($_productCollection) ): ?> last<?php endif; ?> potoky-itembanner">
                 <?php
                     echo $this->getChildHtml($bannerBlock);
                     next($positioningArray);
