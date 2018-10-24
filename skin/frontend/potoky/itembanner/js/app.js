@@ -1067,7 +1067,6 @@ $j(document).ready(function () {
 
                 $j.each(gridRows, function () {
                     var tallestProductInfo = 0;
-                    var tallestLi;
                     $j.each(this, function () {
                         // Since this function is called every time the page is resized, we need to remove the min-height
                         // and bottom-padding so each cell can return to its natural size before being measured.
@@ -1089,25 +1088,32 @@ $j(document).ready(function () {
                         var totalHeight = productInfoHeight + actionSpacing + actionHeight;
                         if (totalHeight > tallestProductInfo) {
                             tallestProductInfo = totalHeight;
-                            tallestLi = $j(this);
                         }
 
                         // Set the bottom-padding to accommodate the height of the .actions element. Note: if .actions
                         // elements are of varying heights, they will not be aligned.
                         $j(this).find('.product-info').css('padding-bottom', actionHeight + 'px');
                     });
+                    var banners = [];
+                    var tallestLiHeight = 314.66;
                     // Set the height of all .product-info elements in a row to the tallest height
                     $j.each(this, function () {
-                        $j(this).find('.product-info').css('min-height', tallestProductInfo);
                         if ($j(this).attr('class').indexOf('potoky-itembanner') > -1) {
-                            var tallestLiHeight = (tallestProductInfo > 10) ? tallestLi.height() : 314.66;
+                            banners.push(this);
+                            {return;}
+                        }
+                        $j(this).find('.product-info').css('min-height', tallestProductInfo);
+                        tallestLiHeight = (tallestProductInfo > 10) ? $j(this).height() : tallestLiHeight;
+                    });
+                    $j.each(banners, function () {
                             $j(this).css({
                                 'height': tallestLiHeight + 'px',
                                 'border-style': 'solid',
-                                'border-width': '1px'
+                                'border-width': '1px',
+                                'border-color': '#000'
                             });
-                        }
-                    });
+
+                    })
                 });
             });
         };
@@ -1139,7 +1145,8 @@ $j(document).ready(function () {
                 element.css({
                     'height': avarageHeight + 'px',
                     'border-style': 'solid',
-                    'border-width': '1px'
+                    'border-width': '1px',
+                    'border-color': '#000'
                 })
             })
         })

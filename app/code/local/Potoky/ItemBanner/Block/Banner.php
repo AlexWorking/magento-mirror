@@ -12,11 +12,11 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
     public static $imageSizes = [
         'grid' => [
             'width'  => 210,
-            'height' => null
+            'height' => 420
         ],
         'list' => [
-            'width'  => 960,
-            'height' => null
+            'width'  => 680,
+            'height' => 250
         ],
     ];
 
