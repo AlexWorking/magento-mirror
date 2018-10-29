@@ -47,7 +47,7 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
             $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $this->getData('image'));
             //$sizes = $this->getResizeSizes([$image->getOriginalWidth(), $image->getOriginalHeight()], $mode);
             $image->keepTransparency(true);
-            $image->resize(self::$imageSizes[$mode]['width'], self::$imageSizes[$mode]['height']);
+            //$image->resize(self::$imageSizes[$mode]['width'], self::$imageSizes[$mode]['height']);
             $image->save($newFilePath);
         //}
 

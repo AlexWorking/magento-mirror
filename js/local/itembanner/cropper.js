@@ -1,10 +1,15 @@
-jQuery(function($) {
-    $('#image_preview').Jcrop();
-});
 
 jQuery(document).ready(function(){
 
-    jQuery('#image_preview').Jcrop({
+    jQuery('#image_preview_grid').Jcrop({
+        onChange: showCoords,
+        onSelect: showCoords,
+        bgColor:     'transparent',
+        bgOpacity:   .4,
+        aspectRatio: 16 / 9
+    });
+
+    jQuery('#image_preview_list').Jcrop({
         onChange: showCoords,
         onSelect: showCoords,
         bgColor:     'transparent',
@@ -18,11 +23,17 @@ jQuery(document).ready(function(){
 // event handlers, as per the Jcrop invocation above
 function showCoords(c)
 {
-    jQuery('#x1').val(c.x);
-    jQuery('#y1').val(c.y);
-    jQuery('#x2').val(c.x2);
-    jQuery('#y2').val(c.y2);
-    jQuery('#w').val(c.w);
-    jQuery('#h').val(c.h);
-};
+    jQuery('#x1_grid').val(c.x);
+    jQuery('#y1_grid').val(c.y);
+    jQuery('#x2_grid').val(c.x2);
+    jQuery('#y2_grid').val(c.y2);
+    jQuery('#w_grid').val(c.w);
+    jQuery('#h_grid').val(c.h);
+    jQuery('#x1_list').val(c.x);
+    jQuery('#y1_list').val(c.y);
+    jQuery('#x2_list').val(c.x2);
+    jQuery('#y2_list').val(c.y2);
+    jQuery('#w_list').val(c.w);
+    jQuery('#h_list').val(c.h);
+}
 

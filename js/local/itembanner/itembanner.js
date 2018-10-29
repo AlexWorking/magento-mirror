@@ -1,17 +1,25 @@
+var isItemBannerInstance = {
+  calculate: function () {
+      if (this.result === 'undefined') {
+          this.result = $j( document ).ready(function () {
+              return ($j( "#type" ).val() === 'itembanner/banner')
+          });
+          return this.result;
+      }
+  }
+};
 
 $j( document ).ready(function () {
-    var instanceType = $j( "#type" ).val();
-    if (instanceType == 'itembanner/banner') {
+    if (isItemBannerInstance) {
         $j( "#edit_form").attr("enctype", "multipart/form-data" );
     }
 });
 
 function imagePreview(element){
     if($(element)){
-        var instanceType = $j( "#type" ).val();
         var win = window.open('', 'preview', 'width=400,height=400,resizable=1,scrollbars=1');
         win.document.open();
-        if(instanceType != 'itembanner/banner') {
+        if(!isItemBannerInstance) {
             win.document.write('<body style="padding:0; margin:0">');
             win.document.write('<img src="'+$(element).src+'" id="image_preview"/>');
             win.document.write('</body>');
@@ -23,14 +31,19 @@ function imagePreview(element){
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
             win.document.write('</head>');
             win.document.write('<body style="padding:0; margin:0">');
-            win.document.write('<img src="'+$(element).src+'" id="image_preview"/>');
-            win.document.write('<form action="http://review3.school.com/index.php/admin/widget_cropper/crop/form_key/LNTKyRfLSrg8IkhX" class="coords" method="post">' +
-                '<label>X1 <input type="text" size="4" id="x1" name="x1"></label>' +
-                '<label>Y1 <input type="text" size="4" id="y1" name="y1"></label>' +
-                '<label>X2 <input type="text" size="4" id="x2" name="x2"></label>' +
-                '<label>Y2 <input type="text" size="4" id="y2" name="y2"></label>' +
-                '<label>W <input type="text" size="4" id="w" name="w"></label>' +
-                '<label>H <input type="text" size="4" id="h" name="h"></label>' +
+            win.document.write('<div style="display: inline-block; border: 1px solid red; margin:10px;">');
+            win.document.write('<img src="'+$(element).src+'" id="image_preview_grid"/>');
+            win.document.write('</div>');
+            win.document.write('<div>');
+            win.document.write('<img src="'+$(element).src+'" id="image_preview_list"/>');
+            win.document.write('</div>');
+            win.document.write('<form action="http://review3.school.com/index.php/admin/widget_cropper/crop/form_key/' + FORM_KEY + '" class="coords" method="post">' +
+                '<label>X1_grid <input type="text" size="4" id="x1_grid" name="x1_grid"></label>' +
+                '<label>Y1_grid <input type="text" size="4" id="y1_grid" name="y1_grid"></label>' +
+                '<label>X2_grid <input type="text" size="4" id="x2_grid" name="x2_grid"></label>' +
+                '<label>Y2_grid <input type="text" size="4" id="y2_grid" name="y2_grid"></label>' +
+                '<label>W_grid <input type="text" size="4" id="w_grid" name="w_grid"></label>' +
+                '<label>H_grid <input type="text" size="4" id="h_grid" name="h_grid"></label>' +
                 '<input type="submit">Crop</input>' +
                 '</form>');
             win.document.write('</body>');

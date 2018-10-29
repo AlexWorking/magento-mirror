@@ -2,22 +2,16 @@
 
 class Potoky_ItemBanner_Model_Resource_Product_Collection extends Mage_Catalog_Model_Resource_Product_Collection
 {
-    private $_collectionSizeWithBannersWithBanners;
-
+    private $bannersQty = 0;
+    
+    public function setBannersQty($qty)
+    {
+        $this->bannersQty = $qty;
+    }
+    
     public function getSize()
     {
-        if (isset($this->_collectionSizeWithBanners)) {
-            return $this->_collectionSizeWithBanners;
-        }
-
-        $parent = parent::getSize();
-
-        if($data = Mage::registry('potoky_itembanner')) {
-            $parent += $data['count'];
-            $this->_collectionSizeWithBanners = $parent;
-        }
-
-        return $parent;
+        return parent::getSize() + $this->bannersQty;
     }
 
     public function _loadEntities($printQuery = false, $logQuery = false)
