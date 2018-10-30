@@ -31,7 +31,7 @@ function imagePreview(element){
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
             win.document.write('</head>');
             win.document.write('<body style="padding:0; margin:0">');
-            win.document.write('<div style="display: inline-block; border: 1px solid red; margin:10px;">');
+            win.document.write('<div>');
             win.document.write('<img src="'+$(element).src+'" id="image_preview_grid"/>');
             win.document.write('</div>');
             win.document.write('<div>');
@@ -44,11 +44,20 @@ function imagePreview(element){
                 '<label>Y2_grid <input type="text" size="4" id="y2_grid" name="y2_grid"></label>' +
                 '<label>W_grid <input type="text" size="4" id="w_grid" name="w_grid"></label>' +
                 '<label>H_grid <input type="text" size="4" id="h_grid" name="h_grid"></label>' +
+                '<label>X1_list <input type="text" size="4" id="x1_list" name="x1_list"></label>' +
+                '<label>Y1_list <input type="text" size="4" id="y1_list" name="y1_list"></label>' +
+                '<label>X2_list <input type="text" size="4" id="x2_list" name="x2_list"></label>' +
+                '<label>Y2_list <input type="text" size="4" id="y2_list" name="y2_list"></label>' +
+                '<label>W_list <input type="text" size="4" id="w_list" name="w_list"></label>' +
+                '<label>H_list <input type="text" size="4" id="h_list" name="h_list"></label>' +
                 '<input type="submit">Crop</input>' +
                 '</form>');
             win.document.write('</body>');
         }
         win.document.close();
+        //$j(win.document).onload(function () {
+        //   $j( ".jcrop-holder" ).css('display', 'inline');
+        //});
         Event.observe(win, 'load', function(){
             var img = win.document.getElementById('image_preview');
             win.resizeTo(800, 800);

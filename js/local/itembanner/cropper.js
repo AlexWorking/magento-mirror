@@ -2,16 +2,16 @@
 jQuery(document).ready(function(){
 
     jQuery('#image_preview_grid').Jcrop({
-        onChange: showCoords,
-        onSelect: showCoords,
+        onChange: showCoordsGrid,
+        onSelect: showCoordsGrid,
         bgColor:     'transparent',
         bgOpacity:   .4,
         aspectRatio: 16 / 9
     });
 
     jQuery('#image_preview_list').Jcrop({
-        onChange: showCoords,
-        onSelect: showCoords,
+        onChange: showCoordsList,
+        onSelect: showCoordsList,
         bgColor:     'transparent',
         bgOpacity:   .4,
         aspectRatio: 16 / 9
@@ -21,7 +21,7 @@ jQuery(document).ready(function(){
 
 // Simple event handler, called from onChange and onSelect
 // event handlers, as per the Jcrop invocation above
-function showCoords(c)
+function showCoordsGrid(c)
 {
     jQuery('#x1_grid').val(c.x);
     jQuery('#y1_grid').val(c.y);
@@ -29,6 +29,10 @@ function showCoords(c)
     jQuery('#y2_grid').val(c.y2);
     jQuery('#w_grid').val(c.w);
     jQuery('#h_grid').val(c.h);
+}
+
+function showCoordsList(c)
+{
     jQuery('#x1_list').val(c.x);
     jQuery('#y1_list').val(c.y);
     jQuery('#x2_list').val(c.x2);
