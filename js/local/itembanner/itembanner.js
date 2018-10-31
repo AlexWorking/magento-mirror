@@ -55,12 +55,8 @@ function imagePreview(element){
             win.document.write('</body>');
         }
         win.document.close();
-        //$j(win.document).onload(function () {
-        //   $j( ".jcrop-holder" ).css('display', 'inline');
-        //});
         Event.observe(win, 'load', function(){
-            var img = win.document.getElementById('image_preview');
-            win.resizeTo(800, 800);
+            win.resizeTo(1200, 1200);
         });
     }
 }
