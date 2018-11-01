@@ -29,13 +29,14 @@ function imagePreview(element){
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
             win.document.write('<script language="Javascript"  src="http://review3.school.com/js/local/itembanner/cropper.js"></script>');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
+            win.document.write('<style>* {box-sizing: border-box;}</style>');
             win.document.write('</head>');
             win.document.write('<body style="padding:0; margin:0">');
-            win.document.write('<div>');
-            win.document.write('<img src="'+$(element).src+'" id="image_preview_grid"/>');
+            win.document.write('<div style="width: 100%; float: left;">');
+            win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_grid"/>');
             win.document.write('</div>');
-            win.document.write('<div>');
-            win.document.write('<img src="'+$(element).src+'" id="image_preview_list"/>');
+            win.document.write('<div style="width: 100%">');
+            win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_list"/>');
             win.document.write('</div>');
             win.document.write('<form action="http://review3.school.com/index.php/admin/widget_cropper/crop/form_key/' + FORM_KEY + '" class="coords" method="post">' +
                 '<label>X1_grid <input type="text" size="4" id="x1_grid" name="x1_grid"></label>' +
@@ -56,6 +57,7 @@ function imagePreview(element){
         }
         win.document.close();
         Event.observe(win, 'load', function(){
+
             win.resizeTo(1200, 1200);
         });
     }
