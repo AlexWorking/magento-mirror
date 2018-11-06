@@ -17,25 +17,28 @@ $j( document ).ready(function () {
 
 function imagePreview(element){
     if($(element)){
-        var win = window.open('', 'preview', 'width=400,height=400,resizable=1,scrollbars=1');
-        win.document.open();
+        var win = window;
         if(!isItemBannerInstance) {
-            win.document.write('<body style="padding:0; margin:0">');
-            win.document.write('<img src="'+$(element).src+'" id="image_preview"/>');
-            win.document.write('</body>');
+            win = win.open('', 'preview', 'width=400,height=400,resizable=1,scrollbars=1');
+            win.document.open();
+            win.document.write('<body style="padding:0;margin:0"><img src="'+$(element).src+'" id="image_preview"/></body>');
+            win.document.close();
+            Event.observe(win, 'load', function(){
+                var img = win.document.getElementById('image_preview');
+                win.resizeTo(img.width+40, img.height+80);
+            });
         } else {
+            win = win.open('', 'preview', 'width=1200,height=1200,resizable=1,scrollbars=1');
+            win.document.open();
             win.document.write('<head>');
-            win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
-            win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
-            win.document.write('<script language="Javascript"  src="http://review3.school.com/js/local/itembanner/cropper.js"></script>');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
             win.document.write('<style>* {box-sizing: border-box;}</style>');
             win.document.write('</head>');
-            win.document.write('<body style="padding:0; margin:0">');
-            win.document.write('<div style="width: 100%; float: left;">');
+            win.document.write('<body id="body" style="padding:0; margin:0">');
+            win.document.write('<div style="width: 46%; margin: 2%; border: solid red; float: left;">');
             win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_grid"/>');
             win.document.write('</div>');
-            win.document.write('<div style="width: 100%">');
+            win.document.write('<div style="width: 46%; margin: 2%; border: solid red; float: left;">');
             win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_list"/>');
             win.document.write('</div>');
             win.document.write('<form action="http://review3.school.com/index.php/admin/widget_cropper/crop/form_key/' + FORM_KEY + '" class="coords" method="post">' +
@@ -54,11 +57,22 @@ function imagePreview(element){
                 '<input type="submit">Crop</input>' +
                 '</form>');
             win.document.write('</body>');
+            win.document.close();
+            Event.observe(win, 'load', function(){
+                var body = win.document.getElementById('body');
+                var scriptJq = win.document.createElement('script');
+                var scriptJcrop = win.document.createElement('script');
+                var scriptCropper = win.document.createElement('script');
+                scriptJq.setAttribute('type', 'text/javascript');
+                scriptJcrop.setAttribute('type', 'text/javascript');
+                scriptCropper.setAttribute('type', 'text/javascript');
+                scriptJq.setAttribute('src', 'http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js');
+                scriptJcrop.setAttribute('src', 'http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js');
+                scriptCropper.setAttribute('src', 'http://review3.school.com/js/local/itembanner/cropper.js');
+                body.appendChild(scriptJq);
+                body.appendChild(scriptJcrop);
+                body.appendChild(scriptCropper);
+            });
         }
-        win.document.close();
-        Event.observe(win, 'load', function(){
-
-            win.resizeTo(1200, 1200);
-        });
     }
 }
