@@ -4,7 +4,7 @@ jQuery(document).ready(function(){
     jQuery('#image_preview_grid').Jcrop({
         onChange: showCoordsGrid,
         onSelect: showCoordsGrid,
-        bgColor:     'transparent',
+        bgColor:     'white',
         bgOpacity:   .4,
         aspectRatio: 16 / 9
     });
@@ -12,7 +12,7 @@ jQuery(document).ready(function(){
     jQuery('#image_preview_list').Jcrop({
         onChange: showCoordsList,
         onSelect: showCoordsList,
-        bgColor:     'transparent',
+        bgColor:     'white',
         bgOpacity:   .4,
         aspectRatio: 16 / 9
     });
