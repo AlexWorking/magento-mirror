@@ -58,12 +58,27 @@ function imagePreview(element){
                 '<input type="hidden" size="4" id="y2_list" name="y2_list"></label>' +
                 '<input type="hidden" size="4" id="w_list" name="w_list"></label>' +
                 '<input type="hidden" size="4" id="h_list" name="h_list"></label>' +
+                '<input type="hidden" size="4" id="w_img" name="w_img"></label>' +
+                '<input type="hidden" size="4" id="h_img" name="h_img"></label>' +
+                '<input type="hidden" size="4" id="src_img" name="src_img"></label>' +
                 '<input type="submit" style="margin-top: 20px; width: 300px; height: 30px;"/>' +
                 '</form>');
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
             Event.observe(win, 'load', function(){
+                win.document.getElementById('w_img').setAttribute(
+                    'value',
+                    win.document.getElementById('image_preview_list').width
+                );
+                win.document.getElementById('h_img').setAttribute(
+                    'value',
+                    win.document.getElementById('image_preview_grid').height
+                );
+                win.document.getElementById('src_img').setAttribute(
+                    'value',
+                    $(element).src
+                );
                 var body = win.document.getElementById('body');
                 var scriptJq = win.document.createElement('script');
                 scriptJq.setAttribute('type', 'text/javascript');

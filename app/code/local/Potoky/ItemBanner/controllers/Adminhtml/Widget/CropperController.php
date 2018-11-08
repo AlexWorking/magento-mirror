@@ -4,15 +4,29 @@ class Potoky_ItemBanner_Adminhtml_Widget_CropperController extends Mage_Adminhtm
 {
     public function cropAction()
     {
-        $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . 'Small-mario.png');
-        $newFilePath = Mage::getBaseDir('media') . DS . 'itembanner' . DS . 'cropped' . DS . 'Small-mario.png';
         extract($this->getRequest()->getPost());
-        $image->crop(
-            $y1_grid,
-            $x1_grid,
-            $image->getOriginalWidth() - $x2_grid,
-            $image->getOriginalHeight() - $y2_grid
-        );
-        $image->save($newFilePath);
+
+        function mycrop($src, $x1, $y1, $x2, $y2, $w, $h, $mode)
+        {
+            $file = substr($src, strrpos($src, '/'));
+            $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $file);
+            $newFilePath = Mage::getBaseDir('media') . DS . 'itembanner' . DS . $mode . DS . $file;
+            $image->crop(
+                ($y1 * $image->getOriginalWidth()) / $w,
+                ($x1 * $image->getOriginalHeight()) / $h,
+                $image->getOriginalWidth() * (1 - $x2 / $w),
+                $image->getOriginalHeight() * (1 - $y2 / $h)
+            );
+            $image->save($newFilePath);
+        }
+
+        if ($w_grid != 0 && $h_grid != 0) {
+            mycrop($src_img, $x1_grid, $y1_grid, $x2_grid, $y2_grid, $w_img, $h_img, 'grid');
+        }
+
+        if ($w_list != 0 && $h_list != 0) {
+            mycrop($src_img, $x1_list, $y1_list, $x2_list, $y2_list, $w_img, $h_img, 'list');
+        }
+
     }
 }
