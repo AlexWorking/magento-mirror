@@ -7,7 +7,7 @@ jQuery(function($) {
             onSelect: showCoordsGrid,
             bgColor:     'white',
             bgOpacity:   .4,
-            aspectRatio: 16 / 9
+            aspectRatio: 1 / gridAspectRatio
         });
 
         $('#image_preview_list').Jcrop({
@@ -15,7 +15,7 @@ jQuery(function($) {
             onSelect: showCoordsList,
             bgColor:     'white',
             bgOpacity:   .4,
-            aspectRatio: 16 / 9
+            aspectRatio: 1 / listAspectRatio
         });
 
         // Simple event handler, called from onChange and onSelect

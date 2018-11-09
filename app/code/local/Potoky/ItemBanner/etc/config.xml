@@ -5,6 +5,14 @@
             <version>0.1.0</version>
         </Potoky_ItemBanner>
     </modules>
+    <default>
+        <cms>
+            <itembanner>
+                <grid_cropping_aspect_ratio>2.25</grid_cropping_aspect_ratio>
+                <list_cropping_aspect_ratio>0.42</list_cropping_aspect_ratio>
+            </itembanner>
+        </cms>
+    </default>
     <global>
         <blocks>
             <itembanner>

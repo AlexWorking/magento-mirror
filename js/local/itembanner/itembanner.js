@@ -33,17 +33,16 @@ function imagePreview(element){
             win.document.open();
             win.document.write('<head>');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
-            win.document.write('<style>* {box-sizing: border-box;}</style>');
             win.document.write('</head>');
             win.document.write('<body id="body" style="background-color: aliceblue; padding:0; margin:0;">');
-            win.document.write('<div style=" text-align: center; width: 1200px; height: auto; margin: 10px;">');
-            win.document.write('<div style="width: 49.5%; margin-right: 1%; border: solid black 1px; float: left;">');
+            win.document.write('<div style="text-align: center; width: 1200px; height: auto; margin: 10px;">');
+            win.document.write('<div style="width: 49.5%; margin-right: 1%; border: solid black 1px; float: left; box-sizing: border-box;">');
             win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_grid"/>');
-            win.document.write('<h4>Crop for Grid Mode</h4>');
+            win.document.write('<h4>' + gridCroppingWindow + '</h4>');
             win.document.write('</div>');
-            win.document.write('<div style="width: 49.5%; border: solid black 1px; float: left;">');
+            win.document.write('<div style="width: 49.5%; border: solid black 1px; float: left; box-sizing: border-box;">');
             win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_list"/>');
-            win.document.write('<h4>Crop for List Mode</h4>');
+            win.document.write('<h4>' + listCroppingWindow + '</h4>');
             win.document.write('</div>');
             win.document.write('<form action="http://review3.school.com/index.php/admin/widget_cropper/crop/form_key/' + FORM_KEY + '" class="coords" method="post">' +
                 '<input type="hidden" size="4" id="x1_grid" name="x1_grid"></label>' +
@@ -80,6 +79,10 @@ function imagePreview(element){
                     $(element).src
                 );
                 var body = win.document.getElementById('body');
+                var scriptVariables = win.document.createElement('script');
+                scriptVariables.setAttribute('type', 'text/javascript');
+                scriptVariables.innerHTML = 'var gridAspectRatio = ' + gridAspectRatio + '; var listAspectRatio = ' + listAspectRatio;
+                body.appendChild(scriptVariables);
                 var scriptJq = win.document.createElement('script');
                 scriptJq.setAttribute('type', 'text/javascript');
                 scriptJq.setAttribute('src', 'http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js');

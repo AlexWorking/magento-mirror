@@ -6,7 +6,7 @@ class Potoky_ItemBanner_Adminhtml_Widget_CropperController extends Mage_Adminhtm
     {
         extract($this->getRequest()->getPost());
 
-        function mycrop($src, $x1, $y1, $x2, $y2, $w, $h, $mode)
+        function crop($src, $x1, $y1, $x2, $y2, $w, $h, $mode)
         {
             $file = substr($src, strrpos($src, '/'));
             $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $file);
@@ -21,11 +21,11 @@ class Potoky_ItemBanner_Adminhtml_Widget_CropperController extends Mage_Adminhtm
         }
 
         if ($w_grid != 0 && $h_grid != 0) {
-            mycrop($src_img, $x1_grid, $y1_grid, $x2_grid, $y2_grid, $w_img, $h_img, 'grid');
+            crop($src_img, $x1_grid, $y1_grid, $x2_grid, $y2_grid, $w_img, $h_img, 'grid');
         }
 
         if ($w_list != 0 && $h_list != 0) {
-            mycrop($src_img, $x1_list, $y1_list, $x2_list, $y2_list, $w_img, $h_img, 'list');
+            crop($src_img, $x1_list, $y1_list, $x2_list, $y2_list, $w_img, $h_img, 'list');
         }
 
     }

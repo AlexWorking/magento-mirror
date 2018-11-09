@@ -1146,7 +1146,8 @@ $j(document).ready(function () {
                     'height': avarageHeight + 'px',
                     'border-style': 'solid',
                     'border-width': '1px',
-                    'border-color': '#000'
+                    'border-color': '#000',
+                    'padding-bottom': '0'
                 })
             })
         })
