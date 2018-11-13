@@ -1,9 +1,11 @@
-var isItemBannerInstance = {
+var itemBannerInstance = {
     result: 'undefined',
-    figureOut: function () {
+    inputs: 'undefined',
+    figureOutIsIt: function () {
         if (this.result === 'undefined') {
             $j( document ).ready(function (p) {
                 p.result = ($j( "#type" ).val() === 'itembanner/banner')
+                p.inputs = ['x1_grid', 'y1_grid', 'x2_grid', 'y2_grid', 'w_grid', 'h_grid', 'x1_list', 'y1_list', 'x2_list', 'y2_list', 'w_list', 'h_list', 'w_img', 'h_img', 'src_img'];
             }(this));
         }
         return this.result;
@@ -11,15 +13,23 @@ var isItemBannerInstance = {
 };
 
 $j( document ).ready(function () {
-    if (isItemBannerInstance.figureOut) {
-        $j( "#edit_form").attr("enctype", "multipart/form-data" );
+    if (itemBannerInstance.figureOutIsIt()) {
+        var formJq = $j( "#edit_form");
+        formJq.attr("enctype", "multipart/form-data" );
+        itemBannerInstance.inputs.forEach(function (identifier) {
+            $j('<input/>', {
+                type: 'hidden',
+                id: identifier,
+                name: identifier
+            }).appendTo(formJq);
+        });
     }
 });
 
 function imagePreview(element){
     if($(element)){
         var win = window;
-        if(!isItemBannerInstance.figureOut) {
+        if(!itemBannerInstance.figureOutIsIt()) {
             win = win.open('', 'preview', 'width=400,height=400,resizable=1,scrollbars=1');
             win.document.open();
             win.document.write('<body style="padding:0;margin:0"><img src="'+$(element).src+'" id="image_preview"/></body>');
@@ -44,24 +54,12 @@ function imagePreview(element){
             win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_list"/>');
             win.document.write('<h4>' + listCroppingWindow + '</h4>');
             win.document.write('</div>');
-            win.document.write('<form action="http://review3.school.com/index.php/admin/widget_cropper/crop/form_key/' + FORM_KEY + '" class="coords" method="post">' +
-                '<input type="hidden" size="4" id="x1_grid" name="x1_grid"></label>' +
-                '<input type="hidden" size="4" id="y1_grid" name="y1_grid"></label>' +
-                '<input type="hidden" size="4" id="x2_grid" name="x2_grid"></label>' +
-                '<input type="hidden" size="4" id="y2_grid" name="y2_grid"></label>' +
-                '<input type="hidden" size="4" id="w_grid" name="w_grid"></label>' +
-                '<input type="hidden" size="4" id="h_grid" name="h_grid"></label>' +
-                '<input type="hidden" size="4" id="x1_list" name="x1_list"></label>' +
-                '<input type="hidden" size="4" id="y1_list" name="y1_list"></label>' +
-                '<input type="hidden" size="4" id="x2_list" name="x2_list"></label>' +
-                '<input type="hidden" size="4" id="y2_list" name="y2_list"></label>' +
-                '<input type="hidden" size="4" id="w_list" name="w_list"></label>' +
-                '<input type="hidden" size="4" id="h_list" name="h_list"></label>' +
-                '<input type="hidden" size="4" id="w_img" name="w_img"></label>' +
-                '<input type="hidden" size="4" id="h_img" name="h_img"></label>' +
-                '<input type="hidden" size="4" id="src_img" name="src_img"></label>' +
-                '<input type="submit" style="margin-top: 20px; width: 300px; height: 30px;"/>' +
-                '</form>');
+            win.document.write('<form>');
+            itemBannerInstance.inputs.forEach(function (identifier) {
+                var value = document.getElementById(identifier).getAttribute('value');
+                win.document.write('<input type="hidden" id="' + identifier + '" value="' + value + '">');
+            });
+            win.document.write('<input type="submit" style="margin-top: 20px; width: 300px; height: 30px;"/></form>');
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
@@ -100,8 +98,14 @@ function imagePreview(element){
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
             });
-            Event.observe(win, 'unload', function(){
-               win.close();
+            Event.observe(win, 'submit', function(){
+                var editForm = document.getElementById('edit_form');
+                itemBannerInstance.inputs.forEach(function (identifier) {
+                    var input = document.getElementById(identifier);
+                    input.setAttribute('value', win.document.getElementById(identifier).value);
+                    editForm.appendChild(input);
+                });
+                win.close();
             });
         }
     }
