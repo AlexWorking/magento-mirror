@@ -2,10 +2,15 @@ var itemBannerInstance = {
     result: 'undefined',
     inputs: 'undefined',
     figureOutIsIt: function () {
-        if (this.result === 'undefined') {
+        if (this.result === "undefined") {
             $j( document ).ready(function (p) {
                 p.result = ($j( "#type" ).val() === 'itembanner/banner')
-                p.inputs = ['x1_grid', 'y1_grid', 'x2_grid', 'y2_grid', 'w_grid', 'h_grid', 'x1_list', 'y1_list', 'x2_list', 'y2_list', 'w_list', 'h_list', 'w_img', 'h_img', 'src_img'];
+                p.inputs = {
+                    "grid": ['x1_grid', 'y1_grid', 'x2_grid', 'y2_grid', 'w_grid', 'h_grid'],
+                    "list": ['x1_list', 'y1_list', 'x2_list', 'y2_list', 'w_list', 'h_list'],
+                    "img": ['w_img', 'h_img', 'src_img'],
+                    "all": ['x1_grid', 'y1_grid', 'x2_grid', 'y2_grid', 'w_grid', 'h_grid', 'x1_list', 'y1_list', 'x2_list', 'y2_list', 'w_list', 'h_list', 'w_img', 'h_img', 'src_img']
+                };
             }(this));
         }
         return this.result;
@@ -16,9 +21,9 @@ $j( document ).ready(function () {
     if (itemBannerInstance.figureOutIsIt()) {
         var formJq = $j( "#edit_form");
         formJq.attr("enctype", "multipart/form-data" );
-        itemBannerInstance.inputs.forEach(function (identifier) {
+        itemBannerInstance.inputs.all.forEach(function (identifier) {
             $j('<input/>', {
-                type: 'hidden',
+                type: 'text',
                 id: identifier,
                 name: identifier
             }).appendTo(formJq);
@@ -39,10 +44,14 @@ function imagePreview(element){
                 win.resizeTo(img.width+40, img.height+80);
             });
         } else {
-            win = win.open('', 'preview', 'width=1200,height=1200,resizable=no,scrollbars=1');
+            win = win.open('', 'preview', 'width=1200,height=1200,resizable=1,scrollbars=1');
             win.document.open();
             win.document.write('<head>');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
+            win.document.write('<script>var gridAspectRatio = gridAspectRatio; var listAspectRatio = listAspectRatio;</script>');
+            win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
+            win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
+            win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/cropper.js"></script>');
             win.document.write('</head>');
             win.document.write('<body id="body" style="background-color: aliceblue; padding:0; margin:0;">');
             win.document.write('<div style="text-align: center; width: 1200px; height: auto; margin: 10px;">');
@@ -55,9 +64,9 @@ function imagePreview(element){
             win.document.write('<h4>' + listCroppingWindow + '</h4>');
             win.document.write('</div>');
             win.document.write('<form>');
-            itemBannerInstance.inputs.forEach(function (identifier) {
+            itemBannerInstance.inputs.all.forEach(function (identifier) {
                 var value = document.getElementById(identifier).getAttribute('value');
-                win.document.write('<input type="hidden" id="' + identifier + '" value="' + value + '">');
+                win.document.write('<input type="text" id="' + identifier + '" value="' + value + '">');
             });
             win.document.write('<input type="submit" style="margin-top: 20px; width: 300px; height: 30px;"/></form>');
             win.document.write('</div>');
@@ -76,36 +85,34 @@ function imagePreview(element){
                     'value',
                     $(element).src
                 );
-                var body = win.document.getElementById('body');
-                var scriptVariables = win.document.createElement('script');
-                scriptVariables.setAttribute('type', 'text/javascript');
-                scriptVariables.innerHTML = 'var gridAspectRatio = ' + gridAspectRatio + '; var listAspectRatio = ' + listAspectRatio;
-                body.appendChild(scriptVariables);
-                var scriptJq = win.document.createElement('script');
-                scriptJq.setAttribute('type', 'text/javascript');
-                scriptJq.setAttribute('src', 'http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js');
-                body.appendChild(scriptJq);
-                var scriptJcrop = win.document.createElement('script');
-                scriptJcrop.setAttribute('type', 'text/javascript');
-                scriptJcrop.setAttribute('src', 'http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js');
-                body.appendChild(scriptJcrop);
-                var scriptCropper = win.document.createElement('script');
-                scriptCropper.setAttribute('type', 'text/javascript');
-                scriptCropper.setAttribute('src', 'http://review3.school.com/js/local/itembanner/cropper.js');
-                body.appendChild(scriptCropper);
                 var container = win.document.getElementsByTagName('div')[0];
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
             });
             Event.observe(win, 'submit', function(){
-                var editForm = document.getElementById('edit_form');
-                itemBannerInstance.inputs.forEach(function (identifier) {
-                    var input = document.getElementById(identifier);
-                    input.setAttribute('value', win.document.getElementById(identifier).value);
-                    editForm.appendChild(input);
-                });
-                win.close();
+                if (itemBannerInstance.figureOutIsIt()) {
+                    var editForm = document.getElementById('edit_form');
+                    var wGrid = win.document.getElementById(itemBannerInstance.inputs.grid[4]).value;
+                    var hGrid = win.document.getElementById(itemBannerInstance.inputs.grid[5]).value;
+                    var wList = win.document.getElementById(itemBannerInstance.inputs.list[4]).value;
+                    var hList = win.document.getElementById(itemBannerInstance.inputs.list[5]).value;
+                    if (wGrid * hGrid) {
+                        itemBannerInstance.inputs.grid.forEach(scatterValues);
+                    }
+
+                    if (wList * hList) {
+                        itemBannerInstance.inputs.list.forEach(scatterValues);
+                    }
+
+                    function scatterValues(identifier) {
+                        var input = document.getElementById(identifier);
+                        input.setAttribute('value', win.document.getElementById(identifier).value);
+                        editForm.appendChild(input);
+                    }
+
+                    win.close();
+                }
             });
         }
     }
