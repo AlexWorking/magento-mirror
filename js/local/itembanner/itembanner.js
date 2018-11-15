@@ -6,9 +6,8 @@ var itemBannerInstance = {
             $j( document ).ready(function (p) {
                 p.result = ($j( "#type" ).val() === 'itembanner/banner');
                 p.inputs = {
-                    "grid": ['x1_grid', 'y1_grid', 'x2_grid', 'y2_grid', 'w_grid', 'h_grid'],
-                    "list": ['x1_list', 'y1_list', 'x2_list', 'y2_list', 'w_list', 'h_list'],
-                    "img": {
+                    baseArray: ['x1', 'y1', 'x2', 'y2', 'w', 'h'],
+                    img: {
                         "w_img": 'win.document.getElementById("image_preview_list").width',
                         "h_img": 'win.document.getElementById("image_preview_grid").height',
                         "src_img": '$(element).src'
@@ -17,14 +16,22 @@ var itemBannerInstance = {
             }(this));
         }
         return this.result;
-  }
+    },
+    getFormatedIdentifiers: function (mode, hashtag) {
+        hashtag = (hashtag) ? '#' : '';
+        var formatedArray = [];
+        this.inputs.baseArray.forEach(function (identifier) {
+            formatedArray.push(hashtag + identifier + '_' + mode);
+        });
+        return formatedArray;
+    }
 };
 
 $j( document ).ready(function () {
     if (itemBannerInstance.figureOutIsIt()) {
         var formJq = $j( "#edit_form");
         formJq.attr("enctype", "multipart/form-data" );
-        var inputsToManage = itemBannerInstance.inputs.grid.concat(itemBannerInstance.inputs.list.concat(Object.keys(itemBannerInstance.inputs.img)));
+        var inputsToManage = itemBannerInstance.getFormatedIdentifiers('grid').concat(itemBannerInstance.getFormatedIdentifiers('list').concat(Object.keys(itemBannerInstance.inputs.img)));
         inputsToManage.forEach(function (identifier) {
             $j('<input/>', {
                 type: 'text',
@@ -52,7 +59,9 @@ function imagePreview(element){
             win.document.open();
             win.document.write('<head>');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
-            win.document.write('<script>var gridAspectRatio = gridAspectRatio; var listAspectRatio = listAspectRatio;</script>');
+            var gridInputs = JSON.stringify(itemBannerInstance.getFormatedIdentifiers('grid', true));
+            var listInputs = JSON.stringify(itemBannerInstance.getFormatedIdentifiers('list', true));
+            win.document.write('<script>var gridAspectRatio = ' + gridAspectRatio +'; var listAspectRatio = ' + listAspectRatio +';</script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/cropper.js"></script>');
@@ -68,7 +77,9 @@ function imagePreview(element){
             win.document.write('<h4>' + listCroppingWindow + '</h4>');
             win.document.write('</div>');
             win.document.write('<form id="preview_form">');
-            var inputsToManage = itemBannerInstance.inputs.grid.concat(itemBannerInstance.inputs.list);
+            gridInputs = itemBannerInstance.getFormatedIdentifiers('grid');
+            listInputs = itemBannerInstance.getFormatedIdentifiers('list');
+            var inputsToManage = gridInputs.concat(listInputs);
             inputsToManage.forEach(function (identifier) {
                 var value = document.getElementById(identifier).getAttribute('value');
                 win.document.write('<input type="text" id="' + identifier + '" value="' + value + '">');
@@ -91,21 +102,21 @@ function imagePreview(element){
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
             });
             Event.observe(win, 'submit', function(){
-                var wGrid = win.document.getElementById(itemBannerInstance.inputs.grid[4]).value;
-                var hGrid = win.document.getElementById(itemBannerInstance.inputs.grid[5]).value;
-                var wList = win.document.getElementById(itemBannerInstance.inputs.list[4]).value;
-                var hList = win.document.getElementById(itemBannerInstance.inputs.list[5]).value;
+                var wGrid = win.document.getElementById(gridInputs[4]).value;
+                var hGrid = win.document.getElementById(gridInputs[5]).value;
+                var wList = win.document.getElementById(listInputs[4]).value;
+                var hList = win.document.getElementById(listInputs[5]).value;
 
                 if (wGrid * hGrid) {
-                    itemBannerInstance.inputs.grid.forEach(scatterValues);
+                    gridInputs.forEach(scatterValues);
                 } else {
-                    itemBannerInstance.inputs.grid.forEach(anullValues);
+                    gridInputs.forEach(annulValues);
                 }
 
                 if (wList * hList) {
-                    itemBannerInstance.inputs.list.forEach(scatterValues);
+                    listInputs.forEach(scatterValues);
                 } else {
-                    itemBannerInstance.inputs.list.forEach(anullValues);
+                    listInputs.forEach(annulValues);
                 }
 
                 Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
@@ -115,7 +126,7 @@ function imagePreview(element){
                     input.setAttribute('value', win.document.getElementById(identifier).value);
                 }
 
-                function anullValues(identifier) {
+                function annulValues(identifier) {
                     var input = document.getElementById(identifier);
                     input.setAttribute('value', null);
                 }
