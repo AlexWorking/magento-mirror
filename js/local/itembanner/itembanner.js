@@ -4,12 +4,15 @@ var itemBannerInstance = {
     figureOutIsIt: function () {
         if (this.result === "undefined") {
             $j( document ).ready(function (p) {
-                p.result = ($j( "#type" ).val() === 'itembanner/banner')
+                p.result = ($j( "#type" ).val() === 'itembanner/banner');
                 p.inputs = {
                     "grid": ['x1_grid', 'y1_grid', 'x2_grid', 'y2_grid', 'w_grid', 'h_grid'],
                     "list": ['x1_list', 'y1_list', 'x2_list', 'y2_list', 'w_list', 'h_list'],
-                    "img": ['w_img', 'h_img', 'src_img'],
-                    "all": ['x1_grid', 'y1_grid', 'x2_grid', 'y2_grid', 'w_grid', 'h_grid', 'x1_list', 'y1_list', 'x2_list', 'y2_list', 'w_list', 'h_list', 'w_img', 'h_img', 'src_img']
+                    "img": {
+                        "w_img": 'win.document.getElementById("image_preview_list").width',
+                        "h_img": 'win.document.getElementById("image_preview_grid").height',
+                        "src_img": '$(element).src'
+                    }
                 };
             }(this));
         }
@@ -21,7 +24,8 @@ $j( document ).ready(function () {
     if (itemBannerInstance.figureOutIsIt()) {
         var formJq = $j( "#edit_form");
         formJq.attr("enctype", "multipart/form-data" );
-        itemBannerInstance.inputs.all.forEach(function (identifier) {
+        var inputsToManage = itemBannerInstance.inputs.grid.concat(itemBannerInstance.inputs.list.concat(Object.keys(itemBannerInstance.inputs.img)));
+        inputsToManage.forEach(function (identifier) {
             $j('<input/>', {
                 type: 'text',
                 id: identifier,
@@ -63,8 +67,9 @@ function imagePreview(element){
             win.document.write('<img style="width: 100%;" src="'+$(element).src+'" id="image_preview_list"/>');
             win.document.write('<h4>' + listCroppingWindow + '</h4>');
             win.document.write('</div>');
-            win.document.write('<form>');
-            itemBannerInstance.inputs.all.forEach(function (identifier) {
+            win.document.write('<form id="preview_form">');
+            var inputsToManage = itemBannerInstance.inputs.grid.concat(itemBannerInstance.inputs.list);
+            inputsToManage.forEach(function (identifier) {
                 var value = document.getElementById(identifier).getAttribute('value');
                 win.document.write('<input type="text" id="' + identifier + '" value="' + value + '">');
             });
@@ -73,46 +78,49 @@ function imagePreview(element){
             win.document.write('</body>');
             win.document.close();
             Event.observe(win, 'load', function(){
-                win.document.getElementById('w_img').setAttribute(
-                    'value',
-                    win.document.getElementById('image_preview_list').width
-                );
-                win.document.getElementById('h_img').setAttribute(
-                    'value',
-                    win.document.getElementById('image_preview_grid').height
-                );
-                win.document.getElementById('src_img').setAttribute(
-                    'value',
-                    $(element).src
-                );
+                var form = win.document.getElementById('preview_form');
+                Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
+                    var input = win.document.createElement('input');
+                    input.setAttribute('id', identifier);
+                    input.setAttribute('value', eval(itemBannerInstance.inputs.img[identifier]));
+                    form.appendChild(input);
+                });
                 var container = win.document.getElementsByTagName('div')[0];
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
             });
             Event.observe(win, 'submit', function(){
-                if (itemBannerInstance.figureOutIsIt()) {
-                    var editForm = document.getElementById('edit_form');
-                    var wGrid = win.document.getElementById(itemBannerInstance.inputs.grid[4]).value;
-                    var hGrid = win.document.getElementById(itemBannerInstance.inputs.grid[5]).value;
-                    var wList = win.document.getElementById(itemBannerInstance.inputs.list[4]).value;
-                    var hList = win.document.getElementById(itemBannerInstance.inputs.list[5]).value;
-                    if (wGrid * hGrid) {
-                        itemBannerInstance.inputs.grid.forEach(scatterValues);
-                    }
+                var wGrid = win.document.getElementById(itemBannerInstance.inputs.grid[4]).value;
+                var hGrid = win.document.getElementById(itemBannerInstance.inputs.grid[5]).value;
+                var wList = win.document.getElementById(itemBannerInstance.inputs.list[4]).value;
+                var hList = win.document.getElementById(itemBannerInstance.inputs.list[5]).value;
 
-                    if (wList * hList) {
-                        itemBannerInstance.inputs.list.forEach(scatterValues);
-                    }
-
-                    function scatterValues(identifier) {
-                        var input = document.getElementById(identifier);
-                        input.setAttribute('value', win.document.getElementById(identifier).value);
-                        editForm.appendChild(input);
-                    }
-
-                    win.close();
+                if (wGrid * hGrid) {
+                    itemBannerInstance.inputs.grid.forEach(scatterValues);
+                } else {
+                    itemBannerInstance.inputs.grid.forEach(anullValues);
                 }
+
+                if (wList * hList) {
+                    itemBannerInstance.inputs.list.forEach(scatterValues);
+                } else {
+                    itemBannerInstance.inputs.list.forEach(anullValues);
+                }
+
+                Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
+
+                function scatterValues(identifier) {
+                    var input = document.getElementById(identifier);
+                    input.setAttribute('value', win.document.getElementById(identifier).value);
+                }
+
+                function anullValues(identifier) {
+                    var input = document.getElementById(identifier);
+                    input.setAttribute('value', null);
+                }
+
+                win.close();
             });
         }
     }
