@@ -6,7 +6,7 @@ var itemBannerInstance = {
             $j( document ).ready(function (p) {
                 p.result = ($j( "#type" ).val() === 'itembanner/banner');
                 p.inputs = {
-                    baseArray: ['x1', 'y1', 'x2', 'y2', 'w', 'h'],
+                    baseArray: ['x', 'y', 'x2', 'y2', 'w', 'h', 's'],
                     img: {
                         "w_img": 'win.document.getElementById("image_preview_list").width',
                         "h_img": 'win.document.getElementById("image_preview_grid").height',
@@ -55,16 +55,23 @@ function imagePreview(element){
                 win.resizeTo(img.width+40, img.height+80);
             });
         } else {
+            var objectToPass = {
+                gridInputs: itemBannerInstance.getFormatedIdentifiers('grid', true),
+                listInputs: itemBannerInstance.getFormatedIdentifiers('list', true),
+                baseArray: itemBannerInstance.inputs.baseArray,
+                gridAspectRatio: gridAspectRatio,
+                listAspectRatio: listAspectRatio
+            };
+            var gridInputs = itemBannerInstance.getFormatedIdentifiers('grid');
+            var listInputs = itemBannerInstance.getFormatedIdentifiers('list');
             win = win.open('', 'preview', 'width=1200,height=1200,resizable=1,scrollbars=1');
             win.document.open();
             win.document.write('<head>');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
-            var gridInputs = JSON.stringify(itemBannerInstance.getFormatedIdentifiers('grid', true));
-            var listInputs = JSON.stringify(itemBannerInstance.getFormatedIdentifiers('list', true));
-            win.document.write('<script>var gridAspectRatio = ' + gridAspectRatio +'; var listAspectRatio = ' + listAspectRatio +';</script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/cropper.js"></script>');
+            win.document.write('<script> var gotObject = ' + JSON.stringify(objectToPass) +'</script>');
             win.document.write('</head>');
             win.document.write('<body id="body" style="background-color: aliceblue; padding:0; margin:0;">');
             win.document.write('<div style="text-align: center; width: 1200px; height: auto; margin: 10px;">');
@@ -77,8 +84,6 @@ function imagePreview(element){
             win.document.write('<h4>' + listCroppingWindow + '</h4>');
             win.document.write('</div>');
             win.document.write('<form id="preview_form">');
-            gridInputs = itemBannerInstance.getFormatedIdentifiers('grid');
-            listInputs = itemBannerInstance.getFormatedIdentifiers('list');
             var inputsToManage = gridInputs.concat(listInputs);
             inputsToManage.forEach(function (identifier) {
                 var value = document.getElementById(identifier).getAttribute('value');
@@ -102,18 +107,14 @@ function imagePreview(element){
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
             });
             Event.observe(win, 'submit', function(){
-                var wGrid = win.document.getElementById(gridInputs[4]).value;
-                var hGrid = win.document.getElementById(gridInputs[5]).value;
-                var wList = win.document.getElementById(listInputs[4]).value;
-                var hList = win.document.getElementById(listInputs[5]).value;
 
-                if (wGrid * hGrid) {
+                if (win.document.getElementById(gridInputs[6]).value > 0) {
                     gridInputs.forEach(scatterValues);
                 } else {
                     gridInputs.forEach(annulValues);
                 }
 
-                if (wList * hList) {
+                if (win.document.getElementById(listInputs[6]).value > 0) {
                     listInputs.forEach(scatterValues);
                 } else {
                     listInputs.forEach(annulValues);
@@ -128,7 +129,7 @@ function imagePreview(element){
 
                 function annulValues(identifier) {
                     var input = document.getElementById(identifier);
-                    input.setAttribute('value', null);
+                    input.setAttribute('value', 'null');
                 }
 
                 win.close();
