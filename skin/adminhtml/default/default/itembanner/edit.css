@@ -1,5 +1,5 @@
 
-#ib_grid_cropping_container {
+.ib_containers:first-of-type {
     margin-right: 1%;
 }
 
@@ -9,4 +9,31 @@
     border: solid black 1px;
     box-sizing: border-box;
     position: relative;
+}
+
+.ib_crops {
+    width: 100%;
+}
+
+#ibw_body {
+    background-color: aliceblue;
+    padding:0;
+    margin:0
+}
+
+#ib_main_container {
+    text-align: center;
+    width: 1200px;
+    height: auto;
+    margin: 10px;
+}
+
+#ib_submit {
+    margin-top: 20px;
+    width: 300px;
+    height: 30px;
+}
+
+#ib_crop_enable {
+    align-self: flex-end;
 }

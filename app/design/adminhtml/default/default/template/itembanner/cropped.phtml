@@ -2,12 +2,15 @@
 ?>
 
 <div style="text-align: center; width: 100%;">
-    <div class="ib_containers" id="ib_grid_cropping_container">
-        <img class="ib_crops" style="width: 100%" src="<?php echo $this->_prepareImage('grid') ?>" id="image_preview_grid">
-        <h4> + gCroppingWindow + </h4>
+    <div class="ib_containers">
+        <img  id="image_preview_grid" class="ib_crops" src="<?php echo $this->_prepareImage('grid') ?>">
+        <h4>
+            <button id="ib_crop_enable">enable cropping</button>
+            <?php echo Mage::helper('itembanner')->__('Grid Mode Cropping') ?>
+        </h4>
     </div>
     <div class="ib_containers" id="ib_list_cropping_container">
-        <img class="ib_crops" style="width: 100%" src="<?php echo $this->_prepareImage('list') ?>"  id="image_preview_list">
-        <h4> + lCroppingWindow + </h4>
+        <img   id="image_preview_list" class="ib_crops" src="<?php echo $this->_prepareImage('list') ?>">
+        <h4><?php echo Mage::helper('itembanner')->__('Grid Mode Cropping') ?></h4>
     </div>
 </div>
