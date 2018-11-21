@@ -1,6 +1,7 @@
 var itemBannerInstance = {
     result: 'undefined',
     inputs: 'undefined',
+    croppingDataObject: 'undefined',
     figureOutIsIt: function () {
         if (this.result === "undefined") {
             $j( document ).ready(function (p) {
@@ -24,6 +25,18 @@ var itemBannerInstance = {
             formatedArray.push(hashtag + identifier + '_' + mode);
         });
         return formatedArray;
+    },
+    getCroppingDataObject: function () {
+        if (this.croppingDataObject === "undefined") {
+            this.croppingDataObject = {
+                gridInputs: this.getFormatedIdentifiers('grid', true),
+                listInputs: this.getFormatedIdentifiers('list', true),
+                baseArray: this.inputs.baseArray,
+                gridAspectRatio: gridAspectRatio,
+                listAspectRatio: listAspectRatio
+            }
+        }
+        return this.croppingDataObject;
     }
 };
 
@@ -38,6 +51,9 @@ $j( document ).ready(function () {
                 id: identifier,
                 name: identifier
             }).appendTo(formJq);
+        });
+        $j( "#widget_instace_tabs_properties_section" ).click( function () {
+            attachCropper(itemBannerInstance.getCroppingDataObject())
         });
     }
 });
@@ -55,13 +71,6 @@ function imagePreview(element){
                 win.resizeTo(img.width+40, img.height+80);
             });
         } else {
-            var objectToPass = {
-                gridInputs: itemBannerInstance.getFormatedIdentifiers('grid', true),
-                listInputs: itemBannerInstance.getFormatedIdentifiers('list', true),
-                baseArray: itemBannerInstance.inputs.baseArray,
-                gridAspectRatio: gridAspectRatio,
-                listAspectRatio: listAspectRatio
-            };
             var gridInputs = itemBannerInstance.getFormatedIdentifiers('grid');
             var listInputs = itemBannerInstance.getFormatedIdentifiers('list');
             win = win.open('', 'preview', 'width=1200,height=1200,resizable=1,scrollbars=1');
@@ -70,8 +79,7 @@ function imagePreview(element){
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
-            win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/cropper.js"></script>');
-            win.document.write('<script> var gotObject = ' + JSON.stringify(objectToPass) +'</script>');
+            win.document.write('<script>' + Cropping + '\n' + attachCropper +'</script>');
             win.document.write('</head>');
             win.document.write('<body id="body" style="background-color: aliceblue; padding:0; margin:0;">');
             win.document.write('<div style="text-align: center; width: 1200px; height: auto; margin: 10px;">');
@@ -93,7 +101,13 @@ function imagePreview(element){
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
-            Event.observe(win, 'load', function(){
+            if (!!document.documentMode || (!isIE && !!window.StyleMedia)) {
+                msCallback();
+            } else {
+                Event.observe(win, 'load', msCallback);
+            }
+            function msCallback(){
+                win.attachCropper(itemBannerInstance.getCroppingDataObject());
                 var form = win.document.getElementById('preview_form');
                 Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
                     var input = win.document.createElement('input');
@@ -105,9 +119,8 @@ function imagePreview(element){
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
-            });
+            }
             Event.observe(win, 'submit', function(){
-
                 if (win.document.getElementById(gridInputs[6]).value > 0) {
                     gridInputs.forEach(scatterValues);
                 } else {
@@ -131,9 +144,68 @@ function imagePreview(element){
                     var input = document.getElementById(identifier);
                     input.setAttribute('value', 'null');
                 }
-
                 win.close();
             });
         }
     }
+}
+
+function Cropping(gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio) {
+
+    var $j = ($j) ? $j : jQuery;
+    this.select = function (mode) {
+        var inputs = eval(mode + 'Inputs');
+        var surface = $j(inputs[6]).val();
+        if (surface > 0) {
+            var selectArray = [];
+            for (var i = 0; i < 4; i++) {
+                selectArray.push($j(inputs[i]).val())
+            }
+        }
+        return selectArray;
+    };
+    this.jcObject = function (mode) {
+        var aspectRatio = mode + 'AspectRatio';
+        var showCords = this[mode + 'ShowCoords'];
+        var obj = {
+            onChange: eval(showCords),
+            bgColor: 'transparent',
+            bgOpacity: .15,
+            aspectRatio: 1 / eval(aspectRatio)
+        };
+        var selectArray = this.select(mode);
+        if (eval(selectArray) !== "undefined") {
+            obj.setSelect = eval(selectArray);
+        }
+        return obj;
+    };
+    this.gridShowCoords = function (c) {
+        for (var i = 0; i < 6; i++) {
+            $j(gridInputs[i]).val(c[baseArray[i]]);
+        }
+        $j(gridInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
+    };
+
+    this.listShowCoords = function (c) {
+        for (var i = 0; i < 6; i++) {
+            $j(listInputs[i]).val(c[baseArray[i]]);
+        }
+        $j(listInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
+    };
+
+    this.attach = function () {
+        $j('#image_preview_grid').Jcrop(this.jcObject('grid'));
+        $j('#image_preview_list').Jcrop(this.jcObject('list'));
+    };
+}
+
+function attachCropper(dataObject) {
+    var cropping = new Cropping(
+        dataObject.gridInputs,
+        dataObject.listInputs,
+        dataObject.baseArray,
+        dataObject.gridAspectRatio,
+        dataObject.listAspectRatio
+    );
+    cropping.attach();
 }

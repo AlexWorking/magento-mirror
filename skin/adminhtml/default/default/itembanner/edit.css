@@ -1,0 +1,12 @@
+
+#ib_grid_cropping_container {
+    margin-right: 1%;
+}
+
+.ib_containers {
+    width: 49.5%;
+    float: left;
+    border: solid black 1px;
+    box-sizing: border-box;
+    position: relative;
+}
