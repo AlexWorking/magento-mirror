@@ -1,11 +1,17 @@
 var itemBannerInstance = {
     result: 'undefined',
+    modes: 'undefined',
     inputs: 'undefined',
     croppingDataObject: 'undefined',
+    api: {
+        grid: 'undefined',
+        list: 'undefined'
+    },
     figureOutIsIt: function () {
         if (this.result === "undefined") {
             $j( document ).ready(function (p) {
                 p.result = ($j( "#type" ).val() === 'itembanner/banner');
+                p.modes = ['grid', 'list'];
                 p.inputs = {
                     baseArray: ['x', 'y', 'x2', 'y2', 'w', 'h', 's'],
                     img: {
@@ -26,14 +32,16 @@ var itemBannerInstance = {
         });
         return formatedArray;
     },
-    getCroppingDataObject: function () {
+    getCroppingDataObject: function (forMainWindow) {
         if (this.croppingDataObject === "undefined") {
             this.croppingDataObject = {
+                modes: this.modes,
                 gridInputs: this.getFormatedIdentifiers('grid', true),
                 listInputs: this.getFormatedIdentifiers('list', true),
                 baseArray: this.inputs.baseArray,
                 gridAspectRatio: gridAspectRatio,
-                listAspectRatio: listAspectRatio
+                listAspectRatio: listAspectRatio,
+                forMainWindow: forMainWindow
             }
         }
         return this.croppingDataObject;
@@ -52,11 +60,99 @@ $j( document ).ready(function () {
                 name: identifier
             }).appendTo(formJq);
         });
-        $j( "#widget_instace_tabs_properties_section" ).click( function () {
-            attachCropper(itemBannerInstance.getCroppingDataObject())
+
+        itemBannerInstance.modes.forEach(function (mode) {
+            var element = $j( "#ib_crop_enable_" +  mode);
+            element.html(frozen);
+            element.click(function (e) {
+                e.preventDefault();
+                if(element.html() === frozen) {
+                    itemBannerInstance.api[mode].enable();
+                    element.html(unfrozen);
+                } else {
+                    itemBannerInstance.api[mode].disable();
+                    element.html(frozen);
+                }
+            });
         });
+
+        $j( "#widget_instace_tabs_properties_section" ).click( function () {
+            attachCropper(itemBannerInstance.getCroppingDataObject(), true)
+        })
     }
 });
+
+function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio, forMainWindow) {
+
+    var $j = ($j) ? $j : jQuery;
+    this.select = function (mode) {
+        var inputs = eval(mode + 'Inputs');
+        var surface = $j(inputs[6]).val();
+        if (surface > 0) {
+            var selectArray = [];
+            for (var i = 0; i < 4; i++) {
+                selectArray.push($j(inputs[i]).val())
+            }
+        }
+        return selectArray;
+    };
+    this.jcObject = function (mode) {
+        var aspectRatio = mode + 'AspectRatio';
+        var showCords = this[mode + 'ShowCoords'];
+        var submitCoords = this[mode + 'SubmitCoords']
+        var obj = {
+            onChange: eval(showCords),
+            bgColor: 'transparent',
+            bgOpacity: .15,
+            aspectRatio: 1 / eval(aspectRatio)
+        };
+        var selectArray = this.select(mode);
+        if (eval(selectArray) !== "undefined") {
+            obj.setSelect = eval(selectArray);
+        }
+        if (forMainWindow) {
+            obj.onSelect = eval(submitCoords);
+        }
+        return obj;
+    };
+    this.gridShowCoords = function (c) {
+        for (var i = 0; i < 6; i++) {
+            $j(gridInputs[i]).val(c[baseArray[i]]);
+        }
+        $j(gridInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
+    };
+
+    this.listShowCoords = function (c) {
+        for (var i = 0; i < 6; i++) {
+            $j(listInputs[i]).val(c[baseArray[i]]);
+        }
+        $j(listInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
+    };
+
+    this.attach = function () {
+        var p = this;
+        modes.forEach(function (mode) {
+            $j("#image_preview_" + mode ).Jcrop(p.jcObject(mode), function () {
+                if(forMainWindow === true) {
+                    itemBannerInstance.api[mode] = this;
+                    this.disable();
+                }
+            });
+        });
+    };
+}
+
+function attachCropper(dataObject, preDisabled) {
+    var cropping = new Cropping(
+        dataObject.modes,
+        dataObject.gridInputs,
+        dataObject.listInputs,
+        dataObject.baseArray,
+        dataObject.gridAspectRatio,
+        dataObject.listAspectRatio
+    );
+    cropping.attach(preDisabled);
+}
 
 function imagePreview(element){
     if($(element)){
@@ -149,64 +245,4 @@ function imagePreview(element){
             });
         }
     }
-}
-
-function Cropping(gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio) {
-
-    var $j = ($j) ? $j : jQuery;
-    this.select = function (mode) {
-        var inputs = eval(mode + 'Inputs');
-        var surface = $j(inputs[6]).val();
-        if (surface > 0) {
-            var selectArray = [];
-            for (var i = 0; i < 4; i++) {
-                selectArray.push($j(inputs[i]).val())
-            }
-        }
-        return selectArray;
-    };
-    this.jcObject = function (mode) {
-        var aspectRatio = mode + 'AspectRatio';
-        var showCords = this[mode + 'ShowCoords'];
-        var obj = {
-            onChange: eval(showCords),
-            bgColor: 'transparent',
-            bgOpacity: .15,
-            aspectRatio: 1 / eval(aspectRatio)
-        };
-        var selectArray = this.select(mode);
-        if (eval(selectArray) !== "undefined") {
-            obj.setSelect = eval(selectArray);
-        }
-        return obj;
-    };
-    this.gridShowCoords = function (c) {
-        for (var i = 0; i < 6; i++) {
-            $j(gridInputs[i]).val(c[baseArray[i]]);
-        }
-        $j(gridInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
-    };
-
-    this.listShowCoords = function (c) {
-        for (var i = 0; i < 6; i++) {
-            $j(listInputs[i]).val(c[baseArray[i]]);
-        }
-        $j(listInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
-    };
-
-    this.attach = function () {
-        $j('#image_preview_grid').Jcrop(this.jcObject('grid'));
-        $j('#image_preview_list').Jcrop(this.jcObject('list'));
-    };
-}
-
-function attachCropper(dataObject) {
-    var cropping = new Cropping(
-        dataObject.gridInputs,
-        dataObject.listInputs,
-        dataObject.baseArray,
-        dataObject.gridAspectRatio,
-        dataObject.listAspectRatio
-    );
-    cropping.attach();
 }

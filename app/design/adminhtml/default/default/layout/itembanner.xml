@@ -9,8 +9,5 @@
             <action method="addCss"><name>itembanner/jquery.Jcrop.css</name></action>
             <action method="addCss"><name>itembanner/edit.css</name></action>
         </reference>
-        <reference name="before_body_end">
-            <block type="adminhtml/template" name="itembanner_variables" as="itembanner_variables" template="itembanner/variables.phtml"/>
-        </reference>
     </adminhtml_widget_instance_edit>
 </layout>

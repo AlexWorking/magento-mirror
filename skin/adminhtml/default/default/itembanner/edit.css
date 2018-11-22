@@ -34,6 +34,7 @@
     height: 30px;
 }
 
-#ib_crop_enable {
-    align-self: flex-end;
+.ib_crop_enable {
+    position: absolute;
+    left: 1%;
 }
