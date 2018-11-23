@@ -61,6 +61,10 @@ $j( document ).ready(function () {
             }).appendTo(formJq);
         });
 
+        $j( "#widget_instace_tabs_properties_section" ).click( function () {
+            attachCropper(itemBannerInstance.getCroppingDataObject(true))
+        });
+
         itemBannerInstance.modes.forEach(function (mode) {
             var element = $j( "#ib_crop_enable_" +  mode);
             element.html(frozen);
@@ -75,10 +79,6 @@ $j( document ).ready(function () {
                 }
             });
         });
-
-        $j( "#widget_instace_tabs_properties_section" ).click( function () {
-            attachCropper(itemBannerInstance.getCroppingDataObject(), true)
-        })
     }
 });
 
@@ -142,16 +142,17 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
     };
 }
 
-function attachCropper(dataObject, preDisabled) {
+function attachCropper(dataObject) {
     var cropping = new Cropping(
         dataObject.modes,
         dataObject.gridInputs,
         dataObject.listInputs,
         dataObject.baseArray,
         dataObject.gridAspectRatio,
-        dataObject.listAspectRatio
+        dataObject.listAspectRatio,
+        dataObject.forMainWindow
     );
-    cropping.attach(preDisabled);
+    cropping.attach();
 }
 
 function imagePreview(element){
