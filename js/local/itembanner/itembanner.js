@@ -32,7 +32,7 @@ var itemBannerInstance = {
         });
         return formatedArray;
     },
-    getCroppingDataObject: function (forMainWindow) {
+    getCroppingDataObject: function () {
         if (this.croppingDataObject === "undefined") {
             this.croppingDataObject = {
                 modes: this.modes,
@@ -41,7 +41,6 @@ var itemBannerInstance = {
                 baseArray: this.inputs.baseArray,
                 gridAspectRatio: gridAspectRatio,
                 listAspectRatio: listAspectRatio,
-                forMainWindow: forMainWindow
             }
         }
         return this.croppingDataObject;
@@ -82,7 +81,7 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio, forMainWindow) {
+function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio) {
 
     var $j = ($j) ? $j : jQuery;
     this.select = function (mode) {
@@ -99,7 +98,7 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
     this.jcObject = function (mode) {
         var aspectRatio = mode + 'AspectRatio';
         var showCords = this[mode + 'ShowCoords'];
-        var submitCoords = this[mode + 'SubmitCoords']
+        var submitCoords = this[mode + 'SubmitCoords'];
         var obj = {
             onChange: eval(showCords),
             bgColor: 'transparent',
@@ -110,9 +109,9 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         if (eval(selectArray) !== "undefined") {
             obj.setSelect = eval(selectArray);
         }
-        if (forMainWindow) {
-            obj.onSelect = eval(submitCoords);
-        }
+        //if (forMainWindow) {
+        //    obj.onSelect = eval(submitCoords);
+        //}
         return obj;
     };
     this.gridShowCoords = function (c) {
@@ -129,11 +128,19 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         $j(listInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
     };
 
-    this.attach = function () {
+    this.gridSubmitCoords = function () {
+        lodgeValues(window, gridInputs, listInputs);
+    };
+
+    this.listSubmitCoords = function () {
+        lodgeValues(window, gridInputs, listInputs);
+    };
+
+    this.attach = function (preDisabled) {
         var p = this;
         modes.forEach(function (mode) {
             $j("#image_preview_" + mode ).Jcrop(p.jcObject(mode), function () {
-                if(forMainWindow === true) {
+                if(preDisabled === true) {
                     itemBannerInstance.api[mode] = this;
                     this.disable();
                 }
@@ -204,6 +211,9 @@ function imagePreview(element){
             } else {
                 Event.observe(win, 'load', msCallback);
             }
+            Event.observe(win, 'submit', function () {
+                lodgeValues(win, gridInputs, listInputs);
+            });
             function msCallback(){
                 win.attachCropper(itemBannerInstance.getCroppingDataObject());
                 var form = win.document.getElementById('preview_form');
@@ -218,32 +228,31 @@ function imagePreview(element){
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
             }
-            Event.observe(win, 'submit', function(){
-                if (win.document.getElementById(gridInputs[6]).value > 0) {
-                    gridInputs.forEach(scatterValues);
-                } else {
-                    gridInputs.forEach(annulValues);
-                }
-
-                if (win.document.getElementById(listInputs[6]).value > 0) {
-                    listInputs.forEach(scatterValues);
-                } else {
-                    listInputs.forEach(annulValues);
-                }
-
-                Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
-
-                function scatterValues(identifier) {
-                    var input = document.getElementById(identifier);
-                    input.setAttribute('value', win.document.getElementById(identifier).value);
-                }
-
-                function annulValues(identifier) {
-                    var input = document.getElementById(identifier);
-                    input.setAttribute('value', 'null');
-                }
-                win.close();
-            });
         }
     }
+}
+
+function lodgeValues(addressedWindow, gridInputs, listInputs){
+
+    itemBannerInstance.modes.forEach(function (mode) {
+        var inputs = eval(mode + 'Inputs');
+        if (addressedWindow.document.getElementById(inputs[6]).value > 0) {
+            inputs.forEach(scatterValues);
+        } else {
+            inputs.forEach(annulValues);
+        }
+    });
+
+    Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
+
+    function scatterValues(identifier) {
+        var input = document.getElementById(identifier);
+        input.setAttribute('value', addressedWindow.document.getElementById(identifier).value);
+    }
+
+    function annulValues(identifier) {
+        var input = document.getElementById(identifier);
+        input.setAttribute('value', 'null');
+    }
+    addressedWindow.close();
 }
