@@ -40,7 +40,7 @@ var itemBannerInstance = {
                 listInputs: this.getFormatedIdentifiers('list', true),
                 baseArray: this.inputs.baseArray,
                 gridAspectRatio: gridAspectRatio,
-                listAspectRatio: listAspectRatio,
+                listAspectRatio: listAspectRatio
             }
         }
         return this.croppingDataObject;
@@ -61,7 +61,7 @@ $j( document ).ready(function () {
         });
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
-            attachCropper(itemBannerInstance.getCroppingDataObject(true))
+            attachCropper(itemBannerInstance.getCroppingDataObject(), true)
         });
 
         itemBannerInstance.modes.forEach(function (mode) {
@@ -98,7 +98,7 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
     this.jcObject = function (mode) {
         var aspectRatio = mode + 'AspectRatio';
         var showCords = this[mode + 'ShowCoords'];
-        //var submitCoords = this[mode + 'SubmitCoords'];
+        var submitCoords = this[mode + 'SubmitCoords'];
         var obj = {
             onChange: eval(showCords),
             bgColor: 'transparent',
@@ -109,9 +109,7 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         if (eval(selectArray) !== "undefined") {
             obj.setSelect = eval(selectArray);
         }
-        //if (forMainWindow) {
-        //    obj.onSelect = eval(submitCoords);
-        //}
+        obj.onSelect = eval(submitCoords);
         return obj;
     };
     this.gridShowCoords = function (c) {
@@ -128,12 +126,18 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         $j(listInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
     };
 
-    this.gridSubmitCoords = function () {
-        lodgeValues(window, gridInputs, listInputs);
+    this.gridSubmitCoords = function (c) {
+        lodgeValues(window,
+            itemBannerInstance.getFormatedIdentifiers('grid'),
+            itemBannerInstance.getFormatedIdentifiers('list')
+        );
     };
 
-    this.listSubmitCoords = function () {
-        lodgeValues(window, gridInputs, listInputs);
+    this.listSubmitCoords = function (c) {
+        lodgeValues(window,
+            itemBannerInstance.getFormatedIdentifiers('grid'),
+            itemBannerInstance.getFormatedIdentifiers('list')
+        );
     };
 
     this.attach = function (preDisabled) {
@@ -149,7 +153,7 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
     };
 }
 
-function attachCropper(dataObject) {
+function attachCropper(dataObject, preDisabled) {
     var cropping = new Cropping(
         dataObject.modes,
         dataObject.gridInputs,
@@ -159,7 +163,7 @@ function attachCropper(dataObject) {
         dataObject.listAspectRatio,
         dataObject.forMainWindow
     );
-    cropping.attach();
+    cropping.attach(preDisabled);
 }
 
 function imagePreview(element){
