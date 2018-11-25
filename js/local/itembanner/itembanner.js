@@ -98,7 +98,7 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
     this.jcObject = function (mode) {
         var aspectRatio = mode + 'AspectRatio';
         var showCords = this[mode + 'ShowCoords'];
-        var submitCoords = this[mode + 'SubmitCoords'];
+        //var submitCoords = this[mode + 'SubmitCoords'];
         var obj = {
             onChange: eval(showCords),
             bgColor: 'transparent',
