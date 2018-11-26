@@ -3,10 +3,8 @@ var itemBannerInstance = {
     modes: 'undefined',
     inputs: 'undefined',
     croppingDataObject: 'undefined',
-    api: {
-        grid: 'undefined',
-        list: 'undefined'
-    },
+    mainWindowCropping: 'undefined',
+    previewWindowCropping: 'undefined',
     figureOutIsIt: function () {
         if (this.result === "undefined") {
             $j( document ).ready(function (p) {
@@ -61,7 +59,11 @@ $j( document ).ready(function () {
         });
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
-            attachCropper(itemBannerInstance.getCroppingDataObject(), true)
+            if (itemBannerInstance.mainWindowCropping === "undefined") {
+                itemBannerInstance.mainWindowCropping = attachCropper(itemBannerInstance.getCroppingDataObject(), true);
+            } else {
+                itemBannerInstance.mainWindowCropping.attach(true);
+            }
         });
 
         itemBannerInstance.modes.forEach(function (mode) {
@@ -70,10 +72,10 @@ $j( document ).ready(function () {
             element.click(function (e) {
                 e.preventDefault();
                 if(element.html() === frozen) {
-                    itemBannerInstance.api[mode].enable();
+                    itemBannerInstance.mainWindowCropping.api[mode].enable();
                     element.html(unfrozen);
                 } else {
-                    itemBannerInstance.api[mode].disable();
+                    itemBannerInstance.mainWindowCropping.api[mode].disable();
                     element.html(frozen);
                 }
             });
@@ -84,6 +86,12 @@ $j( document ).ready(function () {
 function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio) {
 
     var $j = ($j) ? $j : jQuery;
+
+    this.api = {
+        grid: 'undefined',
+        list: 'undefined'
+    };
+
     this.select = function (mode) {
         var inputs = eval(mode + 'Inputs');
         var surface = $j(inputs[6]).val();
@@ -95,12 +103,15 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         }
         return selectArray;
     };
+
     this.jcObject = function (mode) {
         var aspectRatio = mode + 'AspectRatio';
         var showCords = this[mode + 'ShowCoords'];
         var submitCoords = this[mode + 'SubmitCoords'];
+        var annulValues = this[mode + 'AnnulValues'];
         var obj = {
-            onChange: eval(showCords),
+            onSelect: eval(submitCoords),
+            onRelease: eval(annulValues),
             bgColor: 'transparent',
             bgOpacity: .15,
             aspectRatio: 1 / eval(aspectRatio)
@@ -109,43 +120,43 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         if (eval(selectArray) !== "undefined") {
             obj.setSelect = eval(selectArray);
         }
-        obj.onSelect = eval(submitCoords);
         return obj;
-    };
-    this.gridShowCoords = function (c) {
-        for (var i = 0; i < 6; i++) {
-            $j(gridInputs[i]).val(c[baseArray[i]]);
-        }
-        $j(gridInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
-    };
-
-    this.listShowCoords = function (c) {
-        for (var i = 0; i < 6; i++) {
-            $j(listInputs[i]).val(c[baseArray[i]]);
-        }
-        $j(listInputs[6]).val(c[baseArray[4]] * c[baseArray[5]]);
     };
 
     this.gridSubmitCoords = function (c) {
-        lodgeValues(window,
-            itemBannerInstance.getFormatedIdentifiers('grid'),
-            itemBannerInstance.getFormatedIdentifiers('list')
-        );
+        for (var i = 0; i < 6; i++) {
+            $j(gridInputs[i]).attr('value', c[baseArray[i]]);
+        }
+        $j(gridInputs[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
     };
 
     this.listSubmitCoords = function (c) {
-        lodgeValues(window,
-            itemBannerInstance.getFormatedIdentifiers('grid'),
-            itemBannerInstance.getFormatedIdentifiers('list')
-        );
+        for (var i = 0; i < 6; i++) {
+            $j(listInputs[i]).attr('value', (c[baseArray[i]]));
+        }
+        $j(listInputs[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
+    };
+
+    this.gridAnnulValues = function () {
+        for (var i = 0; i < 6; i++) {
+            $j(gridInputs[i]).attr('value', null);
+        }
+        $j(gridInputs[6]).attr('value', null);
+    };
+
+    this.listAnnulValues = function () {
+        for (var i = 0; i < 6; i++) {
+            $j(listInputs[i]).attr('value', null);
+        }
+        $j(listInputs[6]).attr('value', null);
     };
 
     this.attach = function (preDisabled) {
         var p = this;
         modes.forEach(function (mode) {
             $j("#image_preview_" + mode ).Jcrop(p.jcObject(mode), function () {
-                if(preDisabled === true) {
-                    itemBannerInstance.api[mode] = this;
+                p.api[mode] = this;
+                if (preDisabled === true) {
                     this.disable();
                 }
             });
@@ -160,10 +171,12 @@ function attachCropper(dataObject, preDisabled) {
         dataObject.listInputs,
         dataObject.baseArray,
         dataObject.gridAspectRatio,
-        dataObject.listAspectRatio,
-        dataObject.forMainWindow
+        dataObject.listAspectRatio
     );
+
     cropping.attach(preDisabled);
+
+    return cropping;
 }
 
 function imagePreview(element){
@@ -216,10 +229,36 @@ function imagePreview(element){
                 Event.observe(win, 'load', msCallback);
             }
             Event.observe(win, 'submit', function () {
-                lodgeValues(win, gridInputs, listInputs);
+                itemBannerInstance.modes.forEach(function (mode) {
+                    var inputs = eval(mode + 'Inputs');
+                    if (win.document.getElementById(inputs[6]).value > 0) {
+                        inputs.forEach(scatterValues);
+                    } else {
+                        inputs.forEach(annulValues);
+                    }
+                });
+                itemBannerInstance.mainWindowCropping.attach(false);
+
+                Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
+
+                function scatterValues(identifier) {
+                    var input = document.getElementById(identifier);
+                    input.setAttribute('value', win.document.getElementById(identifier).value);
+                }
+
+                function annulValues(identifier) {
+                    var input = document.getElementById(identifier);
+                    input.setAttribute('value', 'null');
+                }
+
+                win.close();
             });
             function msCallback(){
-                win.attachCropper(itemBannerInstance.getCroppingDataObject());
+                if (itemBannerInstance.previewWindowCropping === "undefined") {
+                    itemBannerInstance.previewWindowCropping = win.attachCropper(itemBannerInstance.getCroppingDataObject(), false);
+                } else {
+                    itemBannerInstance.previewWindowCropping.attach(false);
+                }
                 var form = win.document.getElementById('preview_form');
                 Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
                     var input = win.document.createElement('input');
@@ -234,29 +273,4 @@ function imagePreview(element){
             }
         }
     }
-}
-
-function lodgeValues(addressedWindow, gridInputs, listInputs){
-
-    itemBannerInstance.modes.forEach(function (mode) {
-        var inputs = eval(mode + 'Inputs');
-        if (addressedWindow.document.getElementById(inputs[6]).value > 0) {
-            inputs.forEach(scatterValues);
-        } else {
-            inputs.forEach(annulValues);
-        }
-    });
-
-    Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
-
-    function scatterValues(identifier) {
-        var input = document.getElementById(identifier);
-        input.setAttribute('value', addressedWindow.document.getElementById(identifier).value);
-    }
-
-    function annulValues(identifier) {
-        var input = document.getElementById(identifier);
-        input.setAttribute('value', 'null');
-    }
-    addressedWindow.close();
 }
