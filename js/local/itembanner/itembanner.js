@@ -83,13 +83,16 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio) {
+function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio, disabled) {
 
+    var p = this;
     var $j = ($j) ? $j : jQuery;
 
+    disabled = (disabled === true);
+
     this.jcObjects = {
-        'grid': getJcObject('grid'),
-        'list': getJcObject('list')
+        'grid': 'undefined',
+        'list': 'undefined'
     };
 
     this.api = {
@@ -97,26 +100,7 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         'list': 'undefined'
     };
 
-    function getJcObject(mode) {
-        var aspectRatio = mode + 'AspectRatio';
-        var showCords = mode + 'ShowCoords';
-        var submitCoords = mode + 'SubmitCoords';
-        var annulValues = mode + 'AnnulValues';
-        var obj = {
-            onSelect: eval(submitCoords),
-            onRelease: eval(annulValues),
-            bgColor: 'transparent',
-            bgOpacity: .15,
-            aspectRatio: 1 / eval(aspectRatio)
-        };
-        var selectArray = getSelect(mode);
-        if (eval(selectArray) !== "undefined") {
-            obj.setSelect = eval(selectArray);
-        }
-        return obj;
-    }
-
-    function getSelect(mode) {
+    this.calculateSelect = function (mode) {
         var inputs = eval(mode + 'Inputs');
         var surface = $j(inputs[6]).val();
         if (surface > 0) {
@@ -126,60 +110,66 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
             }
         }
         return selectArray;
-    }
+    };
+    
+    this.setSelect = function (selectArray) {
 
-    function gridSubmitCoords(c) {
-        for (var i = 0; i < 6; i++) {
-            $j(gridInputs[i]).attr('value', c[baseArray[i]]);
-        }
-        $j(gridInputs[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
-    }
+    };
 
-    function listSubmitCoords(c) {
-        for (var i = 0; i < 6; i++) {
-            $j(listInputs[i]).attr('value', (c[baseArray[i]]));
-        }
-        $j(listInputs[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
-    }
-
-    function gridAnnulValues() {
-        for (var i = 0; i < 6; i++) {
-            $j(gridInputs[i]).attr('value', null);
-        }
-        $j(gridInputs[6]).attr('value', null);
-    }
-
-    function listAnnulValues() {
-        for (var i = 0; i < 6; i++) {
-            $j(listInputs[i]).attr('value', null);
-        }
-        $j(listInputs[6]).attr('value', null);
-    }
-
-    this.attach = function (preDisabled) {
-        var p = this;
+    this.attach = function () {
         modes.forEach(function (mode) {
             $j("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
                 p.api[mode] = this;
-                if (preDisabled === true) {
+                if (p.jcObjects[mode].disabled === true) {
                     this.disable();
                 }
             });
         });
     };
+
+    modes.forEach(function (mode) {
+        var aspectRatio = mode + 'AspectRatio';
+        p.jcObjects[mode] = {
+            onSelect: function (c) {
+                for (var i = 0; i < 6; i++) {
+                    $j(eval(mode + 'Inputs')[i]).attr('value', c[baseArray[i]]);
+                }
+                $j(eval(mode + 'Inputs')[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
+            },
+            onRelease: function () {
+                for (var i = 0; i < 6; i++) {
+                    $j(eval(mode + 'Inputs')[i]).attr('value', null);
+                }
+                $j(eval(mode + 'Inputs')[6]).attr('value', null);
+            },
+            manageSelect: function (selectArray) {
+                if (eval(selectArray) !== "undefined") {
+                    p.jcObjects[mode].setSelect = eval(selectArray);
+                } else {
+                    unset(p.jcObjects[mode].setSelect);
+                }
+            },
+            bgColor: 'transparent',
+            bgOpacity: .15,
+            aspectRatio: 1 / eval(aspectRatio),
+            disabled: disabled
+        };
+        p.jcObjects[mode].manageSelect(p.calculateSelect(mode));
+    });
 }
 
-function attachCropper(dataObject, preDisabled) {
+function attachCropper(dataObject, disabled) {
     var cropping = new Cropping(
         dataObject.modes,
         dataObject.gridInputs,
         dataObject.listInputs,
         dataObject.baseArray,
         dataObject.gridAspectRatio,
-        dataObject.listAspectRatio
+        dataObject.listAspectRatio,
+        disabled
     );
 
-    cropping.attach(preDisabled);
+    cropping.attach();
 
     return cropping;
 }
@@ -241,8 +231,11 @@ function imagePreview(element){
                     } else {
                         inputs.forEach(annulValues);
                     }
+                    itemBannerInstance.mainWindowCropping.jcObjects[mode].manageSelect(
+                        itemBannerInstance.mainWindowCropping.calculateSelect(mode)
+                    );
                 });
-                itemBannerInstance.mainWindowCropping.attach(false);
+                itemBannerInstance.mainWindowCropping.attach();
 
                 Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
 
