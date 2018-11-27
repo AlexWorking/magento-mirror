@@ -87,12 +87,36 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
 
     var $j = ($j) ? $j : jQuery;
 
-    this.api = {
-        grid: 'undefined',
-        list: 'undefined'
+    this.jcObjects = {
+        'grid': getJcObject('grid'),
+        'list': getJcObject('list')
     };
 
-    this.select = function (mode) {
+    this.api = {
+        'grid': 'undefined',
+        'list': 'undefined'
+    };
+
+    function getJcObject(mode) {
+        var aspectRatio = mode + 'AspectRatio';
+        var showCords = mode + 'ShowCoords';
+        var submitCoords = mode + 'SubmitCoords';
+        var annulValues = mode + 'AnnulValues';
+        var obj = {
+            onSelect: eval(submitCoords),
+            onRelease: eval(annulValues),
+            bgColor: 'transparent',
+            bgOpacity: .15,
+            aspectRatio: 1 / eval(aspectRatio)
+        };
+        var selectArray = getSelect(mode);
+        if (eval(selectArray) !== "undefined") {
+            obj.setSelect = eval(selectArray);
+        }
+        return obj;
+    }
+
+    function getSelect(mode) {
         var inputs = eval(mode + 'Inputs');
         var surface = $j(inputs[6]).val();
         if (surface > 0) {
@@ -102,59 +126,40 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
             }
         }
         return selectArray;
-    };
+    }
 
-    this.jcObject = function (mode) {
-        var aspectRatio = mode + 'AspectRatio';
-        var showCords = this[mode + 'ShowCoords'];
-        var submitCoords = this[mode + 'SubmitCoords'];
-        var annulValues = this[mode + 'AnnulValues'];
-        var obj = {
-            onSelect: eval(submitCoords),
-            onRelease: eval(annulValues),
-            bgColor: 'transparent',
-            bgOpacity: .15,
-            aspectRatio: 1 / eval(aspectRatio)
-        };
-        var selectArray = this.select(mode);
-        if (eval(selectArray) !== "undefined") {
-            obj.setSelect = eval(selectArray);
-        }
-        return obj;
-    };
-
-    this.gridSubmitCoords = function (c) {
+    function gridSubmitCoords(c) {
         for (var i = 0; i < 6; i++) {
             $j(gridInputs[i]).attr('value', c[baseArray[i]]);
         }
         $j(gridInputs[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
-    };
+    }
 
-    this.listSubmitCoords = function (c) {
+    function listSubmitCoords(c) {
         for (var i = 0; i < 6; i++) {
             $j(listInputs[i]).attr('value', (c[baseArray[i]]));
         }
         $j(listInputs[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
-    };
+    }
 
-    this.gridAnnulValues = function () {
+    function gridAnnulValues() {
         for (var i = 0; i < 6; i++) {
             $j(gridInputs[i]).attr('value', null);
         }
         $j(gridInputs[6]).attr('value', null);
-    };
+    }
 
-    this.listAnnulValues = function () {
+    function listAnnulValues() {
         for (var i = 0; i < 6; i++) {
             $j(listInputs[i]).attr('value', null);
         }
         $j(listInputs[6]).attr('value', null);
-    };
+    }
 
     this.attach = function (preDisabled) {
         var p = this;
         modes.forEach(function (mode) {
-            $j("#image_preview_" + mode ).Jcrop(p.jcObject(mode), function () {
+            $j("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
                 p.api[mode] = this;
                 if (preDisabled === true) {
                     this.disable();
