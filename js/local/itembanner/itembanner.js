@@ -62,7 +62,7 @@ $j( document ).ready(function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
                 itemBannerInstance.mainWindowCropping = attachCropper(itemBannerInstance.getCroppingDataObject(), true);
             } else {
-                itemBannerInstance.mainWindowCropping.attach(true);
+                itemBannerInstance.mainWindowCropping.attach();
             }
         });
 
@@ -73,9 +73,11 @@ $j( document ).ready(function () {
                 e.preventDefault();
                 if(element.html() === frozen) {
                     itemBannerInstance.mainWindowCropping.api[mode].enable();
+                    itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = false;
                     element.html(unfrozen);
                 } else {
                     itemBannerInstance.mainWindowCropping.api[mode].disable();
+                    itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = true;
                     element.html(frozen);
                 }
             });
@@ -112,13 +114,10 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         return selectArray;
     };
     
-    this.setSelect = function (selectArray) {
-
-    };
-
-    this.attach = function () {
+    this.attach = function (w) {
+        w = (w) ? w : window;
         modes.forEach(function (mode) {
-            $j("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
+            w.jQuery("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
                 p.api[mode] = this;
                 if (p.jcObjects[mode].disabled === true) {
                     this.disable();
@@ -143,10 +142,10 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
                 $j(eval(mode + 'Inputs')[6]).attr('value', null);
             },
             manageSelect: function (selectArray) {
-                if (eval(selectArray) !== "undefined") {
-                    p.jcObjects[mode].setSelect = eval(selectArray);
+                if (selectArray) {
+                    p.jcObjects[mode].setSelect = selectArray;
                 } else {
-                    unset(p.jcObjects[mode].setSelect);
+                    delete p.jcObjects[mode].setSelect;
                 }
             },
             bgColor: 'transparent',
@@ -196,7 +195,7 @@ function imagePreview(element){
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/edit.css" media="all">');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
-            win.document.write('<script>' + Cropping + '\n' + attachCropper +'</script>');
+            win.document.write('<script> var previewWindowCropping;' + Cropping + '\n' + attachCropper +'</script>');
             win.document.write('</head>');
             win.document.write('<body id="ibw_body">');
             win.document.write('<div id="ib_main_container">');
@@ -255,7 +254,7 @@ function imagePreview(element){
                 if (itemBannerInstance.previewWindowCropping === "undefined") {
                     itemBannerInstance.previewWindowCropping = win.attachCropper(itemBannerInstance.getCroppingDataObject(), false);
                 } else {
-                    itemBannerInstance.previewWindowCropping.attach(false);
+                    itemBannerInstance.previewWindowCropping.attach(win);
                 }
                 var form = win.document.getElementById('preview_form');
                 Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
