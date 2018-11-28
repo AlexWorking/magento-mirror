@@ -16,13 +16,16 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Helper_Image extends Varien_Data_
         return $parent;
     }
 
-    /*protected function _getDeleteCheckbox()
+    /**
+     * Return element html code
+     *
+     * @return string
+     */
+    public function getElementHtml()
     {
-        if ($this->getName() == 'parameters[image]' &&
-            $this->getLabel() == 'Image For Banner') {
-            return '';
-        }
+        $parent = parent::getElementHtml();
+        $parent .= '<script>var thumbNailId = ' . $this->getHtmlId() . '_image </script>';
 
-        return parent::_getDeleteCheckbox();
-    }*/
+        return $parent;
+    }
 }

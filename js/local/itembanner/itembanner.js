@@ -13,9 +13,8 @@ var itemBannerInstance = {
                 p.inputs = {
                     baseArray: ['x', 'y', 'x2', 'y2', 'w', 'h', 's'],
                     img: {
-                        "w_img": 'win.document.getElementById("image_preview_list").width',
-                        "h_img": 'win.document.getElementById("image_preview_grid").height',
-                        "src_img": '$(element).src'
+                        "w_img": 'document.getElementById("image_preview_list").style.width',
+                        "h_img": 'document.getElementById("image_preview_grid").style.height'
                     }
                 };
             }(this));
@@ -58,6 +57,11 @@ $j( document ).ready(function () {
             }).appendTo(formJq);
         });
 
+        var ibImageUrl = $(thumbNailId).src;
+        itemBannerInstance.modes.forEach(function (mode) {
+            $j( "#image_preview_" + mode ).attr('src', ibImageUrl)
+        });
+
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
                 itemBannerInstance.mainWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject(), true);
@@ -65,6 +69,10 @@ $j( document ).ready(function () {
             } else {
                 itemBannerInstance.mainWindowCropping.attach();
             }
+            Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
+                var input = document.getElementById(identifier);
+                input.setAttribute('value', eval(itemBannerInstance.inputs.img[identifier]));
+            });
         });
 
         itemBannerInstance.modes.forEach(function (mode) {
@@ -266,7 +274,7 @@ function imagePreview(element){
                 Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
                     var input = win.document.createElement('input');
                     input.setAttribute('id', identifier);
-                    input.setAttribute('value', eval(itemBannerInstance.inputs.img[identifier]));
+                    input.setAttribute('value', eval('win.' + itemBannerInstance.inputs.img[identifier]));
                     form.appendChild(input);
                 });
                 var container = win.document.getElementsByTagName('div')[0];
