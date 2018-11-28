@@ -60,7 +60,8 @@ $j( document ).ready(function () {
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
-                itemBannerInstance.mainWindowCropping = attachCropper(itemBannerInstance.getCroppingDataObject(), true);
+                itemBannerInstance.mainWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject(), true);
+                itemBannerInstance.mainWindowCropping.attach();
             } else {
                 itemBannerInstance.mainWindowCropping.attach();
             }
@@ -85,10 +86,17 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio, disabled) {
+function Cropping(dataObject, preDisabled) {
 
-    disabled = (disabled === true);
-    var p = this;
+    var modes = dataObject.modes,
+        gridInputs = dataObject.gridInputs,
+        listInputs = dataObject.listInputs,
+        baseArray = dataObject.baseArray,
+        gridAspectRatio = dataObject.gridAspectRatio,
+        listAspectRatio = dataObject.listAspectRatio,
+        p = this;
+
+    preDisabled =(preDisabled === true);
 
     this.jq = jQuery;
 
@@ -122,10 +130,10 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         modes.forEach(function (mode) {
             p.jq("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
                 p.api[mode] = this;
-                if (p.jcObjects[mode].disabled === true) {
-                    this.disable();
-                }
             });
+            if (p.jcObjects[mode].disabled === true) {
+                p.api[mode].disable();
+            }
         });
     };
 
@@ -149,38 +157,18 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
-                }
-
-                if (p === itemBannerInstance.mainWindowCropping) {
-                    p.api[mode].release();
+                    if (p === itemBannerInstance.mainWindowCropping) {
+                        p.api[mode].release();
+                    }
                 }
             },
             bgColor: 'transparent',
             bgOpacity: .15,
             aspectRatio: 1 / eval(aspectRatio),
-            disabled: disabled
+            disabled: preDisabled
         };
         p.jcObjects[mode].manageSelect(p.calculateSelect(mode));
     });
-}
-
-function attachCropper(dataObject, disabled, winw) {
-    var cropping = new Cropping(
-        dataObject.modes,
-        dataObject.gridInputs,
-        dataObject.listInputs,
-        dataObject.baseArray,
-        dataObject.gridAspectRatio,
-        dataObject.listAspectRatio,
-        disabled
-    );
-    if(winw) {
-        cropping.setWindowToJq(winw);
-    }
-
-    cropping.attach();
-
-    return cropping;
 }
 
 function imagePreview(element){
@@ -261,7 +249,10 @@ function imagePreview(element){
             });
             function msCallback(){
                 if (itemBannerInstance.previewWindowCropping === "undefined") {
-                    itemBannerInstance.previewWindowCropping = attachCropper(itemBannerInstance.getCroppingDataObject(), false, win);
+                    itemBannerInstance.previewWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject());
+                    itemBannerInstance.previewWindowCropping.setWindowToJq(win);
+                    itemBannerInstance.previewWindowCropping.attach();
+
                 } else {
                     itemBannerInstance.previewWindowCropping.setWindowToJq(win);
                     itemBannerInstance.modes.forEach(function (mode) {
