@@ -87,10 +87,10 @@ $j( document ).ready(function () {
 
 function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, listAspectRatio, disabled) {
 
-    var p = this;
-    var $j = ($j) ? $j : jQuery;
-
     disabled = (disabled === true);
+    var p = this;
+
+    this.jq = jQuery;
 
     this.jcObjects = {
         'grid': 'undefined',
@@ -102,22 +102,25 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         'list': 'undefined'
     };
 
+    this.setWindowToJq = function (w) {
+        p.jq = w.jQuery;
+    };
+
     this.calculateSelect = function (mode) {
         var inputs = eval(mode + 'Inputs');
-        var surface = $j(inputs[6]).val();
+        var surface = p.jq(inputs[6]).val();
         if (surface > 0) {
             var selectArray = [];
             for (var i = 0; i < 4; i++) {
-                selectArray.push($j(inputs[i]).val())
+                selectArray.push(p.jq(inputs[i]).val())
             }
         }
         return selectArray;
     };
-    
-    this.attach = function (w) {
-        w = (w) ? w : window;
+
+    this.attach = function () {
         modes.forEach(function (mode) {
-            w.jQuery("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
+            p.jq("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
                 p.api[mode] = this;
                 if (p.jcObjects[mode].disabled === true) {
                     this.disable();
@@ -131,21 +134,25 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
         p.jcObjects[mode] = {
             onSelect: function (c) {
                 for (var i = 0; i < 6; i++) {
-                    $j(eval(mode + 'Inputs')[i]).attr('value', c[baseArray[i]]);
+                    p.jq(eval(mode + 'Inputs')[i]).attr('value', c[baseArray[i]]);
                 }
-                $j(eval(mode + 'Inputs')[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
+                p.jq(eval(mode + 'Inputs')[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
             },
             onRelease: function () {
                 for (var i = 0; i < 6; i++) {
-                    $j(eval(mode + 'Inputs')[i]).attr('value', null);
+                    p.jq(eval(mode + 'Inputs')[i]).attr('value', null);
                 }
-                $j(eval(mode + 'Inputs')[6]).attr('value', null);
+                p.jq(eval(mode + 'Inputs')[6]).attr('value', null);
             },
             manageSelect: function (selectArray) {
                 if (selectArray) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
+                }
+
+                if (p === itemBannerInstance.mainWindowCropping) {
+                    p.api[mode].release();
                 }
             },
             bgColor: 'transparent',
@@ -157,7 +164,7 @@ function Cropping(modes, gridInputs, listInputs, baseArray, gridAspectRatio, lis
     });
 }
 
-function attachCropper(dataObject, disabled) {
+function attachCropper(dataObject, disabled, winw) {
     var cropping = new Cropping(
         dataObject.modes,
         dataObject.gridInputs,
@@ -167,6 +174,9 @@ function attachCropper(dataObject, disabled) {
         dataObject.listAspectRatio,
         disabled
     );
+    if(winw) {
+        cropping.setWindowToJq(winw);
+    }
 
     cropping.attach();
 
@@ -195,7 +205,6 @@ function imagePreview(element){
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/edit.css" media="all">');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
-            win.document.write('<script> var previewWindowCropping;' + Cropping + '\n' + attachCropper +'</script>');
             win.document.write('</head>');
             win.document.write('<body id="ibw_body">');
             win.document.write('<div id="ib_main_container">');
@@ -252,9 +261,15 @@ function imagePreview(element){
             });
             function msCallback(){
                 if (itemBannerInstance.previewWindowCropping === "undefined") {
-                    itemBannerInstance.previewWindowCropping = win.attachCropper(itemBannerInstance.getCroppingDataObject(), false);
+                    itemBannerInstance.previewWindowCropping = attachCropper(itemBannerInstance.getCroppingDataObject(), false, win);
                 } else {
-                    itemBannerInstance.previewWindowCropping.attach(win);
+                    itemBannerInstance.previewWindowCropping.setWindowToJq(win);
+                    itemBannerInstance.modes.forEach(function (mode) {
+                        itemBannerInstance.previewWindowCropping.jcObjects[mode].manageSelect(
+                            itemBannerInstance.previewWindowCropping.calculateSelect(mode)
+                        );
+                    });
+                    itemBannerInstance.previewWindowCropping.attach();
                 }
                 var form = win.document.getElementById('preview_form');
                 Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
