@@ -1,19 +1,31 @@
 <?php
+    /* @var $this Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped */
 ?>
 
+<script type="text/javascript">
+    var gridAspectRatio = <?= Mage::getStoreConfig('cms/itembanner/grid_cropping_aspect_ratio') ?>;
+        listAspectRatio = <?= Mage::getStoreConfig('cms/itembanner/list_cropping_aspect_ratio') ?>;
+        gridCroppingWindow = "<?= Mage::helper('itembanner')->__('Crop Here for Grid Mode') ?>";
+        listCroppingWindow = "<?= Mage::helper('itembanner')->__('Crop Here for List Mode') ?>";
+        submitText = "<?= Mage::helper('itembanner')->__('Submit') ?>";
+        frozen = "<?= Mage::helper('itembanner')->__('Unfreeze') ?>";
+        unfrozen = "<?= Mage::helper('itembanner')->__('Freeze') ?>";
+        origImageWidth = "<?= $this->getOrigDimension('width') ?>";
+        origImageHeight = "<?= $this->getOrigDimension('height') ?>";
+</script>
 <div style="text-align: center; width: 100%;">
     <div class="ib_containers">
-        <img id="image_preview_grid" class="ib_crops" src="">
+        <img id="image_preview_grid" class="ib_crops" src="<?= $this->getImageUrl() ?>">
         <h4>
             <button class="ib_crop_enable" id="ib_crop_enable_grid"></button>
-            <?php echo Mage::helper('itembanner')->__('Grid Mode Cropping') ?>
+            <?= Mage::helper('itembanner')->__('Grid Mode Cropping') ?>
         </h4>
     </div>
     <div class="ib_containers" id="ib_list_cropping_container">
-        <img id="image_preview_list" class="ib_crops" src="">
+        <img id="image_preview_list" class="ib_crops" src="<?= $this->getImageUrl() ?>">
         <h4>
             <button class="ib_crop_enable" id="ib_crop_enable_list"></button>
-            <?php echo Mage::helper('itembanner')->__('Grid Mode Cropping') ?>
+            <?= Mage::helper('itembanner')->__('Grid Mode Cropping') ?>
         </h4>
     </div>
 </div>

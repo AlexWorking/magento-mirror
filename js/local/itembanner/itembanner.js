@@ -2,6 +2,10 @@ var itemBannerInstance = {
     result: 'undefined',
     modes: 'undefined',
     inputs: 'undefined',
+    image: {
+        origWidth: 'undefined',
+        origHeight: 'undefined'
+    },
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
     previewWindowCropping: 'undefined',
@@ -13,8 +17,8 @@ var itemBannerInstance = {
                 p.inputs = {
                     baseArray: ['x', 'y', 'x2', 'y2', 'w', 'h', 's'],
                     img: {
-                        "w_img": 'document.getElementById("image_preview_list").style.width',
-                        "h_img": 'document.getElementById("image_preview_grid").style.height'
+                        "w_img": 'document.getElementById("image_preview_grid").style.width',
+                        "h_img": 'document.getElementById("image_preview_list").style.height'
                     }
                 };
             }(this));
@@ -57,11 +61,6 @@ $j( document ).ready(function () {
             }).appendTo(formJq);
         });
 
-        var ibImageUrl = $(thumbNailId).src;
-        itemBannerInstance.modes.forEach(function (mode) {
-            $j( "#image_preview_" + mode ).attr('src', ibImageUrl)
-        });
-
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
                 itemBannerInstance.mainWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject(), true);
@@ -69,10 +68,8 @@ $j( document ).ready(function () {
             } else {
                 itemBannerInstance.mainWindowCropping.attach();
             }
-            Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
-                var input = document.getElementById(identifier);
-                input.setAttribute('value', eval(itemBannerInstance.inputs.img[identifier]));
-            });
+            itemBannerInstance.image.origWidth = parseFloat(origImageWidth);
+            itemBannerInstance.image.origHeight = parseFloat(origImageHeight);
         });
 
         itemBannerInstance.modes.forEach(function (mode) {
@@ -118,6 +115,11 @@ function Cropping(dataObject, preDisabled) {
         'list': 'undefined'
     };
 
+    this.image = {
+        'width': 'undefined',
+        'height': 'undefined'
+    };
+
     this.setWindowToJq = function (w) {
         p.jq = w.jQuery;
     };
@@ -135,14 +137,19 @@ function Cropping(dataObject, preDisabled) {
     };
 
     this.attach = function () {
+        var dimension = 'height';
         modes.forEach(function (mode) {
-            p.jq("#image_preview_" + mode ).Jcrop(p.jcObjects[mode], function () {
+            jqElement = p.jq("#image_preview_" + mode );
+            jqElement.Jcrop(p.jcObjects[mode], function () {
                 p.api[mode] = this;
             });
             if (p.jcObjects[mode].disabled === true) {
                 p.api[mode].disable();
             }
+            p.image[dimension] = parseFloat(eval('jqElement.' + dimension + '()'));
+            dimension = ('height') ? 'width' : null;
         });
+
     };
 
     modes.forEach(function (mode) {
