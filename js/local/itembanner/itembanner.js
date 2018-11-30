@@ -1,28 +1,23 @@
 var itemBannerInstance = {
     result: 'undefined',
-    modes: 'undefined',
-    inputs: 'undefined',
-    image: {
-        origWidth: 'undefined',
-        origHeight: 'undefined'
-    },
+    modesRelCoords: 'undefined',
+    inputIdentifiers: 'undefined',
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
     previewWindowCropping: 'undefined',
     figureOutIsIt: function () {
-        if (this.result === "undefined") {
-            $j( document ).ready(function (p) {
-                p.result = ($j( "#type" ).val() === 'itembanner/banner');
-                p.modes = ['grid', 'list'];
-                p.inputs = {
-                    baseArray: ['x', 'y', 'x2', 'y2', 'w', 'h', 's'],
-                    img: {
-                        "w_img": 'document.getElementById("image_preview_grid").style.width',
-                        "h_img": 'document.getElementById("image_preview_list").style.height'
+                this.result = ($j( "#type" ).val() === 'itembanner/banner');
+                this.inputIdentifiers = ['x', 'y', 'x2', 'y2'];
+                this.modesRelCoords = {
+                    grid: {
+                        active: [],
+                        temporary: []
+                    },
+                    list: {
+                        active: [],
+                        temporary: []
                     }
                 };
-            }(this));
-        }
         return this.result;
     },
     getFormatedIdentifiers: function (mode, hashtag) {
@@ -52,7 +47,12 @@ $j( document ).ready(function () {
     if (itemBannerInstance.figureOutIsIt()) {
         var formJq = $j( "#edit_form");
         formJq.attr("enctype", "multipart/form-data" );
-        var inputsToManage = itemBannerInstance.getFormatedIdentifiers('grid').concat(itemBannerInstance.getFormatedIdentifiers('list').concat(Object.keys(itemBannerInstance.inputs.img)));
+        $j( ".scalable.save" ).each(function () {
+            var onclick = $j(this).attr('onclick');
+            onclick = 'extendOnclick("' + onclick + '")';
+            $j(this).attr('onclick', onclick);
+        });
+        var inputsToManage = itemBannerInstance.getFormatedIdentifiers('grid').concat(itemBannerInstance.getFormatedIdentifiers('list'));
         inputsToManage.forEach(function (identifier) {
             $j('<input/>', {
                 type: 'text',
@@ -68,8 +68,6 @@ $j( document ).ready(function () {
             } else {
                 itemBannerInstance.mainWindowCropping.attach();
             }
-            itemBannerInstance.image.origWidth = parseFloat(origImageWidth);
-            itemBannerInstance.image.origHeight = parseFloat(origImageHeight);
         });
 
         itemBannerInstance.modes.forEach(function (mode) {
@@ -291,4 +289,9 @@ function imagePreview(element){
             }
         }
     }
+}
+
+function extendOnclick(onclick) {
+    alert(onclick);
+    eval(onclick);
 }
