@@ -1,29 +1,26 @@
 var itemBannerInstance = {
     result: 'undefined',
-    modesRelCoords: 'undefined',
+    modes: 'undefined',
     inputIdentifiers: 'undefined',
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
     previewWindowCropping: 'undefined',
     figureOutIsIt: function () {
                 this.result = ($j( "#type" ).val() === 'itembanner/banner');
-                this.inputIdentifiers = ['x', 'y', 'x2', 'y2'];
-                this.modesRelCoords = {
-                    grid: {
-                        active: [],
-                        temporary: []
-                    },
-                    list: {
+                this.inputIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
+                this.modes = ['grid', 'list'];
+                this.relCoords = this.modes.forEach(function (mode) { 
+                    this[mode] = {
                         active: [],
                         temporary: []
                     }
-                };
+                });
         return this.result;
     },
     getFormatedIdentifiers: function (mode, hashtag) {
         hashtag = (hashtag) ? '#' : '';
         var formatedArray = [];
-        this.inputs.baseArray.forEach(function (identifier) {
+        this.inputIdentifiers.forEach(function (identifier) {
             formatedArray.push(hashtag + identifier + '_' + mode);
         });
         return formatedArray;
@@ -34,7 +31,7 @@ var itemBannerInstance = {
                 modes: this.modes,
                 gridInputs: this.getFormatedIdentifiers('grid', true),
                 listInputs: this.getFormatedIdentifiers('list', true),
-                baseArray: this.inputs.baseArray,
+                inputIdentifiers: this.inputIdentifiers,
                 gridAspectRatio: gridAspectRatio,
                 listAspectRatio: listAspectRatio
             }
@@ -94,7 +91,7 @@ function Cropping(dataObject, preDisabled) {
     var modes = dataObject.modes,
         gridInputs = dataObject.gridInputs,
         listInputs = dataObject.listInputs,
-        baseArray = dataObject.baseArray,
+        inputIdentifiers = dataObject.inputIdentifiers,
         gridAspectRatio = dataObject.gridAspectRatio,
         listAspectRatio = dataObject.listAspectRatio,
         p = this;
@@ -124,8 +121,7 @@ function Cropping(dataObject, preDisabled) {
 
     this.calculateSelect = function (mode) {
         var inputs = eval(mode + 'Inputs');
-        var surface = p.jq(inputs[6]).val();
-        if (surface > 0) {
+        if (p.jq(inputs[4]).val() > 0 && p.jq(inputs[5]).val() > 0) {
             var selectArray = [];
             for (var i = 0; i < 4; i++) {
                 selectArray.push(p.jq(inputs[i]).val())
@@ -155,9 +151,9 @@ function Cropping(dataObject, preDisabled) {
         p.jcObjects[mode] = {
             onSelect: function (c) {
                 for (var i = 0; i < 6; i++) {
-                    p.jq(eval(mode + 'Inputs')[i]).attr('value', c[baseArray[i]]);
+                    p.jq(eval(mode + 'Inputs')[i]).attr('value', c[inputIdentifiers[i]]);
                 }
-                p.jq(eval(mode + 'Inputs')[6]).attr('value', c[baseArray[4]] * c[baseArray[5]]);
+                p.jq(eval(mode + 'Inputs')[6]).attr('value', c[inputIdentifiers[4]] * c[inputIdentifiers[5]]);
             },
             onRelease: function () {
                 for (var i = 0; i < 6; i++) {
