@@ -5,16 +5,25 @@ var itemBannerInstance = {
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
     previewWindowCropping: 'undefined',
+    relCoords: 'undefined',
+    image: {
+        origWidth: 'undefined',
+        origHeight: 'undefined'
+    },
     figureOutIsIt: function () {
-                this.result = ($j( "#type" ).val() === 'itembanner/banner');
+        if (this.result === "undefined") {
+            this.result = ($j( "#type" ).val() === 'itembanner/banner');
+            if (this.result === true) {
                 this.inputIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
                 this.modes = ['grid', 'list'];
-                this.relCoords = this.modes.forEach(function (mode) { 
+                this.relCoords = this.modes.forEach(function (mode) {
                     this[mode] = {
                         active: [],
                         temporary: []
                     }
                 });
+            }
+        }
         return this.result;
     },
     getFormatedIdentifiers: function (mode, hashtag) {
@@ -58,9 +67,12 @@ $j( document ).ready(function () {
             }).appendTo(formJq);
         });
 
+        itemBannerInstance.image.origWidth = parseFloat(origImageWidth);
+        itemBannerInstance.image.origHeight = parseFloat(origImageHeight);
+
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
-                itemBannerInstance.mainWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject(), true);
+                itemBannerInstance.mainWindowCropping = new Cropping('main', itemBannerInstance.getCroppingDataObject(), true);
                 itemBannerInstance.mainWindowCropping.attach();
             } else {
                 itemBannerInstance.mainWindowCropping.attach();
@@ -86,7 +98,9 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(dataObject, preDisabled) {
+function Cropping(croppingWindow, dataObject, preDisabled) {
+
+    this.jq = jQuery;
 
     var modes = dataObject.modes,
         gridInputs = dataObject.gridInputs,
@@ -94,11 +108,12 @@ function Cropping(dataObject, preDisabled) {
         inputIdentifiers = dataObject.inputIdentifiers,
         gridAspectRatio = dataObject.gridAspectRatio,
         listAspectRatio = dataObject.listAspectRatio,
+        coordsToFill = (croppingWindow === 'main') ? 'active' : 'temporary';
         p = this;
 
     preDisabled =(preDisabled === true);
 
-    this.jq = jQuery;
+
 
     this.jcObjects = {
         'grid': 'undefined',
@@ -114,6 +129,8 @@ function Cropping(dataObject, preDisabled) {
         'width': 'undefined',
         'height': 'undefined'
     };
+
+    this.minSquare = 'undefined';
 
     this.setWindowToJq = function (w) {
         p.jq = w.jQuery;
@@ -143,30 +160,39 @@ function Cropping(dataObject, preDisabled) {
             p.image[dimension] = parseFloat(eval('jqElement.' + dimension + '()'));
             dimension = ('height') ? 'width' : null;
         });
-
+        p.minSquare = ((p.image.height * p.image.width) / (itemBannerInstance.image.origHeight * itemBannerInstance.image.origWidth)) * 10000;
     };
 
     modes.forEach(function (mode) {
         var aspectRatio = mode + 'AspectRatio';
+        var inputs = eval(mode + 'Inputs');
+
+        function setInputValue(input, value) {
+            p.jq(input).attr('value', value);
+        }
+
         p.jcObjects[mode] = {
             onSelect: function (c) {
-                for (var i = 0; i < 6; i++) {
-                    p.jq(eval(mode + 'Inputs')[i]).attr('value', c[inputIdentifiers[i]]);
+                if (c[inputIdentifiers[4]] * c[inputIdentifiers[5]] < p.minSquare) {
+                    alert('The cropping square is not large enough!');
+                    p.api[mode].release();
+                } else {
+                    inputs.forEach(function (input, index) {
+                        setInputValue(input, c[inputIdentifiers[index]]);
+                    });
                 }
-                p.jq(eval(mode + 'Inputs')[6]).attr('value', c[inputIdentifiers[4]] * c[inputIdentifiers[5]]);
             },
             onRelease: function () {
-                for (var i = 0; i < 6; i++) {
-                    p.jq(eval(mode + 'Inputs')[i]).attr('value', null);
-                }
-                p.jq(eval(mode + 'Inputs')[6]).attr('value', null);
+                inputs.forEach(function (input) {
+                    setInputValue(input, null);
+                });
             },
             manageSelect: function (selectArray) {
                 if (selectArray) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
-                    if (p === itemBannerInstance.mainWindowCropping) {
+                    if (p.croppingWindow  === 'main') {
                         p.api[mode].release();
                     }
                 }
@@ -258,7 +284,7 @@ function imagePreview(element){
             });
             function msCallback(){
                 if (itemBannerInstance.previewWindowCropping === "undefined") {
-                    itemBannerInstance.previewWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject());
+                    itemBannerInstance.previewWindowCropping = new Cropping('preview', itemBannerInstance.getCroppingDataObject());
                     itemBannerInstance.previewWindowCropping.setWindowToJq(win);
                     itemBannerInstance.previewWindowCropping.attach();
 
