@@ -5,15 +5,25 @@ var itemBannerInstance = {
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
     previewWindowCropping: 'undefined',
+    relCoords: 'undefined',
     image: {
         origWidth: 'undefined',
         origHeight: 'undefined'
     },
     figureOutIsIt: function () {
-                this.result = ($j( "#type" ).val() === 'itembanner/banner');
-                this.inputIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
-                this.modes = ['grid', 'list'];
-        return this.result;
+        var ibi = this;
+        if (ibi.result === "undefined") {
+            ibi.result = ($j("#type").val() === 'itembanner/banner');
+            ibi.inputIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
+            ibi.modes = ['grid', 'list'];
+            ibi.modes.forEach(function (mode) {
+                ibi.relCoords[mode] = {
+                    active: [],
+                    temporary: []
+                }
+            });
+        }
+        return ibi.result;
     },
     getFormatedIdentifiers: function (mode, hashtag) {
         hashtag = (hashtag) ? '#' : '';
@@ -61,7 +71,7 @@ $j( document ).ready(function () {
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
-                itemBannerInstance.mainWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject(), true);
+                itemBannerInstance.mainWindowCropping = new Cropping('main', itemBannerInstance.getCroppingDataObject(), true);
                 itemBannerInstance.mainWindowCropping.attach();
             } else {
                 itemBannerInstance.mainWindowCropping.attach();
@@ -87,7 +97,7 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(dataObject, preDisabled) {
+function Cropping(croppingWindow, dataObject, preDisabled) {
 
     var modes = dataObject.modes,
         gridInputs = dataObject.gridInputs,
@@ -95,6 +105,7 @@ function Cropping(dataObject, preDisabled) {
         inputIdentifiers = dataObject.inputIdentifiers,
         gridAspectRatio = dataObject.gridAspectRatio,
         listAspectRatio = dataObject.listAspectRatio,
+        coordsToFill = (croppingWindow === 'main') ? 'active' : 'temporary',
         p = this;
 
     preDisabled =(preDisabled === true);
@@ -270,7 +281,7 @@ function imagePreview(element){
             });
             function msCallback(){
                 if (itemBannerInstance.previewWindowCropping === "undefined") {
-                    itemBannerInstance.previewWindowCropping = new Cropping(itemBannerInstance.getCroppingDataObject());
+                    itemBannerInstance.previewWindowCropping = new Cropping('preview', itemBannerInstance.getCroppingDataObject());
                     itemBannerInstance.previewWindowCropping.setWindowToJq(win);
                     itemBannerInstance.previewWindowCropping.attach();
 
