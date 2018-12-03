@@ -1,11 +1,11 @@
 var itemBannerInstance = {
     result: 'undefined',
-    modes: 'undefined',
-    inputIdentifiers: 'undefined',
+    modes: [],
+    relCoords: [],
+    inputIdentifiers: [],
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
     previewWindowCropping: 'undefined',
-    relCoords: 'undefined',
     image: {
         origWidth: 'undefined',
         origHeight: 'undefined'
@@ -20,7 +20,7 @@ var itemBannerInstance = {
                 ibi.relCoords[mode] = {
                     active: [],
                     temporary: []
-                }
+                };
             });
         }
         return ibi.result;
@@ -189,7 +189,7 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
-                    if (p === itemBannerInstance.mainWindowCropping) {
+                    if (croppingWindow === 'main' && p.api[mode] !== "undefined") {
                         p.api[mode].release();
                     }
                 }
