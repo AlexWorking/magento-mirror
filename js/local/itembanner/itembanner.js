@@ -1,7 +1,7 @@
 var itemBannerInstance = {
     result: 'undefined',
     modes: [],
-    relCoords: [],
+    relCoords: {},
     inputIdentifiers: [],
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
@@ -112,59 +112,57 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
 
     this.jq = jQuery;
 
-    this.jcObjects = (function () {
-        var tempObj = {};
-        modes.forEach(function (mode) {
-            tempObj[mode] = 'undefined'
-        });
-        return tempObj;
-    });
+    this.jcObjects = {};
 
-    this.image = {
-        'width': 'undefined',
-        'height': 'undefined'
-    };
+    this.image = {};
 
     this.minSquare = 'undefined';
+
+    (function () {
+        var dimension = 'width';
+        var square = 1;
+        modes.forEach(function (mode) {
+            p.jcObjects[mode] = 'undefined';
+            p.image[dimension] = parseFloat(eval("p.jq( '#image_preview_" + mode + "' )." + dimension + "()"));
+            square *= p.image[dimension];
+            if (dimension === 'width') {
+                dimension = 'height'
+            } else {
+                p.minSquare = (square / (itemBannerInstance.image.origHeight * itemBannerInstance.image.origWidth)) * 10000;
+            }
+        });
+    })();
 
     this.setWindowToJq = function (w) {
         p.jq = w.jQuery;
     };
 
     this.calculateSelect = function (mode) {
-        var inputs = eval(mode + 'Inputs');
-        if (p.jq(inputs[4]).val() > 0 && p.jq(inputs[5]).val() > 0) {
+        var coords = itemBannerInstance.relCoords[mode].active;
+        if (coords[4] > 0 && coords[5] > 0) {
             var selectArray = [];
+            var dimension = 'width';
             for (var i = 0; i < 4; i++) {
-                selectArray.push(p.jq(inputs[i]).val())
+                selectArray.push(coords[i] * p.image[dimension]);
+                dimension = (dimension === 'width') ? 'height' : 'width';
             }
         }
         return selectArray;
     };
 
     this.attach = function (singleMode) {
-        if (singleMode) {
-            p.jq("#image_preview_" + singleMode ).Jcrop(
-                p.jcObjects[singleMode],
+        var hereModes = (singleMode) ? [singleMode] : modes;
+        hereModes.forEach(function (mode) {
+            p.jq("#image_preview_" + mode ).Jcrop(
+                p.jcObjects[mode],
                 function () {
-                p.jcObjects[singleMode].api = this;
-            });
-
-            return;
-        }
-        var dimension = 'height';
-        modes.forEach(function (mode) {
-            jqElement = p.jq("#image_preview_" + mode );
-            jqElement.Jcrop(p.jcObjects[mode], function () {
-                p.jcObjects[mode].api = this;
-            });
+                    p.jcObjects[mode].api = this;
+                }
+            );
             if (p.jcObjects[mode].disabled === true) {
                 p.jcObjects[mode].api.disable();
             }
-            p.image[dimension] = parseFloat(eval('jqElement.' + dimension + '()'));
-            dimension = ('height') ? 'width' : null;
         });
-        p.minSquare = ((p.image.height * p.image.width) / (itemBannerInstance.image.origHeight * itemBannerInstance.image.origWidth)) * 10000;
     };
 
     modes.forEach(function (mode) {
@@ -184,12 +182,20 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
                     inputs.forEach(function (input, index) {
                         setInputValue(input, c[inputIdentifiers[index]]);
                     });
+                    var dimension = 'width';
+                    for (var i = 0; i < 6; i++) {
+                        itemBannerInstance.relCoords[mode][coordsToFill][i] = c[inputIdentifiers[i]] / p.image[dimension];
+                        dimension = (dimension === 'width') ? 'height' : 'width';
+                    }
                 }
             },
             onRelease: function () {
                 inputs.forEach(function (input) {
                     setInputValue(input, null);
                 });
+                for (var i = 0; i < 6; i++) {
+                    itemBannerInstance.relCoords[mode][coordsToFill][i] = null;
+                }
             },
             manageSelect: function (selectArray) {
                 if (selectArray) {
@@ -303,12 +309,6 @@ function imagePreview(element){
                     itemBannerInstance.previewWindowCropping.attach();
                 }
                 var form = win.document.getElementById('preview_form');
-                Object.keys(itemBannerInstance.inputs.img).forEach(function (identifier) {
-                    var input = win.document.createElement('input');
-                    input.setAttribute('id', identifier);
-                    input.setAttribute('value', eval('win.' + itemBannerInstance.inputs.img[identifier]));
-                    form.appendChild(input);
-                });
                 var container = win.document.getElementsByTagName('div')[0];
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
