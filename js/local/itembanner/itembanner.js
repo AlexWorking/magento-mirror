@@ -84,11 +84,11 @@ $j( document ).ready(function () {
             element.click(function (e) {
                 e.preventDefault();
                 if(element.html() === frozen) {
-                    itemBannerInstance.mainWindowCropping.api[mode].enable();
+                    itemBannerInstance.mainWindowCropping.jcObjects[mode].api.enable();
                     itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = false;
                     element.html(unfrozen);
                 } else {
-                    itemBannerInstance.mainWindowCropping.api[mode].disable();
+                    itemBannerInstance.mainWindowCropping.jcObjects[mode].api.disable();
                     itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = true;
                     element.html(frozen);
                 }
@@ -112,15 +112,13 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
 
     this.jq = jQuery;
 
-    this.jcObjects = {
-        'grid': 'undefined',
-        'list': 'undefined'
-    };
-
-    this.api = {
-        'grid': 'undefined',
-        'list': 'undefined'
-    };
+    this.jcObjects = (function () {
+        var tempObj = {};
+        modes.forEach(function (mode) {
+            tempObj[mode] = 'undefined'
+        });
+        return tempObj;
+    });
 
     this.image = {
         'width': 'undefined',
@@ -144,15 +142,24 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
         return selectArray;
     };
 
-    this.attach = function () {
+    this.attach = function (singleMode) {
+        if (singleMode) {
+            p.jq("#image_preview_" + singleMode ).Jcrop(
+                p.jcObjects[singleMode],
+                function () {
+                p.jcObjects[singleMode].api = this;
+            });
+
+            return;
+        }
         var dimension = 'height';
         modes.forEach(function (mode) {
             jqElement = p.jq("#image_preview_" + mode );
             jqElement.Jcrop(p.jcObjects[mode], function () {
-                p.api[mode] = this;
+                p.jcObjects[mode].api = this;
             });
             if (p.jcObjects[mode].disabled === true) {
-                p.api[mode].disable();
+                p.jcObjects[mode].api.disable();
             }
             p.image[dimension] = parseFloat(eval('jqElement.' + dimension + '()'));
             dimension = ('height') ? 'width' : null;
@@ -172,7 +179,7 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
             onSelect: function (c) {
                 if (c[inputIdentifiers[4]] * c[inputIdentifiers[5]] < p.minSquare) {
                     alert('The cropping square is not large enough!');
-                    p.api[mode].release();
+                    p.jcObjectsa[mode].api.release();
                 } else {
                     inputs.forEach(function (input, index) {
                         setInputValue(input, c[inputIdentifiers[index]]);
@@ -189,15 +196,16 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
-                    if (croppingWindow === 'main' && p.api[mode] !== "undefined") {
-                        p.api[mode].release();
+                    if (croppingWindow === 'main' && p.jcObjects[mode].api !== "undefined") {
+                        p.jcObjects[mode].api.release();
                     }
                 }
             },
             bgColor: 'transparent',
             bgOpacity: .15,
             aspectRatio: 1 / eval(aspectRatio),
-            disabled: preDisabled
+            disabled: preDisabled,
+            api: 'undefined'
         };
         p.jcObjects[mode].manageSelect(p.calculateSelect(mode));
     });
