@@ -19,7 +19,8 @@ var itemBannerInstance = {
             ibi.modes.forEach(function (mode) {
                 ibi.relCoords[mode] = {
                     active: [],
-                    temporary: []
+                    temporary: [],
+                    changed: false
                 };
             });
         }
@@ -250,13 +251,12 @@ function imagePreview(element){
             win.document.write('<img id="image_preview_list" class="ib_crops" src="'+$(element).src+'"/>');
             win.document.write('<h4>' + listCroppingWindow + '</h4>');
             win.document.write('</div>');
-            win.document.write('<form id="preview_form">');
             var inputsToManage = gridInputs.concat(listInputs);
             inputsToManage.forEach(function (identifier) {
                 var value = document.getElementById(identifier).getAttribute('value');
                 win.document.write('<input type="text" id="' + identifier + '" value="' + value + '">');
             });
-            win.document.write('<input id="ib_submit" type="submit"/></form>');
+            win.document.write('<button id="ib_submit">' + submitText + '</button>');
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
@@ -265,35 +265,22 @@ function imagePreview(element){
             } else {
                 Event.observe(win, 'load', msCallback);
             }
-            Event.observe(win, 'submit', function () {
-                itemBannerInstance.modes.forEach(function (mode) {
-                    var inputs = eval(mode + 'Inputs');
-                    if (win.document.getElementById(inputs[6]).value > 0) {
-                        inputs.forEach(scatterValues);
-                    } else {
-                        inputs.forEach(annulValues);
-                    }
-                    itemBannerInstance.mainWindowCropping.jcObjects[mode].manageSelect(
-                        itemBannerInstance.mainWindowCropping.calculateSelect(mode)
-                    );
-                });
-                itemBannerInstance.mainWindowCropping.attach();
-
-                Object.keys(itemBannerInstance.inputs.img).forEach(scatterValues);
-
-                function scatterValues(identifier) {
-                    var input = document.getElementById(identifier);
-                    input.setAttribute('value', win.document.getElementById(identifier).value);
-                }
-
-                function annulValues(identifier) {
-                    var input = document.getElementById(identifier);
-                    input.setAttribute('value', 'null');
-                }
-
-                win.close();
-            });
             function msCallback(){
+                win.document.getElementById("ib_submit").addEventListener("click", function () {
+                    var tempArray = [];
+                    itemBannerInstance.modes.forEach(function (mode) {
+                        for (var i = 0; i < 6 ; i++) {
+                            itemBannerInstance.relCoords[mode].active[i] = itemBannerInstance.relCoords[mode].temporary[i];
+                        }
+                    });
+                    itemBannerInstance.modes.forEach(function (mode) {
+                        itemBannerInstance.mainWindowCropping.jcObjects[mode].manageSelect(
+                            itemBannerInstance.mainWindowCropping.calculateSelect(mode)
+                        );
+                    });
+                    itemBannerInstance.mainWindowCropping.attach();
+                    win.close();
+                });
                 if (itemBannerInstance.previewWindowCropping === "undefined") {
                     itemBannerInstance.previewWindowCropping = new Cropping('preview', itemBannerInstance.getCroppingDataObject());
                     itemBannerInstance.previewWindowCropping.setWindowToJq(win);
@@ -308,7 +295,6 @@ function imagePreview(element){
                     });
                     itemBannerInstance.previewWindowCropping.attach();
                 }
-                var form = win.document.getElementById('preview_form');
                 var container = win.document.getElementsByTagName('div')[0];
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
