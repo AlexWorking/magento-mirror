@@ -20,7 +20,7 @@ var itemBannerInstance = {
                 ibi.relCoords[mode] = {
                     active: [],
                     temporary: [],
-                    changed: false
+                    changed: true
                 };
             });
         }
@@ -46,6 +46,27 @@ var itemBannerInstance = {
             }
         }
         return this.croppingDataObject;
+    },
+    calculateSelect: function (mode) {
+        var selectArray = [];
+        if (this.relCoords[mode].changed === false) {
+            if (p.jcObjects[mode].setSelect) {
+                selectArray = p.jcObjects[mode].setSelect;
+            }
+        } else {
+            var coords = itemBannerInstance.relCoords[mode].active;
+            if (coords[4] > 0 && coords[5] > 0) {
+                selectArray = [];
+                var dimension = 'width';
+                for (var i = 0; i < 4; i++) {
+                    selectArray.push(coords[i] * p.image[dimension]);
+                    dimension = (dimension === 'width') ? 'height' : 'width';
+                }
+            }
+            itemBannerInstance.relCoords[mode].changed = false;
+        }
+
+        return selectArray;
     }
 };
 
@@ -72,7 +93,7 @@ $j( document ).ready(function () {
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
-                itemBannerInstance.mainWindowCropping = new Cropping('main', itemBannerInstance.getCroppingDataObject(), true);
+                itemBannerInstance.mainWindowCropping = new Cropping(false, itemBannerInstance.getCroppingDataObject(), true);
                 itemBannerInstance.mainWindowCropping.attach();
             } else {
                 itemBannerInstance.mainWindowCropping.attach();
@@ -98,7 +119,9 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(croppingWindow, dataObject, preDisabled) {
+function Cropping(currentWindow, dataObject, preDisabled) {
+
+    this.isMainWindowCropping = (!currentWindow);
 
     var modes = dataObject.modes,
         gridInputs = dataObject.gridInputs,
@@ -106,12 +129,13 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
         inputIdentifiers = dataObject.inputIdentifiers,
         gridAspectRatio = dataObject.gridAspectRatio,
         listAspectRatio = dataObject.listAspectRatio,
-        coordsToFill = (croppingWindow === 'main') ? 'active' : 'temporary',
+        windw = (this.isMainWindowCropping) ? window : currentWindow,
+        coordsToFill = (this.isMainWindowCropping) ? 'active' : 'temporary',
         p = this;
 
     preDisabled =(preDisabled === true);
 
-    this.jq = jQuery;
+    this.jq = windw.jQuery;
 
     this.jcObjects = {};
 
@@ -139,15 +163,24 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
     };
 
     this.calculateSelect = function (mode) {
-        var coords = itemBannerInstance.relCoords[mode].active;
-        if (coords[4] > 0 && coords[5] > 0) {
-            var selectArray = [];
-            var dimension = 'width';
-            for (var i = 0; i < 4; i++) {
-                selectArray.push(coords[i] * p.image[dimension]);
-                dimension = (dimension === 'width') ? 'height' : 'width';
+        var selectArray = [];
+        if (itemBannerInstance.relCoords[mode].changed === false) {
+            if (p.jcObjects[mode].setSelect) {
+                selectArray = p.jcObjects[mode].setSelect;
             }
+        } else {
+            var coords = itemBannerInstance.relCoords[mode].active;
+            if (coords[4] > 0 && coords[5] > 0) {
+                selectArray = [];
+                var dimension = 'width';
+                for (var i = 0; i < 4; i++) {
+                    selectArray.push(coords[i] * p.image[dimension]);
+                    dimension = (dimension === 'width') ? 'height' : 'width';
+                }
+            }
+            itemBannerInstance.relCoords[mode].changed = false;
         }
+
         return selectArray;
     };
 
@@ -177,8 +210,8 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
         p.jcObjects[mode] = {
             onSelect: function (c) {
                 if (c[inputIdentifiers[4]] * c[inputIdentifiers[5]] < p.minSquare) {
-                    alert('The cropping square is not large enough!');
-                    p.jcObjectsa[mode].api.release();
+                    windw.alert('The cropping square is not large enough!');
+                    p.jcObjects[mode].api.release();
                 } else {
                     inputs.forEach(function (input, index) {
                         setInputValue(input, c[inputIdentifiers[index]]);
@@ -188,6 +221,7 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
                         itemBannerInstance.relCoords[mode][coordsToFill][i] = c[inputIdentifiers[i]] / p.image[dimension];
                         dimension = (dimension === 'width') ? 'height' : 'width';
                     }
+                    itemBannerInstance.relCoords[mode].changed = true;
                 }
             },
             onRelease: function () {
@@ -199,11 +233,11 @@ function Cropping(croppingWindow, dataObject, preDisabled) {
                 }
             },
             manageSelect: function (selectArray) {
-                if (selectArray) {
+                if (selectArray.length !== 0) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
-                    if (croppingWindow === 'main' && p.jcObjects[mode].api !== "undefined") {
+                    if (p.isMainWindowCropping && p.jcObjects[mode].api !== "undefined") {
                         p.jcObjects[mode].api.release();
                     }
                 }
@@ -282,8 +316,7 @@ function imagePreview(element){
                     win.close();
                 });
                 if (itemBannerInstance.previewWindowCropping === "undefined") {
-                    itemBannerInstance.previewWindowCropping = new Cropping('preview', itemBannerInstance.getCroppingDataObject());
-                    itemBannerInstance.previewWindowCropping.setWindowToJq(win);
+                    itemBannerInstance.previewWindowCropping = new Cropping(win, itemBannerInstance.getCroppingDataObject());
                     itemBannerInstance.previewWindowCropping.attach();
 
                 } else {
