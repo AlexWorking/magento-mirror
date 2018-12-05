@@ -1,8 +1,9 @@
 var itemBannerInstance = {
     result: 'undefined',
     modes: [],
-    relCoords: {},
     inputIdentifiers: [],
+    inputIds: {},
+    relCoords: {},
     croppingDataObject: 'undefined',
     mainWindowCropping: 'undefined',
     previewWindowCropping: 'undefined',
@@ -22,6 +23,10 @@ var itemBannerInstance = {
                     temporary: [],
                     changed: true
                 };
+                ibi.inputIds[mode] = [];
+                ibi.inputIdentifiers.forEach(function (identifier) {
+                    ibi.inputIds[mode].push(identifier + '_' + mode);
+                });
             });
         }
         return ibi.result;
@@ -49,6 +54,14 @@ $j( document ).ready(function () {
             var onclick = $j(this).attr('onclick');
             onclick = 'extendOnclick("' + onclick + '")';
             $j(this).attr('onclick', onclick);
+        });
+        var inputsToManage = itemBannerInstance.inputIds.grid.concat(itemBannerInstance.inputIds.list);
+        inputsToManage.forEach(function (identifier) {
+            $j('<input/>', {
+                type: 'hidden',
+                id: identifier,
+                name: identifier,
+            }).appendTo(formJq);
         });
         itemBannerInstance.image.origWidth = parseFloat(origImageWidth);
         itemBannerInstance.image.origHeight = parseFloat(origImageHeight);
@@ -282,6 +295,11 @@ function imagePreview(element){
 }
 
 function extendOnclick(onclick) {
-    alert(onclick);
+    itemBannerInstance.modes.forEach(function (mode) {
+        for (var i = 0; i < 6; i++) {
+            $j( "#" + itemBannerInstance.inputIds[mode][i] ).attr('value', itemBannerInstance.relCoords[mode].active[i]);
+            console.log($j( "#" + itemBannerInstance.inputIds[mode][i] ).val());
+        }
+    });
     eval(onclick);
 }
