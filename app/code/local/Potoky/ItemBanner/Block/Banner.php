@@ -16,13 +16,11 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
         return parent::setNameInLayout($name);
     }
 
-    public function _prepareImage()
+    public function getImageUrl()
     {
-        $mode = (Mage::registry('potoky_itembanner')['mode']) ? Mage::registry('potoky_itembanner')['mode'] : '';
-        $baseDir = Mage::getBaseDir('media');
-        $path = $baseDir . DS . 'itembanner' . DS . $mode . DS . $this->getData('image');
-        $path = str_replace($baseDir . DS, "", $path);
-
-        return Mage::getBaseUrl('media') . str_replace(DS, '/', $path);
+        return Mage::helper('itembanner')->getImageUrl(
+            $this->getData('image'),
+            Mage::registry('potoky_itembanner')['mode'] ?? ''
+        );
     }
 }

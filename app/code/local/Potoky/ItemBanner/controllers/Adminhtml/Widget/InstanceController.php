@@ -61,4 +61,18 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
 
         return $result['file'];
     }
+
+    private function crop($src, $x1, $y1, $x2, $y2, $w, $h, $mode)
+    {
+        $file = substr($src, strrpos($src, '/'));
+        $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $file);
+        $newFilePath = Mage::getBaseDir('media') . DS . 'itembanner' . DS . $mode . DS . $file;
+        $image->crop(
+            ($y1 * $image->getOriginalWidth()) / $w,
+            ($x1 * $image->getOriginalHeight()) / $h,
+            $image->getOriginalWidth() * (1 - $x2 / $w),
+            $image->getOriginalHeight() * (1 - $y2 / $h)
+        );
+        $image->save($newFilePath);
+    }
 }

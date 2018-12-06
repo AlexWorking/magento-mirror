@@ -15,11 +15,9 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
     }
 
     private function prepareImageUrl() {
-        $baseDir = Mage::getBaseDir('media');
-        $filename = Mage::registry('current_widget_instance')->getWidgetParameters()['image'];
-        $path = $baseDir . DS . 'itembanner' . DS . $filename;
-        $path = str_replace($baseDir . DS, "", $path);
-        return Mage::getBaseUrl('media') . str_replace(DS, '/', $path);
+        return Mage::helper('itembanner')->getImageUrl(
+            Mage::registry('current_widget_instance')->getWidgetParameters()['image']
+        );
     }
 
     private function measureImage() {
