@@ -37,6 +37,16 @@
                 <type>image</type>
                 <note>*.jpg, *.png, *.gif, *.jpeg</note>
             </image>
+            <rel_coords_grid>
+                <label>Coordinates of the Grid Mode Croppeing</label>
+                <visible>1</visible>
+                <type>text</type>
+            </rel_coords_grid>
+            <rel_coords_list>
+                <label>Coordinates of the List Mode Croppeing</label>
+                <visible>1</visible>
+                <type>text</type>
+            </rel_coords_list>
             <template translate="label">
                 <label>Template</label>
                 <visible>1</visible>

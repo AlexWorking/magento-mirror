@@ -55,14 +55,6 @@ $j( document ).ready(function () {
             onclick = 'extendOnclick("' + onclick + '")';
             $j(this).attr('onclick', onclick);
         });
-        var inputsToManage = itemBannerInstance.inputIds.grid.concat(itemBannerInstance.inputIds.list);
-        inputsToManage.forEach(function (identifier) {
-            $j('<input/>', {
-                type: 'hidden',
-                id: identifier,
-                name: identifier,
-            }).appendTo(formJq);
-        });
         itemBannerInstance.image.origWidth = parseFloat(origImageWidth);
         itemBannerInstance.image.origHeight = parseFloat(origImageHeight);
 
@@ -296,10 +288,10 @@ function imagePreview(element){
 
 function extendOnclick(onclick) {
     itemBannerInstance.modes.forEach(function (mode) {
-        for (var i = 0; i < 6; i++) {
-            $j( "#" + itemBannerInstance.inputIds[mode][i] ).attr('value', itemBannerInstance.relCoords[mode].active[i]);
-            console.log($j( "#" + itemBannerInstance.inputIds[mode][i] ).val());
-        }
+        $j( "#" + instanceHtmlHash + '_rel_coords_' + mode).attr(
+            'value',
+            JSON.stringify(itemBannerInstance.relCoords[mode].active)
+        );
     });
     eval(onclick);
 }

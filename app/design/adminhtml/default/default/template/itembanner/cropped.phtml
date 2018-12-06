@@ -3,15 +3,16 @@
 ?>
 
 <script type="text/javascript">
-    var gridAspectRatio = <?= Mage::getStoreConfig('cms/itembanner/grid_cropping_aspect_ratio') ?>;
-        listAspectRatio = <?= Mage::getStoreConfig('cms/itembanner/list_cropping_aspect_ratio') ?>;
-        gridCroppingWindow = "<?= Mage::helper('itembanner')->__('Crop Here for Grid Mode') ?>";
-        listCroppingWindow = "<?= Mage::helper('itembanner')->__('Crop Here for List Mode') ?>";
-        submitText = "<?= Mage::helper('itembanner')->__('Submit Text') ?>";
-        frozen = "<?= Mage::helper('itembanner')->__('Unfreeze') ?>";
-        unfrozen = "<?= Mage::helper('itembanner')->__('Freeze') ?>";
-        origImageWidth = "<?= $this->getOrigDimension('width') ?>";
-        origImageHeight = "<?= $this->getOrigDimension('height') ?>";
+    var gridAspectRatio = <?= Mage::getStoreConfig('cms/itembanner/grid_cropping_aspect_ratio') ?>,
+        listAspectRatio = <?= Mage::getStoreConfig('cms/itembanner/list_cropping_aspect_ratio') ?>,
+        gridCroppingWindow = "<?= Mage::helper('itembanner')->__('Crop Here for Grid Mode') ?>",
+        listCroppingWindow = "<?= Mage::helper('itembanner')->__('Crop Here for List Mode') ?>",
+        submitText = "<?= Mage::helper('itembanner')->__('Submit Text') ?>",
+        frozen = "<?= Mage::helper('itembanner')->__('Unfreeze') ?>",
+        unfrozen = "<?= Mage::helper('itembanner')->__('Freeze') ?>",
+        origImageWidth = "<?= $this->getOrigDimension('width') ?>",
+        origImageHeight = "<?= $this->getOrigDimension('height') ?>",
+        instanceHtmlHash = "<?= 'options_fieldset'. md5('itembanner/banner')?>";
 </script>
 <div style="text-align: center; width: 100%;">
     <div class="ib_containers">
