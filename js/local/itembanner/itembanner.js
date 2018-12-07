@@ -154,7 +154,7 @@ function Cropping(currentWindow, preDisabled) {
 
     this.attach = function () {
         modes.forEach(function (mode) {
-            if (p.isMainWindowCropping && itemBannerInstance.relCoords[mode].changed === false) {
+            if (p.isMainWindowCropping && !itemBannerInstance.relCoords[mode].changed && itemBannerInstance.getResult() === 'launched') {
                 return;
             }
             p.jq( "#image_preview_" + mode ).Jcrop(
@@ -175,6 +175,9 @@ function Cropping(currentWindow, preDisabled) {
     modes.forEach(function (mode) {
         p.jcObjects[mode] = {
             onSelect: function (c) {
+                if(!p.jcObjects[mode].needsOnSelectFire) {
+                    p.jcObjects[mode].needsOnSelectFire = true;
+                }
                 if (c[inputIdentifiers[4]] * c[inputIdentifiers[5]] < p.minSquare) {
                     windw.alert('The cropping square is not large enough!');
                     p.jcObjects[mode].api.release();
@@ -207,6 +210,7 @@ function Cropping(currentWindow, preDisabled) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
+                    p.jcObjects[mode].needsOnSelectFire = true;
                     if (p.isMainWindowCropping && p.jcObjects[mode].api !== "undefined") {
                         p.jcObjects[mode].api.release();
                     }
@@ -216,6 +220,7 @@ function Cropping(currentWindow, preDisabled) {
             bgOpacity: .15,
             aspectRatio: 1 / eval(mode + 'AspectRatio'),
             disabled: preDisabled,
+            needsOnSelectFire: false,
             api: 'undefined'
         };
         p.jcObjects[mode].manageSelect(mode);
