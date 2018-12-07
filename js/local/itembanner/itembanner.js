@@ -67,45 +67,43 @@ $j( document ).ready(function () {
                 itemBannerInstance.mainWindowCropping = new Cropping(false, true);
                 itemBannerInstance.mainWindowCropping.attach();
             }
-        });
-
-        itemBannerInstance.modes.forEach(function (mode) {
-            var element = $j( "#ib_crop_enable_" +  mode);
-            element.html(frozen);
-            element.click(function (e) {
-                e.preventDefault();
-                if(element.html() === frozen) {
-                    itemBannerInstance.mainWindowCropping.jcObjects[mode].api.enable();
-                    itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = false;
-                    element.html(unfrozen);
-                } else {
-                    itemBannerInstance.mainWindowCropping.jcObjects[mode].api.disable();
-                    itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = true;
-                    element.html(frozen);
-                }
+            itemBannerInstance.modes.forEach(function (mode) {
+                var element = $j( "#ib_crop_enable_" +  mode);
+                element.html(frozen);
+                element.click(function (e) {
+                    e.preventDefault();
+                    if(element.html() === frozen) {
+                        itemBannerInstance.mainWindowCropping.jcObjects[mode].api.enable();
+                        itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = false;
+                        element.html(unfrozen);
+                    } else {
+                        itemBannerInstance.mainWindowCropping.jcObjects[mode].api.disable();
+                        itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = true;
+                        element.html(frozen);
+                    }
+                });
             });
+            itemBannerInstance.result = 'launched';
         });
 
-        itemBannerInstance.result = 'launched';
+
     }
 });
 
 function Cropping(currentWindow, preDisabled) {
 
-    this.isMainWindowCropping = (!currentWindow);
+    this.windowObject = (currentWindow) ? currentWindow : window;
 
+    this.isMainWindowCropping = (!currentWindow);
 
     var p = this,
         modes = itemBannerInstance.modes,
         inputIdentifiers = itemBannerInstance.inputIdentifiers,
-        windw,
         coordsToFill;
 
     if (this.isMainWindowCropping) {
-        windw = window;
         coordsToFill = 'active';
     } else {
-        windw = currentWindow;
         coordsToFill = 'temporary';
     }
 
@@ -120,7 +118,7 @@ function Cropping(currentWindow, preDisabled) {
     this.minSquare = 'undefined';
 
     (function () {
-        p.jq = windw.jQuery;
+        p.jq = p.windowObject.jQuery;
         var dimension = 'width';
         var square = 1;
         modes.forEach(function (mode) {
@@ -179,7 +177,7 @@ function Cropping(currentWindow, preDisabled) {
                     p.jcObjects[mode].needsOnSelectFire = true;
                 }
                 if (c[inputIdentifiers[4]] * c[inputIdentifiers[5]] < p.minSquare) {
-                    windw.alert('The cropping square is not large enough!');
+                    p.windowObject.alert('The cropping square is not large enough!');
                     p.jcObjects[mode].api.release();
                 } else {
                     var dimension = 'width';
@@ -307,11 +305,14 @@ function imagePreview(element){
 }
 
 function extendOnclick(onclick) {
+    if (itemBannerInstance.previewWindowCropping !== "undefined") {
+        itemBannerInstance.previewWindowCropping.windowObject.close();
+    }
     itemBannerInstance.modes.forEach(function (mode) {
         $j( "#" + instanceHtmlHash + '_rel_coords_' + mode).attr(
             'value',
-            JSON.stringify(itemBannerInstance.relCoords[mode].active)
-        );
+            (itemBannerInstance.relCoords[mode].changed !== null) ? JSON.stringify(itemBannerInstance.relCoords[mode].active) : ''
+        )
     });
     eval(onclick);
 }
