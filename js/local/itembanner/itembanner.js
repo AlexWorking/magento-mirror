@@ -11,24 +11,28 @@ var itemBannerInstance = {
         origWidth: 'undefined',
         origHeight: 'undefined'
     },
+    getResult: function () {
+        if (this.result === "undefined") {
+            this.result = this.figureOutIsIt()
+        }
+        return this.result;
+    },
     figureOutIsIt: function () {
         var ibi = this;
-        if (ibi.result === "undefined") {
-            ibi.result = ($j("#type").val() === 'itembanner/banner');
-            ibi.inputIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
-            ibi.modes = ['grid', 'list'];
-            ibi.modes.forEach(function (mode) {
-                ibi.relCoords[mode] = {
-                    active: [],
-                    temporary: [],
-                    changed: true
-                };
-                ibi.inputIds[mode] = [];
-                ibi.inputIdentifiers.forEach(function (identifier) {
-                    ibi.inputIds[mode].push(identifier + '_' + mode);
-                });
+        ibi.result = ($j("#type").val() === 'itembanner/banner');
+        ibi.inputIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
+        ibi.modes = ['grid', 'list'];
+        ibi.modes.forEach(function (mode) {
+            ibi.relCoords[mode] = {
+                active: [],
+                temporary: [],
+                changed: null
+            };
+            ibi.inputIds[mode] = [];
+            ibi.inputIdentifiers.forEach(function (identifier) {
+                ibi.inputIds[mode].push(identifier + '_' + mode);
             });
-        }
+        });
         return ibi.result;
     },
     getFormatedIdentifiers: function (mode, hashtag) {
@@ -47,7 +51,7 @@ var itemBannerInstance = {
 };
 
 $j( document ).ready(function () {
-    if (itemBannerInstance.figureOutIsIt()) {
+    if (itemBannerInstance.getResult()) {
         var formJq = $j( "#edit_form");
         formJq.attr("enctype", "multipart/form-data" );
         $j( ".scalable.save" ).each(function () {
@@ -81,6 +85,8 @@ $j( document ).ready(function () {
                 }
             });
         });
+
+        itemBannerInstance.result = 'launched';
     }
 });
 
@@ -160,7 +166,9 @@ function Cropping(currentWindow, preDisabled) {
             if (p.jcObjects[mode].disabled === true) {
                 p.jcObjects[mode].api.disable();
             }
-            itemBannerInstance.relCoords[mode].changed = false;
+            if (itemBannerInstance.relCoords[mode].changed) {
+                itemBannerInstance.relCoords[mode].changed = false;
+            }
         });
     };
 
@@ -176,7 +184,9 @@ function Cropping(currentWindow, preDisabled) {
                         itemBannerInstance.relCoords[mode][coordsToFill][i] = c[inputIdentifiers[i]] / p.image[dimension];
                         dimension = (dimension === 'width') ? 'height' : 'width';
                     }
-                    itemBannerInstance.relCoords[mode].changed = true;
+                    if (itemBannerInstance.getResult() === 'launched') {
+                        itemBannerInstance.relCoords[mode].changed = true;
+                    }
                 }
             },
             onRelease: function () {
@@ -187,6 +197,9 @@ function Cropping(currentWindow, preDisabled) {
             },
             manageSelect: function (mode) {
                 if (itemBannerInstance.relCoords[mode].changed === false) {
+                    return;
+                }
+                if (itemBannerInstance.relCoords[mode].changed === null && itemBannerInstance.getResult() === 'launched') {
                     return;
                 }
                 var selectArray = p.calculateSelect(mode);
@@ -212,7 +225,7 @@ function Cropping(currentWindow, preDisabled) {
 function imagePreview(element){
     if($(element)){
         var win = window;
-        if(!itemBannerInstance.figureOutIsIt()) {
+        if(!itemBannerInstance.getResult()) {
             win = win.open('', 'preview', 'width=400,height=400,resizable=1,scrollbars=1');
             win.document.open();
             win.document.write('<body style="padding:0;margin:0"><img src="'+$(element).src+'" id="image_preview"/></body>');
@@ -251,7 +264,9 @@ function imagePreview(element){
             }
             Event.observe(win, 'unload', function () {
                itemBannerInstance.modes.forEach(function (mode) {
-                   itemBannerInstance.relCoords[mode].changed = false;
+                   if (itemBannerInstance.relCoords[mode].changed) {
+                       itemBannerInstance.relCoords[mode].changed = false;
+                   }
                });
             });
             function msCallback(){

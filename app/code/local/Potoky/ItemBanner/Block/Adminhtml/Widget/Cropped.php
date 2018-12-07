@@ -15,7 +15,7 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
     }
 
     private function prepareImageUrl() {
-        return Mage::helper('itembanner')->getImageUrl(
+        return Mage::helper('itembanner')->getImageUri(
             Mage::registry('current_widget_instance')->getWidgetParameters()['image']
         );
     }
