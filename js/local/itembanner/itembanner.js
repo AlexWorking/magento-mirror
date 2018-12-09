@@ -64,7 +64,7 @@ $j( document ).ready(function () {
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
             if (itemBannerInstance.mainWindowCropping === "undefined") {
-                itemBannerInstance.mainWindowCropping = new Cropping(false, true);
+                itemBannerInstance.mainWindowCropping = new Cropping();
                 itemBannerInstance.mainWindowCropping.attach();
             }
             itemBannerInstance.modes.forEach(function (mode) {
@@ -90,7 +90,7 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(currentWindow, preDisabled) {
+function Cropping(currentWindow) {
 
     this.windowObject = (currentWindow) ? currentWindow : window;
 
@@ -106,8 +106,6 @@ function Cropping(currentWindow, preDisabled) {
     } else {
         coordsToFill = 'temporary';
     }
-
-    preDisabled =(preDisabled === true);
 
     this.jq = 'undefined';
 
@@ -133,8 +131,9 @@ function Cropping(currentWindow, preDisabled) {
         });
     })();
 
-    this.setWindowToJq = function (w) {
-        p.jq = w.jQuery;
+    this.renewWindowObject = function (w) {
+        p.windowObject = w;
+        p.jq = p.windowObject.jQuery
     };
 
     this.calculateSelect = function (mode) {
@@ -217,7 +216,7 @@ function Cropping(currentWindow, preDisabled) {
             bgColor: 'transparent',
             bgOpacity: .15,
             aspectRatio: 1 / eval(mode + 'AspectRatio'),
-            disabled: preDisabled,
+            disabled: p.isMainWindowCropping,
             needsOnSelectFire: false,
             api: 'undefined'
         };
@@ -238,6 +237,11 @@ function imagePreview(element){
                 win.resizeTo(img.width+40, img.height+80);
             });
         } else {
+            var previousWindObj = itemBannerInstance.previewWindowCropping.windowObject;
+            if (previousWindObj && !previousWindObj.closed) {
+                itemBannerInstance.previewWindowCropping.windowObject.focus();
+                return;
+            }
             win = win.open('', 'preview', 'width=1200,height=1200,resizable=1,scrollbars=1');
             win.document.open();
             win.document.write('<head>');
@@ -273,6 +277,16 @@ function imagePreview(element){
                });
             });
             function msCallback(){
+                if (itemBannerInstance.previewWindowCropping === "undefined") {
+                    itemBannerInstance.previewWindowCropping = new Cropping(win);
+                    itemBannerInstance.manageSelects(itemBannerInstance.previewWindowCropping);
+                    itemBannerInstance.previewWindowCropping.attach();
+
+                } else {
+                    itemBannerInstance.previewWindowCropping.renewWindowObject(win);
+                    itemBannerInstance.manageSelects(itemBannerInstance.previewWindowCropping);
+                    itemBannerInstance.previewWindowCropping.attach();
+                }
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     var tempArray = [];
                     itemBannerInstance.modes.forEach(function (mode) {
@@ -285,16 +299,6 @@ function imagePreview(element){
                     itemBannerInstance.mainWindowCropping.attach();
                     win.close();
                 });
-                if (itemBannerInstance.previewWindowCropping === "undefined") {
-                    itemBannerInstance.previewWindowCropping = new Cropping(win);
-                    itemBannerInstance.manageSelects(itemBannerInstance.previewWindowCropping);
-                    itemBannerInstance.previewWindowCropping.attach();
-
-                } else {
-                    itemBannerInstance.previewWindowCropping.setWindowToJq(win);
-                    itemBannerInstance.manageSelects(itemBannerInstance.previewWindowCropping);
-                    itemBannerInstance.previewWindowCropping.attach();
-                }
                 var container = win.document.getElementsByTagName('div')[0];
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
