@@ -1,18 +1,14 @@
 var itemBannerInstance = {
-    result: 'undefined',
+    result: undefined,
     modes: [],
     inputIdentifiers: [],
     inputIds: {},
     relCoords: {},
-    croppingDataObject: 'undefined',
-    mainWindowCropping: 'undefined',
-    previewWindowCropping: 'undefined',
-    image: {
-        origWidth: 'undefined',
-        origHeight: 'undefined'
-    },
+    mainWindowCropping: {},
+    previewWindowCropping: {},
+    image: {},
     getResult: function () {
-        if (this.result === "undefined") {
+        if (typeof this.result === "undefined") {
             this.result = this.figureOutIsIt()
         }
         return this.result;
@@ -33,15 +29,10 @@ var itemBannerInstance = {
                 ibi.inputIds[mode].push(identifier + '_' + mode);
             });
         });
+        ibi.image.origWidth = parseFloat(origImageWidth);
+        ibi.image.origHeight = parseFloat(origImageHeight);
+        ibi.image.origMinSquare = 10000;
         return ibi.result;
-    },
-    getFormatedIdentifiers: function (mode, hashtag) {
-        hashtag = (hashtag) ? '#' : '';
-        var formatedArray = [];
-        this.inputIdentifiers.forEach(function (identifier) {
-            formatedArray.push(hashtag + identifier + '_' + mode);
-        });
-        return formatedArray;
     },
     manageSelects: function (cropping) {
         this.modes.forEach(function (mode) {
@@ -59,11 +50,9 @@ $j( document ).ready(function () {
             onclick = 'extendOnclick("' + onclick + '")';
             $j(this).attr('onclick', onclick);
         });
-        itemBannerInstance.image.origWidth = parseFloat(origImageWidth);
-        itemBannerInstance.image.origHeight = parseFloat(origImageHeight);
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
-            if (itemBannerInstance.mainWindowCropping === "undefined") {
+            if ($j.isEmptyObject(itemBannerInstance.mainWindowCropping)) {
                 itemBannerInstance.mainWindowCropping = new Cropping();
                 itemBannerInstance.mainWindowCropping.attach();
             }
@@ -107,26 +96,24 @@ function Cropping(currentWindow) {
         coordsToFill = 'temporary';
     }
 
-    this.jq = 'undefined';
+    this.jq = undefined;
 
     this.jcObjects = {};
 
     this.image = {};
-
-    this.minSquare = 'undefined';
 
     (function () {
         p.jq = p.windowObject.jQuery;
         var dimension = 'width';
         var square = 1;
         modes.forEach(function (mode) {
-            p.jcObjects[mode] = 'undefined';
+            p.jcObjects[mode] = {};
             p.image[dimension] = parseFloat(eval("p.jq( '#image_preview_" + mode + "' )." + dimension + "()"));
             square *= p.image[dimension];
             if (dimension === 'width') {
                 dimension = 'height'
             } else {
-                p.minSquare = (square / (itemBannerInstance.image.origHeight * itemBannerInstance.image.origWidth)) * 10000;
+                p.image.minSquare = (square / (itemBannerInstance.image.origHeight * itemBannerInstance.image.origWidth)) * itemBannerInstance.image.origMinSquare;
             }
         });
     })();
@@ -175,7 +162,7 @@ function Cropping(currentWindow) {
                 if(!p.jcObjects[mode].needsOnSelectFire) {
                     p.jcObjects[mode].needsOnSelectFire = true;
                 }
-                if (c[inputIdentifiers[4]] * c[inputIdentifiers[5]] < p.minSquare) {
+                if (c[inputIdentifiers[4]] * c[inputIdentifiers[5]] < p.image.minSquare) {
                     p.windowObject.alert('The cropping square is not large enough!');
                     p.jcObjects[mode].api.release();
                 } else {
@@ -206,7 +193,7 @@ function Cropping(currentWindow) {
                 } else {
                     delete p.jcObjects[mode].setSelect;
                     p.jcObjects[mode].needsOnSelectFire = true;
-                    if (p.isMainWindowCropping && p.jcObjects[mode].api !== "undefined") {
+                    if (p.isMainWindowCropping && typeof p.jcObjects[mode].api !== "undefined") {
                         p.jcObjects[mode].api.release();
                     }
                 }
@@ -216,7 +203,7 @@ function Cropping(currentWindow) {
             aspectRatio: 1 / eval(mode + 'AspectRatio'),
             disabled: p.isMainWindowCropping,
             needsOnSelectFire: false,
-            api: 'undefined'
+            api: undefined
         };
         p.jcObjects[mode].manageSelect(mode);
     });
@@ -235,8 +222,8 @@ function imagePreview(element){
                 win.resizeTo(img.width+40, img.height+80);
             });
         } else {
-            var previousWindObj = itemBannerInstance.previewWindowCropping.windowObject;
-            if (previousWindObj && !previousWindObj.closed) {
+            if (itemBannerInstance.previewWindowCropping.windowObject &&
+                !itemBannerInstance.previewWindowCropping.windowObject.closed) {
                 itemBannerInstance.previewWindowCropping.windowObject.focus();
                 return;
             }
@@ -275,7 +262,7 @@ function imagePreview(element){
                });
             });
             function msCallback(){
-                if (itemBannerInstance.previewWindowCropping === "undefined") {
+                if ($j.isEmptyObject(itemBannerInstance.previewWindowCropping)) {
                     itemBannerInstance.previewWindowCropping = new Cropping(win);
                     itemBannerInstance.manageSelects(itemBannerInstance.previewWindowCropping);
                     itemBannerInstance.previewWindowCropping.attach();
@@ -307,16 +294,16 @@ function imagePreview(element){
 }
 
 function extendOnclick(onclick) {
-    if (itemBannerInstance.previewWindowCropping !== "undefined" && !itemBannerInstance.previewWindowCropping.windowObject.closed()) {
+    if (!$j.isEmptyObject(itemBannerInstance.previewWindowCropping) &&
+        !itemBannerInstance.previewWindowCropping.windowObject.closed) {
         itemBannerInstance.previewWindowCropping.windowObject.close();
     }
     itemBannerInstance.modes.forEach(function (mode) {
-        $cond = itemBannerInstance.relCoords[mode].changed !== null && $j( instanceHtmlHash + "_image_delete" ).is(':checked');
+        $cond = itemBannerInstance.relCoords[mode].changed !== null && !$j( "#" + instanceHtmlHash + "_image_delete" ).is(':checked');
         $j( "#" + instanceHtmlHash + '_rel_coords_' + mode).attr(
             'value',
-            (itemBannerInstance.relCoords[mode].changed !== null) ? JSON.stringify(itemBannerInstance.relCoords[mode].active) : ''
+            ($cond) ? JSON.stringify(itemBannerInstance.relCoords[mode].active) : ''
         )
     });
-
     eval(onclick);
 }
