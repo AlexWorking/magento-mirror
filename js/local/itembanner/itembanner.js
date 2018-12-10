@@ -317,5 +317,6 @@ function extendOnclick(onclick) {
             (itemBannerInstance.relCoords[mode].changed !== null) ? JSON.stringify(itemBannerInstance.relCoords[mode].active) : ''
         )
     });
+
     eval(onclick);
 }
