@@ -190,9 +190,7 @@ function Cropping(currentWindow) {
                 }
             },
             onRelease: function () {
-                for (var i = 0; i < 6; i++) {
-                    itemBannerInstance.relCoords[mode][coordsToFill][i] = null;
-                }
+                itemBannerInstance.relCoords[mode][coordsToFill] = [];
                 itemBannerInstance.relCoords[mode].changed = true;
             },
             manageSelect: function (mode) {
@@ -309,10 +307,11 @@ function imagePreview(element){
 }
 
 function extendOnclick(onclick) {
-    if (itemBannerInstance.previewWindowCropping !== "undefined") {
+    if (itemBannerInstance.previewWindowCropping !== "undefined" && !itemBannerInstance.previewWindowCropping.windowObject.closed()) {
         itemBannerInstance.previewWindowCropping.windowObject.close();
     }
     itemBannerInstance.modes.forEach(function (mode) {
+        $cond = itemBannerInstance.relCoords[mode].changed !== null && $j( instanceHtmlHash + "_image_delete" ).is(':checked');
         $j( "#" + instanceHtmlHash + '_rel_coords_' + mode).attr(
             'value',
             (itemBannerInstance.relCoords[mode].changed !== null) ? JSON.stringify(itemBannerInstance.relCoords[mode].active) : ''

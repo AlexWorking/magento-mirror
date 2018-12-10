@@ -16,9 +16,9 @@ class Potoky_ItemBanner_Block_Banner extends Mage_Core_Block_Template implements
         return parent::setNameInLayout($name);
     }
 
-    public function getImageUri()
+    public function getImageUrl()
     {
-        return Mage::helper('itembanner')->getImageUrl(
+        return Mage::helper('itembanner')->getImageUri(
             $this->getData('image'),
             Mage::registry('potoky_itembanner')['mode'] ?? ''
         );

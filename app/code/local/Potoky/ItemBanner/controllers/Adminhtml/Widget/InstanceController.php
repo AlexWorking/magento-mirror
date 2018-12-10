@@ -14,24 +14,31 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
      */
     protected function _prepareParameters()
     {
+        $currentWidgetInstance = Mage::helper('itembanner')->getCurrentInstance();
+
         $parent = parent::_prepareParameters();
 
-        $currentWidgetInstance = Mage::registry('current_widget_instance');
         if($currentWidgetInstance &&
-            $currentWidgetInstance->getType() == 'itembanner/banner') {
+            $currentWidgetInstance->getType() === 'itembanner/banner') {
+            $oldRelCoordsGrid = $currentWidgetInstance->getWidgetParameters()['rel_coords_grid'];
+            $oldRelCoordsList = $currentWidgetInstance->getWidgetParameters()['rel_coords_list'];
             if ($parent['image']['delete']) {
                 //TODO disable widget
                 $parent['image'] = null;
+                $parent['rel_coords_grid'] = '';
+                $parent['rel_coords_list'] = '';
             }
             elseif ($uploaded = $this->imageUpload()) {
                 $parent['image'] = $uploaded;
+                $parent['rel_coords_grid'] = '';
+                $parent['rel_coords_list'] = '';
             }
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
                 $parent['image'] = $image;
+                $parent['rel_coords_grid'] = ($parent['rel_coords_grid']) ? $this->manageRelCoords($image, $parent['rel_coords_grid'], 'grid') : $oldRelCoordsGrid;
+                $parent['rel_coords_list'] = ($parent['rel_coords_list']) ? $this->manageRelCoords($image, $parent['rel_coords_list'], 'list') : $oldRelCoordsList;
             }
 
-            $parent['instance_id'] = $currentWidgetInstance->getId();
-            $parent['rel_coords'] = $this->getRequest()->getPost('rel_coords');
         }
 
         return $parent;
@@ -62,17 +69,25 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         return $result['file'];
     }
 
-    private function crop($src, $x1, $y1, $x2, $y2, $w, $h, $mode)
+    private function manageRelCoords($baseImageFile, $relCoords, $mode)
     {
-        $file = substr($src, strrpos($src, '/'));
-        $image = new Varien_Image(Mage::getBaseDir('media') . DS . 'itembanner' . DS . $file);
-        $newFilePath = Mage::getBaseDir('media') . DS . 'itembanner' . DS . $mode . DS . $file;
-        $image->crop(
-            ($y1 * $image->getOriginalWidth()) / $w,
-            ($x1 * $image->getOriginalHeight()) / $h,
-            $image->getOriginalWidth() * (1 - $x2 / $w),
-            $image->getOriginalHeight() * (1 - $y2 / $h)
+        $relCoords = Mage::helper('core')->jsonDecode($relCoords);
+        extract($relCoords);
+
+        $image =  new Varien_Image(Mage::helper('itembanner')->getImageUri(
+            $baseImageFile,
+            '',
+            false)
         );
-        $image->save($newFilePath);
+        $modeImageFile = Mage::helper('itembanner')->getImageUri($baseImageFile, $mode, false);
+        $image->crop(
+            $relCoords[1] * $image->getOriginalHeight(),
+            $relCoords[0] * $image->getOriginalWidth(),
+            (1 - $relCoords[2]) * $image->getOriginalWidth(),
+            (1 - $relCoords[3]) * $image->getOriginalHeight()
+        );
+        $image->save($modeImageFile);
+
+        return Mage::helper('core')->jsonEncode($relCoords);
     }
 }
