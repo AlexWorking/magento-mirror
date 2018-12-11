@@ -20,26 +20,33 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
 
         if($currentWidgetInstance &&
             $currentWidgetInstance->getType() === 'itembanner/banner') {
-            $oldRelCoordsGrid = $currentWidgetInstance->getWidgetParameters()['rel_coords_grid'];
-            $oldRelCoordsList = $currentWidgetInstance->getWidgetParameters()['rel_coords_list'];
+            $encodedEmptyArray = Mage::helper('core')->jsonEncode([]);
+            $oldRelCoordsGrid = $currentWidgetInstance->getWidgetParameters()['rel_coords_grid'] ?? $encodedEmptyArray;
+            $oldRelCoordsList = $currentWidgetInstance->getWidgetParameters()['rel_coords_list'] ?? $encodedEmptyArray;
+            function assignRelCoords(&$arr, $value)
+            {
+                $arr['rel_coords_grid'] = $value;
+                $arr['rel_coords_list'] = $value;
+            }
             if ($parent['image']['delete']) {
                 //TODO disable widget
                 $parent['image'] = null;
-                $parent['rel_coords_grid'] = '';
-                $parent['rel_coords_list'] = '';
+                assignRelCoords($parent, $encodedEmptyArray);
             }
             elseif ($uploaded = $this->imageUpload()) {
                 $parent['image'] = $uploaded;
-                $parent['rel_coords_grid'] = '';
-                $parent['rel_coords_list'] = '';
+                assignRelCoords($parent, $encodedEmptyArray);
             }
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
                 $parent['image'] = $image;
                 $parent['rel_coords_grid'] = ($parent['rel_coords_grid']) ? $this->manageRelCoords($image, $parent['rel_coords_grid'], 'grid') : $oldRelCoordsGrid;
                 $parent['rel_coords_list'] = ($parent['rel_coords_list']) ? $this->manageRelCoords($image, $parent['rel_coords_list'], 'list') : $oldRelCoordsList;
+            } else {
+                assignRelCoords($parent, $encodedEmptyArray);
             }
 
         }
+
 
         return $parent;
     }

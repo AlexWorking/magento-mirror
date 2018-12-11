@@ -2,11 +2,9 @@ var itemBannerInstance = {
     result: undefined,
     modes: [],
     inputIdentifiers: [],
-    inputIds: {},
     relCoords: {},
     mainWindowCropping: {},
     previewWindowCropping: {},
-    image: {},
     getResult: function () {
         if (typeof this.result === "undefined") {
             this.result = this.figureOutIsIt()
@@ -24,15 +22,16 @@ var itemBannerInstance = {
                 temporary: [],
                 changed: null
             };
-            ibi.inputIds[mode] = [];
-            ibi.inputIdentifiers.forEach(function (identifier) {
-                ibi.inputIds[mode].push(identifier + '_' + mode);
-            });
         });
-        ibi.image.origWidth = parseFloat(origImageWidth);
-        ibi.image.origHeight = parseFloat(origImageHeight);
-        ibi.image.origMinSquare = 10000;
         return ibi.result;
+    },
+    setRelCoords: function () {
+        this.modes.forEach(function (mode) {
+            var relCoords = eval('outerVariables.' + mode + 'RelCoords');
+            if (relCoords) {
+                itemBannerInstance.relCoords[mode].active = relCoords;
+            }
+        });
     },
     manageSelects: function (cropping) {
         this.modes.forEach(function (mode) {
@@ -52,30 +51,33 @@ $j( document ).ready(function () {
         });
 
         $j( "#widget_instace_tabs_properties_section" ).click( function () {
+            if (typeof outerVariables === "undefined") {
+                return;
+            }
             if ($j.isEmptyObject(itemBannerInstance.mainWindowCropping)) {
+                itemBannerInstance.setRelCoords();
                 itemBannerInstance.mainWindowCropping = new Cropping();
                 itemBannerInstance.mainWindowCropping.attach();
             }
             itemBannerInstance.modes.forEach(function (mode) {
-                var element = $j( "#ib_crop_enable_" +  mode);
-                element.html(frozen);
-                element.click(function (e) {
+                var enable = $j( "#ib_crop_enable_" +  mode);
+                var revert = $j( "#ib_crop_revert_" +  mode);
+                enable.html(outerVariables.frozen);
+                enable.click(function (e) {
                     e.preventDefault();
-                    if(element.html() === frozen) {
+                    if(enable.html() === outerVariables.frozen) {
                         itemBannerInstance.mainWindowCropping.jcObjects[mode].api.enable();
                         itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = false;
-                        element.html(unfrozen);
+                        enable.html(outerVariables.unfrozen);
                     } else {
                         itemBannerInstance.mainWindowCropping.jcObjects[mode].api.disable();
                         itemBannerInstance.mainWindowCropping.jcObjects[mode].disabled = true;
-                        element.html(frozen);
+                        enable.html(outerVariables.frozen);
                     }
                 });
+                revert.html(outerVariables.revert);
             });
-            itemBannerInstance.result = 'launched';
         });
-
-
     }
 });
 
@@ -113,12 +115,12 @@ function Cropping(currentWindow) {
             if (dimension === 'width') {
                 dimension = 'height'
             } else {
-                p.image.minSquare = (square / (itemBannerInstance.image.origHeight * itemBannerInstance.image.origWidth)) * itemBannerInstance.image.origMinSquare;
+                p.image.minSquare = (square / (outerVariables.origImageWidth * outerVariables.origImageHeight)) * 10000;
             }
         });
     })();
 
-    this.renewWindowObject = function (w) {
+    this.updateWindowObject = function (w) {
         p.windowObject = w;
         p.jq = p.windowObject.jQuery
     };
@@ -138,7 +140,7 @@ function Cropping(currentWindow) {
 
     this.attach = function () {
         modes.forEach(function (mode) {
-            if (p.isMainWindowCropping && !itemBannerInstance.relCoords[mode].changed && itemBannerInstance.getResult() === 'launched') {
+            if (p.isMainWindowCropping && !itemBannerInstance.relCoords[mode].changed && p.launched) {
                 return;
             }
             p.jq( "#image_preview_" + mode ).Jcrop(
@@ -154,6 +156,7 @@ function Cropping(currentWindow) {
                 itemBannerInstance.relCoords[mode].changed = false;
             }
         });
+        p.launched = true;
     };
 
     modes.forEach(function (mode) {
@@ -171,7 +174,7 @@ function Cropping(currentWindow) {
                         itemBannerInstance.relCoords[mode][coordsToFill][i] = c[inputIdentifiers[i]] / p.image[dimension];
                         dimension = (dimension === 'width') ? 'height' : 'width';
                     }
-                    if (itemBannerInstance.getResult() === 'launched') {
+                    if (p.launched) {
                         itemBannerInstance.relCoords[mode].changed = true;
                     }
                 }
@@ -184,7 +187,7 @@ function Cropping(currentWindow) {
                 if (itemBannerInstance.relCoords[mode].changed === false) {
                     return;
                 }
-                if (itemBannerInstance.relCoords[mode].changed === null && itemBannerInstance.getResult() === 'launched') {
+                if (itemBannerInstance.relCoords[mode].changed === null && p.launched) {
                     return;
                 }
                 var selectArray = p.calculateSelect(mode);
@@ -199,11 +202,12 @@ function Cropping(currentWindow) {
                 }
             },
             bgColor: 'transparent',
-            bgOpacity: .15,
-            aspectRatio: 1 / eval(mode + 'AspectRatio'),
+            bgOpacity: .2,
+            aspectRatio: 1 / eval('outerVariables.' + mode + 'AspectRatio'),
             disabled: p.isMainWindowCropping,
             needsOnSelectFire: false,
-            api: undefined
+            api: undefined,
+            launched: false
         };
         p.jcObjects[mode].manageSelect(mode);
     });
@@ -239,13 +243,13 @@ function imagePreview(element){
             win.document.write('<div id="ib_main_container">');
             win.document.write('<div class="ib_containers">');
             win.document.write('<img id="image_preview_grid" class="ib_crops" src="'+$(element).src+'"/>');
-            win.document.write('<h4>' + gridCroppingWindow + '</h4>');
+            win.document.write('<h4>' + outerVariables.gridCroppingWindow + '</h4>');
             win.document.write('</div>');
             win.document.write('<div class="ib_containers">');
             win.document.write('<img id="image_preview_list" class="ib_crops" src="'+$(element).src+'"/>');
-            win.document.write('<h4>' + listCroppingWindow + '</h4>');
+            win.document.write('<h4>' + outerVariables.listCroppingWindow + '</h4>');
             win.document.write('</div>');
-            win.document.write('<button id="ib_submit">' + submitText + '</button>');
+            win.document.write('<button id="ib_submit">' + outerVariables.submitText + '</button>');
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
@@ -258,6 +262,7 @@ function imagePreview(element){
                itemBannerInstance.modes.forEach(function (mode) {
                    if (itemBannerInstance.relCoords[mode].changed) {
                        itemBannerInstance.relCoords[mode].changed = false;
+                       itemBannerInstance.previewWindowCropping.launched = false;
                    }
                });
             });
@@ -268,7 +273,7 @@ function imagePreview(element){
                     itemBannerInstance.previewWindowCropping.attach();
 
                 } else {
-                    itemBannerInstance.previewWindowCropping.renewWindowObject(win);
+                    itemBannerInstance.previewWindowCropping.updateWindowObject(win);
                     itemBannerInstance.manageSelects(itemBannerInstance.previewWindowCropping);
                     itemBannerInstance.previewWindowCropping.attach();
                 }
@@ -282,6 +287,7 @@ function imagePreview(element){
                         itemBannerInstance.manageSelects(itemBannerInstance.mainWindowCropping);
                         itemBannerInstance.manageSelects(itemBannerInstance.previewWindowCropping);
                     itemBannerInstance.mainWindowCropping.attach();
+                    itemBannerInstance.previewWindowCropping.launched = false;
                     win.close();
                 });
                 var container = win.document.getElementsByTagName('div')[0];
@@ -294,16 +300,18 @@ function imagePreview(element){
 }
 
 function extendOnclick(onclick) {
-    if (!$j.isEmptyObject(itemBannerInstance.previewWindowCropping) &&
-        !itemBannerInstance.previewWindowCropping.windowObject.closed) {
-        itemBannerInstance.previewWindowCropping.windowObject.close();
+    if (typeof outerVariables !== "undefined") {
+        if (!$j.isEmptyObject(itemBannerInstance.previewWindowCropping) &&
+            !itemBannerInstance.previewWindowCropping.windowObject.closed) {
+            itemBannerInstance.previewWindowCropping.windowObject.close();
+        }
+        itemBannerInstance.modes.forEach(function (mode) {
+            $cond = itemBannerInstance.relCoords[mode].changed !== null && !$j( "#" + outerVariables.instanceHtmlHash + "_image_delete" ).is(':checked');
+            $j( "#" + outerVariables.instanceHtmlHash + '_rel_coords_' + mode).attr(
+                'value',
+                ($cond) ? JSON.stringify(itemBannerInstance.relCoords[mode].active) : ''
+            )
+        });
     }
-    itemBannerInstance.modes.forEach(function (mode) {
-        $cond = itemBannerInstance.relCoords[mode].changed !== null && !$j( "#" + instanceHtmlHash + "_image_delete" ).is(':checked');
-        $j( "#" + instanceHtmlHash + '_rel_coords_' + mode).attr(
-            'value',
-            ($cond) ? JSON.stringify(itemBannerInstance.relCoords[mode].active) : ''
-        )
-    });
     eval(onclick);
 }
