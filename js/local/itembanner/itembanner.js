@@ -76,6 +76,10 @@ $j( document ).ready(function () {
                     }
                 });
                 revert.html(outerVariables.revert);
+                revert.click(function (e) {
+                    e.preventDefault();
+                    revert.attr('style', 'visibility: hidden');
+                })
             });
         });
     }
