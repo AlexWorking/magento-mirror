@@ -72,37 +72,6 @@ $j( document ).ready(function () {
                 itemBannerInstance.croppings.main = new Cropping();
                 itemBannerInstance.croppings.main.attach();
             }
-            itemBannerInstance.modes.forEach(function (mode) {
-                var enable = $j( "#ib_crop_enable_" +  mode);
-                var revert = $j( "#ib_crop_revert_" +  mode);
-                enable.html(outerVariables.frozen);
-                enable.click(function (e) {
-                    e.preventDefault();
-                    if(enable.html() === outerVariables.frozen) {
-                        itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-                        itemBannerInstance.croppings.main.jcObjects[mode].disabled = false;
-                        enable.html(outerVariables.unfrozen);
-                    } else {
-                        itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
-                        itemBannerInstance.croppings.main.jcObjects[mode].disabled = true;
-                        enable.html(outerVariables.frozen);
-                    }
-                });
-                revert.html(outerVariables.revert);
-                revert.click(function (e) {
-                    e.preventDefault();
-                    revert.attr('style', 'visibility: hidden');
-                    itemBannerInstance.downLoadRelCoords();
-                    itemBannerInstance.relCoords[mode].changed = true;
-                    itemBannerInstance.croppings.main.jcObjects[mode].attached = false;
-                    itemBannerInstance.manageSelects(itemBannerInstance.croppings.main);
-                    itemBannerInstance.croppings.main.attach(mode);
-                    if (!$j.isEmptyObject(itemBannerInstance.croppings.preview) && !itemBannerInstance.croppings.preview.windowObject.closed) {
-                        itemBannerInstance.manageSelects(itemBannerInstance.croppings.preview);
-                        itemBannerInstance.croppings.main.attach();
-                    }
-                })
-            });
         });
     }
 });
@@ -181,9 +150,19 @@ function Cropping(currentWindow) {
             if (p.jcObjects[mode].disabled === true) {
                 p.jcObjects[mode].api.disable();
             }
-            p.jcObjects[mode].attached = true;
+            if (!p.jcObjects[mode].attached) {
+                p.addButton(mode, addFreezingButton);
+                p.addButton(mode, addRevertButton);
+                p.jcObjects[mode].attached = true;
+            }
         });
     };
+
+    this.addButton = function (mode, callback) {
+        callback(mode);
+    };
+
+    this.addRightButton = addRevertButton;
 
     modes.forEach(function (mode) {
         p.jcObjects[mode] = {
@@ -315,6 +294,50 @@ function imagePreview(element){
             }
         }
     }
+}
+
+function addFreezingButton(mode) {
+    var element = this.jq( "#ib_crop_enable_" +  mode);
+    var writtenOn = (this.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen
+    element.html(writtenOn);
+    element.click(function (e) {
+        e.preventDefault();
+        if(element.html() === outerVariables.frozen) {
+            itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
+            itemBannerInstance.croppings.main.jcObjects[mode].disabled = false;
+            element.html(outerVariables.unfrozen);
+        } else {
+            itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
+            itemBannerInstance.croppings.main.jcObjects[mode].disabled = true;
+            element.html(outerVariables.frozen);
+        }
+    });
+}
+
+function addHighlightButton(mode) {
+    var element = this.jq( "#ib_crop_highlight_" +  mode);
+    element.html(outerVariables.highlight);
+    element.mousedown(function (e) {
+        alert('Test');
+    });
+}
+
+function addRevertButton(mode) {
+    var element = this.jq( "#ib_crop_revert_" +  mode);
+    element.html(outerVariables.revert);
+    element.click(function (e) {
+        e.preventDefault();
+        element.attr('style', 'visibility: hidden');
+        itemBannerInstance.downLoadRelCoords();
+        itemBannerInstance.relCoords[mode].changed = true;
+        itemBannerInstance.croppings.main.jcObjects[mode].attached = false;
+        itemBannerInstance.manageSelects(itemBannerInstance.croppings.main);
+        itemBannerInstance.croppings.main.attach(mode);
+        if (!$j.isEmptyObject(itemBannerInstance.croppings.preview) && !itemBannerInstance.croppings.preview.windowObject.closed) {
+            itemBannerInstance.manageSelects(itemBannerInstance.croppings.preview);
+            itemBannerInstance.croppings.main.attach();
+        }
+    })
 }
 
 function extendOnclick(onclick) {
