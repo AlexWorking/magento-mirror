@@ -43,13 +43,4 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
     {
         return $this->origDimensions[$dimension];
     }
-
-    public function getRelCoords($mode) {
-        $relCoords = null;
-        if ($currentWidgetInstance = Mage::helper('itembanner')->getCurrentInstance()) {
-            $relCoords = $currentWidgetInstance->getWidgetParameters()['rel_coords_' . $mode];
-        }
-
-        return $relCoords;
-    }
 }

@@ -14,39 +14,24 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
      */
     protected function _prepareParameters()
     {
-        $currentWidgetInstance = Mage::helper('itembanner')->getCurrentInstance();
-
         $parent = parent::_prepareParameters();
 
+        $currentWidgetInstance = Mage::registry('current_widget_instance');
         if($currentWidgetInstance &&
-            $currentWidgetInstance->getType() === 'itembanner/banner') {
-            $encodedEmptyArray = Mage::helper('core')->jsonEncode([]);
-            $oldRelCoordsGrid = $currentWidgetInstance->getWidgetParameters()['rel_coords_grid'] ?? $encodedEmptyArray;
-            $oldRelCoordsList = $currentWidgetInstance->getWidgetParameters()['rel_coords_list'] ?? $encodedEmptyArray;
-            function assignRelCoords(&$arr, $value)
-            {
-                $arr['rel_coords_grid'] = $value;
-                $arr['rel_coords_list'] = $value;
-            }
+            $currentWidgetInstance->getType() == 'itembanner/banner') {
             if ($parent['image']['delete']) {
                 //TODO disable widget
                 $parent['image'] = null;
-                assignRelCoords($parent, $encodedEmptyArray);
             }
             elseif ($uploaded = $this->imageUpload()) {
                 $parent['image'] = $uploaded;
-                assignRelCoords($parent, $encodedEmptyArray);
             }
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
                 $parent['image'] = $image;
-                $parent['rel_coords_grid'] = ($parent['rel_coords_grid']) ? $this->manageRelCoords($image, $parent['rel_coords_grid'], 'grid') : $oldRelCoordsGrid;
-                $parent['rel_coords_list'] = ($parent['rel_coords_list']) ? $this->manageRelCoords($image, $parent['rel_coords_list'], 'list') : $oldRelCoordsList;
-            } else {
-                assignRelCoords($parent, $encodedEmptyArray);
+                $this->manageRelCoords($image, $parent['rel_coords_grid'], 'grid');
+                $this->manageRelCoords($image, $parent['rel_coords_list'], 'list');
             }
-
         }
-
 
         return $parent;
     }
@@ -94,7 +79,5 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             (1 - $relCoords[3]) * $image->getOriginalHeight()
         );
         $image->save($modeImageFile);
-
-        return Mage::helper('core')->jsonEncode($relCoords);
     }
 }

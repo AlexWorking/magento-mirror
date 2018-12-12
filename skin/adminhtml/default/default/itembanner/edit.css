@@ -34,7 +34,7 @@
     height: 30px;
 }
 
-.ib_crop_enable {
+.ib_crop_enable, .ib_crop_highlight {
     position: absolute;
     left: 1%;
 }
@@ -45,6 +45,7 @@
     background: transparent;
     color: darkgrey;
     border: none;
+    visibility: hidden;
 }
 
 .ib_crop_revert:hover {

@@ -4,8 +4,6 @@
 
 <script type="text/javascript">
     var outerVariables = {
-        gridRelCoords: <?= $this->getRelCoords('grid') ?>,
-        listRelCoords: <?= $this->getRelCoords('list') ?>,
         gridAspectRatio: <?= Mage::getStoreConfig('cms/itembanner/grid_cropping_aspect_ratio') ?>,
         listAspectRatio: <?= Mage::getStoreConfig('cms/itembanner/list_cropping_aspect_ratio') ?>,
         gridCroppingWindow: "<?= Mage::helper('itembanner')->__('Crop Here for Grid Mode') ?>",
@@ -16,7 +14,7 @@
         revert: "<?= Mage::helper('itembanner')->__('revert ⮌') ?>",
         origImageWidth: "<?= $this->getOrigDimension('width') ?>",
         origImageHeight: "<?= $this->getOrigDimension('height') ?>",
-        instanceHtmlHash: "<?= 'options_fieldset'. md5('itembanner/banner')?>"
+        instanceHtmlIdPrefix: "<?= 'options_fieldset'. md5('itembanner/banner')?>"
     }
 </script>
 <div style="text-align: center; width: 100%;">
