@@ -69,16 +69,16 @@ $j( document ).ready(function () {
             }
             if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
                 itemBannerInstance.downLoadRelCoords();
-                itemBannerInstance.croppings.main = new Cropping();
+                itemBannerInstance.croppings.main = new Cropping(false, [addFreezingButton, addRevertButton]);
                 itemBannerInstance.croppings.main.attach();
             }
         });
     }
 });
 
-function Cropping(currentWindow) {
+function Cropping(currentWindow, addButtonCallbacks) {
 
-    this.windowObject = (currentWindow) ? currentWindow : window;
+    this.windowObject = (currentWindow !== false) ? currentWindow : window;
 
     this.isMainWindowCopping = (!currentWindow);
 
@@ -150,19 +150,9 @@ function Cropping(currentWindow) {
             if (p.jcObjects[mode].disabled === true) {
                 p.jcObjects[mode].api.disable();
             }
-            if (!p.jcObjects[mode].attached) {
-                p.addButton(mode, addFreezingButton);
-                p.addButton(mode, addRevertButton);
-                p.jcObjects[mode].attached = true;
-            }
+            p.jcObjects[mode].attached = true;
         });
     };
-
-    this.addButton = function (mode, callback) {
-        callback(mode);
-    };
-
-    this.addRightButton = addRevertButton;
 
     modes.forEach(function (mode) {
         p.jcObjects[mode] = {
@@ -178,7 +168,7 @@ function Cropping(currentWindow) {
                     }
                     itemBannerInstance.relCoords[mode].changed = true;
                     if (p.jcObjects[mode].attached) {
-                        $j( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+                        p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
                     }
                 }
             },
@@ -208,6 +198,9 @@ function Cropping(currentWindow) {
             attached: false
         };
         p.jcObjects[mode].manageSelect(mode);
+        addButtonCallbacks.forEach(function (func) {
+            func(p, mode);
+        });
     });
 }
 
@@ -267,7 +260,7 @@ function imagePreview(element){
             });
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
-                    itemBannerInstance.croppings.preview = new Cropping(win);
+                    itemBannerInstance.croppings.preview = new Cropping(win, [addHighlightButton, addRevertButton]);
                     itemBannerInstance.croppings.preview.attach();
 
                 } else {
@@ -296,9 +289,9 @@ function imagePreview(element){
     }
 }
 
-function addFreezingButton(mode) {
-    var element = this.jq( "#ib_crop_enable_" +  mode);
-    var writtenOn = (this.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen
+function addFreezingButton(cropping, mode) {
+    var element = cropping.jq( "#ib_crop_enable_" +  mode);
+    var writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen
     element.html(writtenOn);
     element.click(function (e) {
         e.preventDefault();
@@ -314,16 +307,16 @@ function addFreezingButton(mode) {
     });
 }
 
-function addHighlightButton(mode) {
-    var element = this.jq( "#ib_crop_highlight_" +  mode);
+function addHighlightButton(cropping, mode) {
+    var element = cropping.jq( "#ib_crop_highlight_" +  mode);
     element.html(outerVariables.highlight);
     element.mousedown(function (e) {
-        alert('Test');
+        cropping.windowObject.alert('Test');
     });
 }
 
-function addRevertButton(mode) {
-    var element = this.jq( "#ib_crop_revert_" +  mode);
+function addRevertButton(cropping, mode) {
+    var element = cropping.jq( "#ib_crop_revert_" +  mode);
     element.html(outerVariables.revert);
     element.click(function (e) {
         e.preventDefault();
@@ -333,7 +326,7 @@ function addRevertButton(mode) {
         itemBannerInstance.croppings.main.jcObjects[mode].attached = false;
         itemBannerInstance.manageSelects(itemBannerInstance.croppings.main);
         itemBannerInstance.croppings.main.attach(mode);
-        if (!$j.isEmptyObject(itemBannerInstance.croppings.preview) && !itemBannerInstance.croppings.preview.windowObject.closed) {
+        if (!cropping.jq.isEmptyObject(itemBannerInstance.croppings.preview) && !itemBannerInstance.croppings.preview.windowObject.closed) {
             itemBannerInstance.manageSelects(itemBannerInstance.croppings.preview);
             itemBannerInstance.croppings.main.attach();
         }
