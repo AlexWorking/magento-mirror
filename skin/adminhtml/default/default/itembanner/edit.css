@@ -45,7 +45,6 @@
     background: transparent;
     color: darkgrey;
     border: none;
-    visibility: hidden;
 }
 
 .ib_crop_revert:hover {

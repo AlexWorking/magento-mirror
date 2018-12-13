@@ -22,7 +22,7 @@ var itemBannerInstance = {
                 original: [],
                 active: [],
                 temporary: [],
-                changed: true,
+                changed: null,
                 inputId: outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode
             };
         });
@@ -48,7 +48,7 @@ var itemBannerInstance = {
     },
     manageSelects: function (cropping) {
         this.modes.forEach(function (mode) {
-            cropping.jcObjects[mode].manageSelect(mode);
+            cropping.jcObjects[mode].manageSelect();
         })
     }
 };
@@ -69,14 +69,14 @@ $j( document ).ready(function () {
             }
             if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
                 itemBannerInstance.downLoadRelCoords();
-                itemBannerInstance.croppings.main = new Cropping(false, [addFreezingButton, addRevertButton]);
+                itemBannerInstance.croppings.main = new Cropping(false, [workoutFreezingButton, workoutRevertButton]);
                 itemBannerInstance.croppings.main.attach();
             }
         });
     }
 });
 
-function Cropping(currentWindow, addButtonCallbacks) {
+function Cropping(currentWindow, buttonWorkoutCallbacks) {
 
     this.windowObject = (currentWindow !== false) ? currentWindow : window;
 
@@ -138,7 +138,7 @@ function Cropping(currentWindow, addButtonCallbacks) {
             modes = [hereMode];
         }
         modes.forEach(function (mode) {
-            if (p.isMainWindowCopping && itemBannerInstance.relCoords[mode].changed === false) {
+            if (p.jcObjects[mode].actual) {
                 return;
             }
             p.jq( "#image_preview_" + mode ).Jcrop(
@@ -150,7 +150,10 @@ function Cropping(currentWindow, addButtonCallbacks) {
             if (p.jcObjects[mode].disabled === true) {
                 p.jcObjects[mode].api.disable();
             }
-            p.jcObjects[mode].attached = true;
+            p.jcObjects[mode].actual = true;
+            buttonWorkoutCallbacks.forEach(function (func) {
+                func(p, mode);
+            });
         });
     };
 
@@ -166,9 +169,9 @@ function Cropping(currentWindow, addButtonCallbacks) {
                         itemBannerInstance.relCoords[mode][coordsToFill][i] = c[inputIdentifiers[i]] / p.image[dimension];
                         dimension = (dimension === 'width') ? 'height' : 'width';
                     }
-                    itemBannerInstance.relCoords[mode].changed = true;
-                    if (p.jcObjects[mode].attached) {
+                    if (p.jcObjects[mode].actual) {
                         p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+                        itemBannerInstance.relCoords[mode].changed = true;
                     }
                 }
             },
@@ -176,7 +179,7 @@ function Cropping(currentWindow, addButtonCallbacks) {
                 itemBannerInstance.relCoords[mode][coordsToFill] = [];
                 itemBannerInstance.relCoords[mode].changed = true;
             },
-            manageSelect: function (mode) {
+            manageSelect: function () {
                 if (itemBannerInstance.relCoords[mode].changed === false) {
                     return;
                 }
@@ -195,12 +198,9 @@ function Cropping(currentWindow, addButtonCallbacks) {
             aspectRatio: 1 / eval('outerVariables.' + mode + 'AspectRatio'),
             disabled: p.isMainWindowCopping,
             api: undefined,
-            attached: false
+            actual: false
         };
-        p.jcObjects[mode].manageSelect(mode);
-        addButtonCallbacks.forEach(function (func) {
-            func(p, mode);
-        });
+        p.jcObjects[mode].manageSelect();
     });
 }
 
@@ -254,18 +254,23 @@ function imagePreview(element){
                 Event.observe(win, 'load', msCallback);
             }
             Event.observe(win, 'unload', function () {
-               itemBannerInstance.modes.forEach(function (mode) {
-                   itemBannerInstance.relCoords[mode].changed = false;
-               });
+                itemBannerInstance.modes.forEach(function (mode) {
+                    if (itemBannerInstance.relCoords[mode].changed === true) {
+                        itemBannerInstance.relCoords[mode].changed = false;
+                    }
+                    itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
+                });
             });
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
-                    itemBannerInstance.croppings.preview = new Cropping(win, [addHighlightButton, addRevertButton]);
+                    itemBannerInstance.croppings.preview = new Cropping(win, [workoutHighlightButton, workoutRevertButton]);
                     itemBannerInstance.croppings.preview.attach();
 
                 } else {
                     itemBannerInstance.croppings.preview.updateWindowObject(win);
-                    itemBannerInstance.manageSelects(itemBannerInstance.croppings.preview);
+                    itemBannerInstance.modes.forEach(function (mode) {
+                        itemBannerInstance.croppings.preview.jcObjects[mode].manageSelect();
+                    });
                     itemBannerInstance.croppings.preview.attach();
                 }
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
@@ -274,10 +279,12 @@ function imagePreview(element){
                         for (var i = 0; i < 6 ; i++) {
                             itemBannerInstance.relCoords[mode].active[i] = itemBannerInstance.relCoords[mode].temporary[i];
                         }
+                        itemBannerInstance.croppings.main.jcObjects[mode].actual = false;
+                        itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
+                        itemBannerInstance.croppings.main.jcObjects[mode].manageSelect();
+                        itemBannerInstance.croppings.preview.jcObjects[mode].manageSelect();
+                        itemBannerInstance.croppings.main.attach(mode);
                     });
-                    itemBannerInstance.manageSelects(itemBannerInstance.croppings.main);
-                    itemBannerInstance.manageSelects(itemBannerInstance.croppings.preview);
-                    itemBannerInstance.croppings.main.attach();
                     win.close();
                 });
                 var container = win.document.getElementsByTagName('div')[0];
@@ -289,10 +296,11 @@ function imagePreview(element){
     }
 }
 
-function addFreezingButton(cropping, mode) {
+function workoutFreezingButton(cropping, mode) {
     var element = cropping.jq( "#ib_crop_enable_" +  mode);
     var writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen
     element.html(writtenOn);
+    element.unbind( "click" );
     element.click(function (e) {
         e.preventDefault();
         if(element.html() === outerVariables.frozen) {
@@ -307,30 +315,30 @@ function addFreezingButton(cropping, mode) {
     });
 }
 
-function addHighlightButton(cropping, mode) {
+function workoutHighlightButton(cropping, mode) {
     var element = cropping.jq( "#ib_crop_highlight_" +  mode);
     element.html(outerVariables.highlight);
+    element.unbind( "mousedown" );
     element.mousedown(function (e) {
         cropping.windowObject.alert('Test');
     });
 }
 
-function addRevertButton(cropping, mode) {
+function workoutRevertButton(cropping, mode) {
     var element = cropping.jq( "#ib_crop_revert_" +  mode);
     element.html(outerVariables.revert);
+    element.unbind( "click" );
+    var visibility = (itemBannerInstance.relCoords[mode].changed === null) ? 'hidden' : 'visible';
+    element.css('visibility', visibility);
     element.click(function (e) {
         e.preventDefault();
-        element.attr('style', 'visibility: hidden');
+        itemBannerInstance.relCoords[mode].changed = null;
+        element.css('visibility', 'hidden');
+        cropping.jcObjects[mode].actual = false;
         itemBannerInstance.downLoadRelCoords();
-        itemBannerInstance.relCoords[mode].changed = true;
-        itemBannerInstance.croppings.main.jcObjects[mode].attached = false;
-        itemBannerInstance.manageSelects(itemBannerInstance.croppings.main);
-        itemBannerInstance.croppings.main.attach(mode);
-        if (!cropping.jq.isEmptyObject(itemBannerInstance.croppings.preview) && !itemBannerInstance.croppings.preview.windowObject.closed) {
-            itemBannerInstance.manageSelects(itemBannerInstance.croppings.preview);
-            itemBannerInstance.croppings.main.attach();
-        }
-    })
+        cropping.jcObjects[mode].manageSelect();
+        cropping.attach(mode);
+    });
 }
 
 function extendOnclick(onclick) {
