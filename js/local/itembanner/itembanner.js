@@ -22,37 +22,49 @@ var itemBannerInstance = {
             ibi.inputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
             ibi.relCoords[mode] = {
                 original: JSON.parse($j( "#" + ibi.inputIds[mode] ).val()),
-                active: [],
-                temporary: [],
+                first: [],
+                second: [],
+                active: 'first',
+                temporary: 'second',
                 changed: null
             };
         });
         return ibi.result;
     },
-    downLoadRelCoords: function (toCoords) {
-        if (typeof toCoords === "undefined") {
-            toCoords = 'active'
-        }
+    pullFromOrigRelCoords: function (mode, toCoordsCategory) {
         var ibi = this;
-        ibi.modes.forEach(function (mode) {
-            ibi.relCoords[mode].original.forEach(function (val, ind) {
-                ibi.relCoords[mode][toCoords][ind] = val;
-            });
+        var modes = (mode && mode !== false) ? [mode] : ibi.modes;
+        modes.forEach(function (mode) {
+            if (typeof toCoordsCategory === "undefined") {
+                ibi.transferCoords('original', 'first', mode);
+                ibi.transferCoords('original', 'second', mode);
+            } else {
+                var toCoords = itemBannerInstance.relCoords[mode][toCoordsCategory];
+                ibi.transferCoords('original', toCoords, mode);
+            }
         });
     },
     uploadRelCoords: function () {
         var ibi = this;
+        var arrayToUpload;
         ibi.modes.forEach(function (mode) {
+            arrayToUpload = ibi.relCoords[mode].active;
             $j( "#" + ibi.inputIds[mode] ).attr(
                 'value',
-                JSON.stringify(ibi.relCoords[mode].active)
+                JSON.stringify(ibi.relCoords[mode][arrayToUpload])
             );
         });
     },
-    manageSelects: function (cropping) {
-        this.modes.forEach(function (mode) {
-            cropping.jcObjects[mode].manageSelect();
-        })
+    transferCoords: function (fromCoords, toCoords, mode) {
+        var ibi = this;
+        ibi.relCoords[mode][fromCoords].forEach(function (val, ind) {
+            ibi.relCoords[mode][toCoords][ind] = val;
+        });
+    },
+    swapCoordsActiveness: function (mode) {
+        var temp = this.relCoords[mode].active;
+        this.relCoords[mode].active = this.relCoords[mode].temporary;
+        this.relCoords[mode].temporary = temp;
     }
 };
 
@@ -71,7 +83,7 @@ $j( document ).ready(function () {
                 return;
             }
             if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
-                itemBannerInstance.downLoadRelCoords();
+                itemBannerInstance.pullFromOrigRelCoords();
                 itemBannerInstance.croppings.main = new Cropping(false, [workoutFreezingButton, workoutRevertButton]);
                 itemBannerInstance.croppings.main.attach();
             }
@@ -87,14 +99,9 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
 
     var p = this,
         modes = itemBannerInstance.modes,
-        coordIdentifiers = itemBannerInstance.coordIdentifiers,
-        coordsToFill;
+        coordIdentifiers = itemBannerInstance.coordIdentifiers;
 
-    if (this.isMainWindowCopping) {
-        coordsToFill = 'active';
-    } else {
-        coordsToFill = 'temporary';
-    }
+    this.coordsToFillCategory = (this.isMainWindowCopping) ? 'active' : 'temporary';
 
     this.jq = undefined;
 
@@ -123,11 +130,9 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
         p.jq = p.windowObject.jQuery
     };
 
-    this.calculateSelect = function (mode, fromCoords) {
-        if (typeof fromCoords === "undefined") {
-            fromCoords = 'active';
-        }
-        coords = itemBannerInstance.relCoords[mode][fromCoords];
+    this.calculateSelect = function (mode, coordsToFillCategory) {
+        var coords = itemBannerInstance.relCoords[mode][coordsToFillCategory];
+        coords = itemBannerInstance.relCoords[mode][coords];
         if (coords[4] > 0 && coords[5] > 0) {
             var selectArray = [];
             var dimension = 'width';
@@ -140,10 +145,8 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
     };
 
     this.attach = function (hereMode) {
-        if (typeof hereMode !== "undefined") {
-            modes = [hereMode];
-        }
-        modes.forEach(function (mode) {
+        var hereModes = (!hereMode) ? modes : [hereMode];
+        hereModes.forEach(function (mode) {
             p.jq( "#image_preview_" + mode ).Jcrop(
                 p.jcObjects[mode],
                 function () {
@@ -154,6 +157,9 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                 p.jcObjects[mode].api.disable();
             }
             p.jcObjects[mode].actual = true;
+            if (itemBannerInstance.relCoords[mode].changed === true) {
+                itemBannerInstance.relCoords[mode].changed = false;
+            }
             buttonWorkoutCallbacks.forEach(function (func) {
                 func(p, mode);
             });
@@ -169,7 +175,7 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                 } else {
                     var dimension = 'width';
                     for (var i = 0; i < 6; i++) {
-                        itemBannerInstance.relCoords[mode][coordsToFill][i] = c[coordIdentifiers[i]] / p.image[dimension];
+                        itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill][i] = c[coordIdentifiers[i]] / p.image[dimension];
                         dimension = (dimension === 'width') ? 'height' : 'width';
                     }
                     if (p.jcObjects[mode].actual) {
@@ -179,11 +185,12 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                 }
             },
             onRelease: function () {
-                itemBannerInstance.relCoords[mode][coordsToFill] = [];
+                itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
                 itemBannerInstance.relCoords[mode].changed = true;
             },
-            manageSelect: function (fromCoords) {
-                var selectArray = p.calculateSelect(mode, fromCoords);
+            manageSelect: function (fromCoordsCategory) {
+                fromCoordsCategory = (typeof fromCoordsCategory === "undefined") ? 'active' : fromCoordsCategory;
+                var selectArray = p.calculateSelect(mode, fromCoordsCategory);
                 if (selectArray) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
@@ -193,14 +200,20 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                     }
                 }
             },
+            updateCoordsToFill: function () {
+                p.jcObjects[mode].coordsToFill = itemBannerInstance.relCoords[mode][p.coordsToFillCategory];
+            },
             bgColor: 'transparent',
             bgOpacity: .2,
             aspectRatio: 1 / eval('outerVariables.' + mode + 'AspectRatio'),
+            setSelect: undefined,
+            coordsToFill: undefined,
             disabled: p.isMainWindowCopping,
             api: undefined,
             actual: false
         };
         p.jcObjects[mode].manageSelect();
+        p.jcObjects[mode].updateCoordsToFill()
     });
 }
 
@@ -242,16 +255,17 @@ function imagePreview(element){
             win.document.write('</div>');
             win.document.write('<div class="ib_containers">');
             win.document.write('<img id="image_preview_list" class="ib_crops" src="'+$(element).src+'"/>');
-            win.document.write('<h4>' + outerVariables.listCroppingWindow + '</h4>');
+            win.document.write('<h4>');
+            win.document.write('<button class="ib_crop_highlight" id="ib_crop_highlight_list">test</button>');
+            win.document.write(outerVariables.listCroppingWindow);
+            win.document.write('<button class="ib_crop_revert" id="ib_crop_revert_list"></button>');
+            win.document.write('</h4>');
             win.document.write('</div>');
             win.document.write('<button id="ib_submit">' + outerVariables.submitText + '</button>');
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
             var entryChangeStatus = {};
-            itemBannerInstance.modes.forEach(function (mode) {
-                entryChangeStatus[mode] = itemBannerInstance.relCoords[mode].changed;
-             });
             var submitted = false;
             if (!!document.documentMode || (!isIE && !!window.StyleMedia)) {
                 msCallback();
@@ -269,42 +283,35 @@ function imagePreview(element){
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
                     itemBannerInstance.croppings.preview = new Cropping(win, [workoutHighlightButton, workoutRevertButton]);
-                    itemBannerInstance.croppings.preview.attach();
 
                 } else {
                     itemBannerInstance.croppings.preview.updateWindowObject(win);
                     itemBannerInstance.modes.forEach(function (mode) {
-                        itemBannerInstance.croppings.preview.jcObjects[mode].manageSelect();
-                    });
-                    itemBannerInstance.croppings.preview.attach();
-                }
-                win.document.getElementById("ib_submit").addEventListener("click", function () {
-                    var execute = {};
-                    itemBannerInstance.modes.forEach(function (mode) {
-                        if (itemBannerInstance.relCoords[mode].changed === true) {
-                            execute[mode] = true;
-                            itemBannerInstance.relCoords[mode].changed = false;
-                        }
-                        else if (itemBannerInstance.relCoords[mode].changed === entryChangeStatus[mode]) {
-                            execute[mode] = false;
-                        }
-                        else if (itemBannerInstance.relCoords[mode].changed === null) {
-                            execute[mode] = true;
-                            itemBannerInstance.relCoords[mode].changed = null;
-                        }
-
-                        if (execute[mode] === true) {
-                            for (var i = 0; i < 6 ; i++) {
-                                itemBannerInstance.relCoords[mode].active[i] = itemBannerInstance.relCoords[mode].temporary[i];
-                            }
-                            itemBannerInstance.croppings.main.jcObjects[mode].actual = false;
-                            itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
-                            itemBannerInstance.croppings.main.jcObjects[mode].manageSelect();
+                        if (itemBannerInstance.relCoords[mode].changed !== false) {
                             itemBannerInstance.croppings.preview.jcObjects[mode].manageSelect();
+                            itemBannerInstance.croppings.preview.jcObjects[mode].updateCoordsToFill();
+                        }
+                        itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
+                    });
+                }
+                itemBannerInstance.croppings.preview.attach();
+                itemBannerInstance.modes.forEach(function (mode) {
+                    entryChangeStatus[mode] = itemBannerInstance.relCoords[mode].changed;
+                });
+                win.document.getElementById("ib_submit").addEventListener("click", function () {
+                    itemBannerInstance.modes.forEach(function (mode) {
+                        if (itemBannerInstance.relCoords[mode].changed === true ||
+                            itemBannerInstance.relCoords[mode].changed !== entryChangeStatus[mode]) {
+                            itemBannerInstance.swapCoordsActiveness(mode);
+                            Object.keys(itemBannerInstance.croppings).forEach(function (cropping) {
+                                itemBannerInstance.croppings[cropping].jcObjects[mode].actual = false;
+                                itemBannerInstance.croppings[cropping].jcObjects[mode].manageSelect();
+                                itemBannerInstance.croppings[cropping].jcObjects[mode].updateCoordsToFill();
+                            });
                             itemBannerInstance.croppings.main.attach(mode);
+                            submitted = true;
                         }
                     });
-                    submitted = true;
                     win.close();
                 });
                 var container = win.document.getElementsByTagName('div')[0];
@@ -355,8 +362,8 @@ function workoutRevertButton(cropping, mode) {
         itemBannerInstance.relCoords[mode].changed = null;
         element.css('visibility', 'hidden');
         cropping.jcObjects[mode].actual = false;
-        itemBannerInstance.downLoadRelCoords('temporary');
-        cropping.jcObjects[mode].manageSelect('temporary');
+        itemBannerInstance.pullFromOrigRelCoords(mode, cropping.coordsToFillCategory);
+        cropping.jcObjects[mode].manageSelect(cropping.coordsToFillCategory);
         cropping.attach(mode);
     });
 }
