@@ -22,25 +22,29 @@ var itemBannerInstance = {
             ibi.inputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
             ibi.relCoords[mode] = {
                 original: JSON.parse($j( "#" + ibi.inputIds[mode] ).val()),
-                first: [],
-                second: [],
-                active: 'first',
-                temporary: 'second',
-                changed: null
+                aCoords: [],
+                bCoords: [],
+                forPost: 'aCoords',
+                temporary: 'bCoords',
+                currentChangeStatus: null,
+                entryChangeStatus:null
             };
         });
         return ibi.result;
     },
-    pullFromOrigRelCoords: function (mode, toCoordsCategory) {
+    pullFromOrigRelCoords: function (mode, toCoords) {
         var ibi = this;
         var modes = (mode && mode !== false) ? [mode] : ibi.modes;
         modes.forEach(function (mode) {
-            if (typeof toCoordsCategory === "undefined") {
-                ibi.transferCoords('original', 'first', mode);
-                ibi.transferCoords('original', 'second', mode);
+            if (typeof toCoords === "undefined") {
+                ibi.relCoords[mode].original.forEach(function (val, ind) {
+                    ibi.relCoords[mode].aCoords[ind] = val;
+                    ibi.relCoords[mode].bCoords[ind] = val;
+                });
             } else {
-                var toCoords = itemBannerInstance.relCoords[mode][toCoordsCategory];
-                ibi.transferCoords('original', toCoords, mode);
+                ibi.relCoords[mode].original.forEach(function (val, ind) {
+                    ibi.relCoords[mode][toCoords][ind] = val;
+                });
             }
         });
     },
@@ -48,23 +52,19 @@ var itemBannerInstance = {
         var ibi = this;
         var arrayToUpload;
         ibi.modes.forEach(function (mode) {
-            arrayToUpload = ibi.relCoords[mode].active;
+            arrayToUpload = ibi.relCoords[mode].forPost;
             $j( "#" + ibi.inputIds[mode] ).attr(
                 'value',
                 JSON.stringify(ibi.relCoords[mode][arrayToUpload])
             );
         });
     },
-    transferCoords: function (fromCoords, toCoords, mode) {
-        var ibi = this;
-        ibi.relCoords[mode][fromCoords].forEach(function (val, ind) {
-            ibi.relCoords[mode][toCoords][ind] = val;
-        });
-    },
-    swapCoordsActiveness: function (mode) {
-        var temp = this.relCoords[mode].active;
-        this.relCoords[mode].active = this.relCoords[mode].temporary;
-        this.relCoords[mode].temporary = temp;
+    swapCoordsToFill: function (mode) {
+        this.relCoords[mode].forPost = (this.relCoords[mode].forPost === 'aCoords') ? 'bCoords' : 'aCoords';
+        itemBannerInstance.croppings.preview.jcObjects[mode].coordsToFill = itemBannerInstance.croppings.main.jcObjects[mode].coordsToFill;
+        itemBannerInstance.croppings.main.jcObjects[mode].coordsToFill = this.relCoords[mode].forPost;
+        itemBannerInstance.croppings.main.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
+        itemBannerInstance.croppings.preview.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
     }
 };
 
@@ -101,8 +101,6 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
         modes = itemBannerInstance.modes,
         coordIdentifiers = itemBannerInstance.coordIdentifiers;
 
-    this.coordsToFillCategory = (this.isMainWindowCopping) ? 'active' : 'temporary';
-
     this.jq = undefined;
 
     this.jcObjects = {};
@@ -130,9 +128,8 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
         p.jq = p.windowObject.jQuery
     };
 
-    this.calculateSelect = function (mode, coordsToFillCategory) {
-        var coords = itemBannerInstance.relCoords[mode][coordsToFillCategory];
-        coords = itemBannerInstance.relCoords[mode][coords];
+    this.calculateSelect = function (mode, fromRelCoordsOf) {
+        var coords = itemBannerInstance.relCoords[mode][fromRelCoordsOf]
         if (coords[4] > 0 && coords[5] > 0) {
             var selectArray = [];
             var dimension = 'width';
@@ -147,6 +144,9 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
     this.attach = function (hereMode) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
+            if (p.jcObjects[mode].actual === false) {
+                p.jcObjects[mode].manageSelect();
+            }
             p.jq( "#image_preview_" + mode ).Jcrop(
                 p.jcObjects[mode],
                 function () {
@@ -157,8 +157,8 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                 p.jcObjects[mode].api.disable();
             }
             p.jcObjects[mode].actual = true;
-            if (itemBannerInstance.relCoords[mode].changed === true) {
-                itemBannerInstance.relCoords[mode].changed = false;
+            if (itemBannerInstance.relCoords[mode].currentChangeStatus === true) {
+                itemBannerInstance.relCoords[mode].currentChangeStatus = false;
             }
             buttonWorkoutCallbacks.forEach(function (func) {
                 func(p, mode);
@@ -180,17 +180,16 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                     }
                     if (p.jcObjects[mode].actual) {
                         p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
-                        itemBannerInstance.relCoords[mode].changed = true;
+                        itemBannerInstance.relCoords[mode].currentChangeStatus = true;
                     }
                 }
             },
             onRelease: function () {
                 itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
-                itemBannerInstance.relCoords[mode].changed = true;
+                itemBannerInstance.relCoords[mode].currentChangeStatus = true;
             },
-            manageSelect: function (fromCoordsCategory) {
-                fromCoordsCategory = (typeof fromCoordsCategory === "undefined") ? 'active' : fromCoordsCategory;
-                var selectArray = p.calculateSelect(mode, fromCoordsCategory);
+            manageSelect: function () {
+                var selectArray = p.calculateSelect(mode, p.jcObjects[mode].coordsForSelect);
                 if (selectArray) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
@@ -200,20 +199,16 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                     }
                 }
             },
-            updateCoordsToFill: function () {
-                p.jcObjects[mode].coordsToFill = itemBannerInstance.relCoords[mode][p.coordsToFillCategory];
-            },
             bgColor: 'transparent',
             bgOpacity: .2,
             aspectRatio: 1 / eval('outerVariables.' + mode + 'AspectRatio'),
             setSelect: undefined,
-            coordsToFill: undefined,
+            coordsForSelect: 'aCoords',
+            coordsToFill: (p.isMainWindowCopping) ? 'aCoords' : 'bCoords',
             disabled: p.isMainWindowCopping,
             api: undefined,
             actual: false
         };
-        p.jcObjects[mode].manageSelect();
-        p.jcObjects[mode].updateCoordsToFill()
     });
 }
 
@@ -265,20 +260,14 @@ function imagePreview(element){
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
-            var entryChangeStatus = {};
-            var submitted = false;
             if (!!document.documentMode || (!isIE && !!window.StyleMedia)) {
                 msCallback();
             } else {
                 Event.observe(win, 'load', msCallback);
             }
-            Event.observe(win, 'unload', function () {
-                if (submitted === false) {
-                    itemBannerInstance.modes.forEach(function (mode) {
-                        itemBannerInstance.relCoords[mode].changed = entryChangeStatus[mode];
-                        itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
-                    });
-                }
+            var passed = {};
+            itemBannerInstance.modes.forEach(function (mode) {
+                passed[mode] = false;
             });
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
@@ -287,29 +276,27 @@ function imagePreview(element){
                 } else {
                     itemBannerInstance.croppings.preview.updateWindowObject(win);
                     itemBannerInstance.modes.forEach(function (mode) {
-                        if (itemBannerInstance.relCoords[mode].changed !== false) {
-                            itemBannerInstance.croppings.preview.jcObjects[mode].manageSelect();
-                            itemBannerInstance.croppings.preview.jcObjects[mode].updateCoordsToFill();
+                        if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
+                            itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
+                            itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
                         }
-                        itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
                     });
                 }
                 itemBannerInstance.croppings.preview.attach();
                 itemBannerInstance.modes.forEach(function (mode) {
-                    entryChangeStatus[mode] = itemBannerInstance.relCoords[mode].changed;
+                    itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                 });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     itemBannerInstance.modes.forEach(function (mode) {
-                        if (itemBannerInstance.relCoords[mode].changed === true ||
-                            itemBannerInstance.relCoords[mode].changed !== entryChangeStatus[mode]) {
-                            itemBannerInstance.swapCoordsActiveness(mode);
+                        if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
+                            itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
+                            itemBannerInstance.swapCoordsToFill(mode);
                             Object.keys(itemBannerInstance.croppings).forEach(function (cropping) {
                                 itemBannerInstance.croppings[cropping].jcObjects[mode].actual = false;
-                                itemBannerInstance.croppings[cropping].jcObjects[mode].manageSelect();
-                                itemBannerInstance.croppings[cropping].jcObjects[mode].updateCoordsToFill();
                             });
                             itemBannerInstance.croppings.main.attach(mode);
-                            submitted = true;
+                            itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
+                            passed[mode] = true;
                         }
                     });
                     win.close();
@@ -319,6 +306,16 @@ function imagePreview(element){
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
             }
+            Event.observe(win, 'unload', function () {
+                itemBannerInstance.modes.forEach(function (mode) {
+                    if (passed[mode] === false) {
+                        if (itemBannerInstance.relCoords[mode].currentChangeStatus === null && itemBannerInstance.relCoords[mode].entryChangeStatus !== null) {
+                            itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
+                        }
+                        itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
+                    }
+                });
+            });
         }
     }
 }
@@ -355,16 +352,18 @@ function workoutRevertButton(cropping, mode) {
     var element = cropping.jq( "#ib_crop_revert_" +  mode);
     element.html(outerVariables.revert);
     element.unbind( "click" );
-    var visibility = (itemBannerInstance.relCoords[mode].changed === null) ? 'hidden' : 'visible';
+    var visibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
     element.css('visibility', visibility);
     element.click(function (e) {
         e.preventDefault();
-        itemBannerInstance.relCoords[mode].changed = null;
+        itemBannerInstance.relCoords[mode].currentChangeStatus = null;
         element.css('visibility', 'hidden');
+        var temp = cropping.jcObjects[mode].coordsForSelect;
+        cropping.jcObjects[mode].coordsForSelect = cropping.jcObjects[mode].coordsToFill;
+        itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
         cropping.jcObjects[mode].actual = false;
-        itemBannerInstance.pullFromOrigRelCoords(mode, cropping.coordsToFillCategory);
-        cropping.jcObjects[mode].manageSelect(cropping.coordsToFillCategory);
         cropping.attach(mode);
+        cropping.jcObjects[mode].coordsForSelect = temp;
     });
 }
 
