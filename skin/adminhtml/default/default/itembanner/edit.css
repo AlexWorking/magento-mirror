@@ -39,15 +39,29 @@
     left: 1%;
 }
 
+.ib_crop_enable:disabled, .ib_crop_enable:disabled:hover {
+    background: lightgrey;
+    color: grey;
+}
+
 .ib_crop_revert {
     position: absolute;
     right: 1%;
     background: transparent;
-    color: darkgrey;
+    color: black;
     border: none;
+}
+
+.ib_crop_revert {
+    color: black;
 }
 
 .ib_crop_revert:hover {
     background: none;
-    color: darkblue;
+    color: red;
 }
+
+.ib_crop_revert:disabled, .ib_crop_revert:disabled:hover {
+    color: grey;
+}
+

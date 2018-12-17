@@ -14,22 +14,24 @@ var itemBannerInstance = {
     figureOutIsIt: function () {
         var ibi = this;
         ibi.result = ($j("#type").val() === 'itembanner/banner');
-        ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
-        ibi.croppings.main = {};
-        ibi.croppings.preview = {};
-        ibi.modes = ['grid', 'list'];
-        ibi.modes.forEach(function (mode) {
-            ibi.inputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
-            ibi.relCoords[mode] = {
-                original: JSON.parse($j( "#" + ibi.inputIds[mode] ).val()),
-                aCoords: [],
-                bCoords: [],
-                forPost: 'aCoords',
-                temporary: 'bCoords',
-                currentChangeStatus: null,
-                entryChangeStatus:null
-            };
-        });
+        if (ibi.result === true) {
+            ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
+            ibi.croppings.main = {};
+            ibi.croppings.preview = {};
+            ibi.modes = ['grid', 'list'];
+            ibi.modes.forEach(function (mode) {
+                ibi.inputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
+                ibi.relCoords[mode] = {
+                    original: JSON.parse($j( "#" + ibi.inputIds[mode] ).val()),
+                    aCoords: [],
+                    bCoords: [],
+                    forPost: 'aCoords',
+                    temporary: 'bCoords',
+                    currentChangeStatus: null,
+                    entryChangeStatus:null
+                };
+            });
+        }
         return ibi.result;
     },
     pullFromOrigRelCoords: function (mode, toCoords) {
@@ -88,6 +90,12 @@ $j( document ).ready(function () {
                 itemBannerInstance.croppings.main.attach();
             }
         });
+        $j( window ).unload(function () {
+            if (!$j.isEmptyObject(itemBannerInstance.croppings.preview) &&
+                !itemBannerInstance.croppings.preview.windowObject.closed) {
+                itemBannerInstance.croppings.preview.windowObject.close();
+            }
+        });
     }
 });
 
@@ -144,7 +152,10 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
     this.attach = function (hereMode) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
-            if (p.jcObjects[mode].actual === false) {
+            if (p.jcObjects[mode].actual === true) {
+                p.jcObjects[mode].actual = null;
+            }
+            else if (p.jcObjects[mode].actual === false) {
                 p.jcObjects[mode].manageSelect();
             }
             p.jq( "#image_preview_" + mode ).Jcrop(
@@ -178,7 +189,7 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                         itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill][i] = c[coordIdentifiers[i]] / p.image[dimension];
                         dimension = (dimension === 'width') ? 'height' : 'width';
                     }
-                    if (p.jcObjects[mode].actual) {
+                    if (p.jcObjects[mode].actual === true) {
                         p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
                         itemBannerInstance.relCoords[mode].currentChangeStatus = true;
                     }
@@ -235,6 +246,7 @@ function imagePreview(element){
             win.document.write('<head>');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery.Jcrop.css" media="all">');
             win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/itembanner/edit.css" media="all">');
+            win.document.write('<link rel="stylesheet" type="text/css" href="http://review3.school.com/skin/adminhtml/default/default/boxes.css" media="all">');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/lib/jquery/jquery-1.12.0.min.js"></script>');
             win.document.write('<script type="text/javascript" src="http://review3.school.com/js/local/itembanner/jquery.Jcrop.min.js"></script>');
             win.document.write('</head>');
@@ -256,7 +268,7 @@ function imagePreview(element){
             win.document.write('<button class="ib_crop_revert" id="ib_crop_revert_list"></button>');
             win.document.write('</h4>');
             win.document.write('</div>');
-            win.document.write('<button id="ib_submit">' + outerVariables.submitText + '</button>');
+            win.document.write('<input type="submit" id="ib_submit" value="' + outerVariables.submitText + '"/>');
             win.document.write('</div>');
             win.document.write('</body>');
             win.document.close();
@@ -285,6 +297,9 @@ function imagePreview(element){
                 itemBannerInstance.croppings.preview.attach();
                 itemBannerInstance.modes.forEach(function (mode) {
                     itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
+                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
+                        itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
+                    }
                 });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     itemBannerInstance.modes.forEach(function (mode) {
@@ -305,6 +320,7 @@ function imagePreview(element){
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
+                $j( 'button[class^="ib_crop"]' ).attr('disabled', 'disabled');
             }
             Event.observe(win, 'unload', function () {
                 itemBannerInstance.modes.forEach(function (mode) {
@@ -313,7 +329,11 @@ function imagePreview(element){
                             itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
                         }
                         itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
+                        if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
+                            itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
+                        }
                     }
+                    $j( 'button[class^="ib_crop"]' ).removeAttr('disabled');
                 });
             });
         }
@@ -343,8 +363,13 @@ function workoutHighlightButton(cropping, mode) {
     var element = cropping.jq( "#ib_crop_highlight_" +  mode);
     element.html(outerVariables.highlight);
     element.unbind( "mousedown" );
+    element.unbind( "mouseup" );
+    var img = cropping.jq( "#image_preview_" +  mode + "+ div").children("img");
     element.mousedown(function (e) {
-        cropping.windowObject.alert('Test');
+        img.css('opacity', 0);
+    });
+    element.mouseup(function (e) {
+        img.css('opacity', 0.2);
     });
 }
 
