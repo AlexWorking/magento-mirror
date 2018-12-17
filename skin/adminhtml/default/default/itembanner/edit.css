@@ -39,7 +39,7 @@
     left: 1%;
 }
 
-.ib_crop_enable:disabled, .ib_crop_enable:disabled:hover {
+.ib_crop_enable.ib_false_disable {
     background: lightgrey;
     color: grey;
 }
@@ -61,7 +61,6 @@
     color: red;
 }
 
-.ib_crop_revert:disabled, .ib_crop_revert:disabled:hover {
+.ib_crop_revert.ib_false_disable {
     color: grey;
 }
-

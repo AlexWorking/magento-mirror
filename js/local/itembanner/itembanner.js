@@ -301,6 +301,12 @@ function imagePreview(element){
                         itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
                     }
                 });
+                $j( ".ib_containers" ).click(function () {
+                    itemBannerInstance.croppings.preview.windowObject.focus();
+                });
+                $j( ".ib_false_disable" ).click(function () {
+                    itemBannerInstance.croppings.preview.windowObject.focus();
+                });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     itemBannerInstance.modes.forEach(function (mode) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
@@ -320,7 +326,7 @@ function imagePreview(element){
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
-                $j( 'button[class^="ib_crop"]' ).attr('disabled', 'disabled');
+                $j( 'button[class^="ib_crop"]' ).addClass('ib_false_disable');
             }
             Event.observe(win, 'unload', function () {
                 itemBannerInstance.modes.forEach(function (mode) {
@@ -333,7 +339,7 @@ function imagePreview(element){
                             itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
                         }
                     }
-                    $j( 'button[class^="ib_crop"]' ).removeAttr('disabled');
+                    $j( 'button[class^="ib_crop"]' ).removeClass('ib_false_disable');
                 });
             });
         }
