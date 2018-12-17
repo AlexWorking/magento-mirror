@@ -184,18 +184,19 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                     p.windowObject.alert('The cropping square is not large enough!');
                     p.jcObjects[mode].api.release();
                 } else {
+                    if (p.jcObjects[mode].actual === true) {
+                        p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+                        itemBannerInstance.relCoords[mode].currentChangeStatus = true;
+                    }
                     var dimension = 'width';
                     for (var i = 0; i < 6; i++) {
                         itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill][i] = c[coordIdentifiers[i]] / p.image[dimension];
                         dimension = (dimension === 'width') ? 'height' : 'width';
                     }
-                    if (p.jcObjects[mode].actual === true) {
-                        p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
-                        itemBannerInstance.relCoords[mode].currentChangeStatus = true;
-                    }
                 }
             },
             onRelease: function () {
+                p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
                 itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
                 itemBannerInstance.relCoords[mode].currentChangeStatus = true;
             },
@@ -350,9 +351,9 @@ function workoutFreezingButton(cropping, mode) {
     var element = cropping.jq( "#ib_crop_enable_" +  mode);
     var writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen
     element.html(writtenOn);
-    element.unbind( "click" );
-    element.click(function (e) {
-        e.preventDefault();
+    element.off( "click" );
+    element.click(function (event) {
+        event.preventDefault();
         if(element.html() === outerVariables.frozen) {
             itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
             itemBannerInstance.croppings.main.jcObjects[mode].disabled = false;
@@ -366,36 +367,47 @@ function workoutFreezingButton(cropping, mode) {
 }
 
 function workoutHighlightButton(cropping, mode) {
-    var element = cropping.jq( "#ib_crop_highlight_" +  mode);
-    element.html(outerVariables.highlight);
-    element.unbind( "mousedown" );
-    element.unbind( "mouseup" );
-    var img = cropping.jq( "#image_preview_" +  mode + "+ div").children("img");
-    element.mousedown(function (e) {
-        img.css('opacity', 0);
-    });
-    element.mouseup(function (e) {
-        img.css('opacity', 0.2);
-    });
+    var button = cropping.jq( "#ib_crop_highlight_" +  mode);
+    button.html(outerVariables.highlight);
+    button.off( "mousedown" );
+    button.off( "mouseup" );
+    button.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
+    button.on('mouseup', {c: cropping, m: mode, o: 0.2}, highlightAction);
 }
 
 function workoutRevertButton(cropping, mode) {
     var element = cropping.jq( "#ib_crop_revert_" +  mode);
     element.html(outerVariables.revert);
-    element.unbind( "click" );
+    element.off( "click" );
     var visibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
     element.css('visibility', visibility);
-    element.click(function (e) {
-        e.preventDefault();
-        itemBannerInstance.relCoords[mode].currentChangeStatus = null;
-        element.css('visibility', 'hidden');
-        var temp = cropping.jcObjects[mode].coordsForSelect;
-        cropping.jcObjects[mode].coordsForSelect = cropping.jcObjects[mode].coordsToFill;
-        itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
-        cropping.jcObjects[mode].actual = false;
-        cropping.attach(mode);
-        cropping.jcObjects[mode].coordsForSelect = temp;
-    });
+    element.on('click', {c: cropping, m: mode, e:element}, revertAction);
+}
+
+function highlightAction(event) {
+    event.preventDefault();
+    var cropping = event.data.c;
+    var mode = event.data.m;
+    if (itemBannerInstance.relCoords[mode][cropping.jcObjects[mode].coordsToFill].length > 0) {
+        var opacity = event.data.o;
+        var img = cropping.jq( "#image_preview_" +  mode + "+ div").children("img");
+        img.css('opacity', opacity);
+    }
+}
+
+function revertAction (event) {
+    event.preventDefault();
+    var cropping = event.data.c;
+    var mode = event.data.m;
+    var element = event.data.e;
+    itemBannerInstance.relCoords[mode].currentChangeStatus = null;
+    element.css('visibility', 'hidden');
+    var temp = cropping.jcObjects[mode].coordsForSelect;
+    cropping.jcObjects[mode].coordsForSelect = cropping.jcObjects[mode].coordsToFill;
+    itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
+    cropping.jcObjects[mode].actual = false;
+    cropping.attach(mode);
+    cropping.jcObjects[mode].coordsForSelect = temp;
 }
 
 function extendOnclick(onclick) {
