@@ -61,6 +61,6 @@
     color: red;
 }
 
-.ib_crop_revert.ib_false_disable {
+.ib_crop_revert.ib_false_disable, .ib_crop_revert:disabled, .ib_crop_revert.ib_false_disable:disabled{
     color: grey;
 }

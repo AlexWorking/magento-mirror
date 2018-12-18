@@ -53,6 +53,8 @@ var itemBannerInstance = {
                     element.off( "click" );
                     var visibility = (ibi.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
                     element.css('visibility', visibility);
+                    var disabled = cropping.jcObjects[mode].disabled;
+                    element.css('disabled', disabled);
                     element.on('click', {c: cropping, m: mode, e:element}, revertAction);
                 }
             }
@@ -357,7 +359,7 @@ function imagePreview(element){
                     event.preventDefault();
                 });
                 $j( 'button[class^="ib_crop_revert"]' ).off('click').on('click', function (event) {
-                    event.preventDefault();
+                    event.preventDefault().removeAttr('disabled');
                 });
                 $j( 'button[class^="ib_crop"]' ).addClass('ib_false_disable');
                 $j( ".ib_containers" ).click(function () {
@@ -376,16 +378,20 @@ function imagePreview(element){
                             {c: itemBannerInstance.croppings.main, m: mode, e: $j( '#ib_crop_enable_' + mode )},
                             freezingAction
                         );
+                        $j( '#ib_crop_revert_' + mode ).off('click').on(
+                            'click',
+                            {c: itemBannerInstance.croppings.main, m: mode, e: $j( '#ib_crop_revert_' + mode )},
+                            revertAction
+                        );
+                        if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
+                            itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
+                        } else {
+                            $j( '#ib_crop_revert_' + mode ).attr('disabled', 'disabled');
+                        }
                     }
-                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
-                        itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-                        $j( '#ib_crop_revert_' + mode ).removeClass('ib_false_disable');
-                    } else {
-                        $j( '#ib_crop_revert_' + mode ).off('click');
-                    }
-                    $j( '#ib_crop_enable_' + mode ).removeClass('ib_false_disable');
                 });
                 $j( ".ib_containers" ).off('click');
+                $j( 'button[class^="ib_crop"]' ).removeClass('ib_false_disable');
             });
         }
     }
@@ -401,16 +407,12 @@ function freezingAction(event) {
         cropping.jcObjects[mode].api.enable();
         cropping.jcObjects[mode].disabled = false;
         element.html(outerVariables.unfrozen);
-        revertButton.removeClass('ib_false_disable');
-        revertButton.off('click').on('click', {c: cropping, m: mode, e: revertButton}, revertAction);
+        revertButton.removeAttr('disabled');
     } else {
         cropping.jcObjects[mode].api.disable();
         cropping.jcObjects[mode].disabled = true;
         element.html(outerVariables.frozen);
-        revertButton.addClass('ib_false_disable');
-        revertButton.off('click').on('click', function (event) {
-            event.preventDefault();
-        });
+        revertButton.attr('disabled', 'disabled');
     }
 }
 
