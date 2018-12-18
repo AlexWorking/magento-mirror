@@ -31,6 +31,31 @@ var itemBannerInstance = {
                     entryChangeStatus:null
                 };
             });
+            ibi.buttonWorkouts = {
+                freezing: function(cropping, mode) {
+                    var element = cropping.jq( "#ib_crop_enable_" +  mode),
+                        writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen;
+                    element.html(writtenOn);
+                    element.off( "click" );
+                    element.on('click', {c: cropping, m: mode, e: element}, freezingAction);
+                },
+                highlight: function(cropping, mode) {
+                    var button = cropping.jq( "#ib_crop_highlight_" +  mode);
+                    button.html(outerVariables.highlight);
+                    button.off( "mousedown" );
+                    button.off( "mouseup" );
+                    button.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
+                    button.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity}, highlightAction);
+                },
+                revert: function(cropping, mode) {
+                    var element = cropping.jq( "#ib_crop_revert_" +  mode);
+                    element.html(outerVariables.revert);
+                    element.off( "click" );
+                    var visibility = (ibi.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
+                    element.css('visibility', visibility);
+                    element.on('click', {c: cropping, m: mode, e:element}, revertAction);
+                }
+            }
         }
         return ibi.result;
     },
@@ -63,10 +88,10 @@ var itemBannerInstance = {
     },
     swapCoordsToFill: function (mode) {
         this.relCoords[mode].forPost = (this.relCoords[mode].forPost === 'aCoords') ? 'bCoords' : 'aCoords';
-        itemBannerInstance.croppings.preview.jcObjects[mode].coordsToFill = itemBannerInstance.croppings.main.jcObjects[mode].coordsToFill;
-        itemBannerInstance.croppings.main.jcObjects[mode].coordsToFill = this.relCoords[mode].forPost;
-        itemBannerInstance.croppings.main.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
-        itemBannerInstance.croppings.preview.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
+        this.croppings.preview.jcObjects[mode].coordsToFill = this.croppings.main.jcObjects[mode].coordsToFill;
+        this.croppings.main.jcObjects[mode].coordsToFill = this.relCoords[mode].forPost;
+        this.croppings.main.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
+        this.croppings.preview.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
     }
 };
 
@@ -86,7 +111,10 @@ $j( document ).ready(function () {
             }
             if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
                 itemBannerInstance.pullFromOrigRelCoords();
-                itemBannerInstance.croppings.main = new Cropping(false, [workoutFreezingButton, workoutRevertButton]);
+                itemBannerInstance.croppings.main = new Cropping(
+                    false,
+                    [itemBannerInstance.buttonWorkouts.freezing, itemBannerInstance.buttonWorkouts.revert]
+                );
                 itemBannerInstance.croppings.main.attach();
             }
         });
@@ -284,7 +312,10 @@ function imagePreview(element){
             });
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
-                    itemBannerInstance.croppings.preview = new Cropping(win, [workoutHighlightButton, workoutRevertButton]);
+                    itemBannerInstance.croppings.preview = new Cropping(
+                        win,
+                        [itemBannerInstance.buttonWorkouts.highlight, itemBannerInstance.buttonWorkouts.revert]
+                    );
 
                 } else {
                     itemBannerInstance.croppings.preview.updateWindowObject(win);
@@ -301,12 +332,6 @@ function imagePreview(element){
                     if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
                         itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
                     }
-                });
-                $j( ".ib_containers" ).click(function () {
-                    itemBannerInstance.croppings.preview.windowObject.focus();
-                });
-                $j( ".ib_false_disable" ).click(function () {
-                    itemBannerInstance.croppings.preview.windowObject.focus();
                 });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     itemBannerInstance.modes.forEach(function (mode) {
@@ -327,7 +352,17 @@ function imagePreview(element){
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
+
+                $j( 'button[class^="ib_crop_enable"]' ).off('click').on('click', function (event) {
+                    event.preventDefault();
+                });
+                $j( 'button[class^="ib_crop_revert"]' ).off('click').on('click', function (event) {
+                    event.preventDefault();
+                });
                 $j( 'button[class^="ib_crop"]' ).addClass('ib_false_disable');
+                $j( ".ib_containers" ).click(function () {
+                    itemBannerInstance.croppings.preview.windowObject.focus();
+                });
             }
             Event.observe(win, 'unload', function () {
                 itemBannerInstance.modes.forEach(function (mode) {
@@ -336,70 +371,65 @@ function imagePreview(element){
                             itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
                         }
                         itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
-                        if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
-                            itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-                        }
+                        $j( '#ib_crop_enable_' + mode ).off('click').on(
+                            'click',
+                            {c: itemBannerInstance.croppings.main, m: mode, e: $j( '#ib_crop_enable_' + mode )},
+                            freezingAction
+                        );
                     }
-                    $j( 'button[class^="ib_crop"]' ).removeClass('ib_false_disable');
+                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
+                        itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
+                        $j( '#ib_crop_revert_' + mode ).removeClass('ib_false_disable');
+                    } else {
+                        $j( '#ib_crop_revert_' + mode ).off('click');
+                    }
+                    $j( '#ib_crop_enable_' + mode ).removeClass('ib_false_disable');
                 });
+                $j( ".ib_containers" ).off('click');
             });
         }
     }
 }
 
-function workoutFreezingButton(cropping, mode) {
-    var element = cropping.jq( "#ib_crop_enable_" +  mode);
-    var writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen
-    element.html(writtenOn);
-    element.off( "click" );
-    element.click(function (event) {
-        event.preventDefault();
-        if(element.html() === outerVariables.frozen) {
-            itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-            itemBannerInstance.croppings.main.jcObjects[mode].disabled = false;
-            element.html(outerVariables.unfrozen);
-        } else {
-            itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
-            itemBannerInstance.croppings.main.jcObjects[mode].disabled = true;
-            element.html(outerVariables.frozen);
-        }
-    });
-}
-
-function workoutHighlightButton(cropping, mode) {
-    var button = cropping.jq( "#ib_crop_highlight_" +  mode);
-    button.html(outerVariables.highlight);
-    button.off( "mousedown" );
-    button.off( "mouseup" );
-    button.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
-    button.on('mouseup', {c: cropping, m: mode, o: 0.2}, highlightAction);
-}
-
-function workoutRevertButton(cropping, mode) {
-    var element = cropping.jq( "#ib_crop_revert_" +  mode);
-    element.html(outerVariables.revert);
-    element.off( "click" );
-    var visibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
-    element.css('visibility', visibility);
-    element.on('click', {c: cropping, m: mode, e:element}, revertAction);
+function freezingAction(event) {
+    event.preventDefault();
+    var cropping = event.data.c,
+        mode = event.data.m,
+        element = event.data.e,
+        revertButton = cropping.jq( "#ib_crop_revert_" +  mode);
+    if(element.html() === outerVariables.frozen) {
+        cropping.jcObjects[mode].api.enable();
+        cropping.jcObjects[mode].disabled = false;
+        element.html(outerVariables.unfrozen);
+        revertButton.removeClass('ib_false_disable');
+        revertButton.off('click').on('click', {c: cropping, m: mode, e: revertButton}, revertAction);
+    } else {
+        cropping.jcObjects[mode].api.disable();
+        cropping.jcObjects[mode].disabled = true;
+        element.html(outerVariables.frozen);
+        revertButton.addClass('ib_false_disable');
+        revertButton.off('click').on('click', function (event) {
+            event.preventDefault();
+        });
+    }
 }
 
 function highlightAction(event) {
     event.preventDefault();
-    var cropping = event.data.c;
-    var mode = event.data.m;
+    var cropping = event.data.c,
+        mode = event.data.m;
     if (itemBannerInstance.relCoords[mode][cropping.jcObjects[mode].coordsToFill].length > 0) {
-        var opacity = event.data.o;
-        var img = cropping.jq( "#image_preview_" +  mode + "+ div").children("img");
+        var opacity = event.data.o,
+            img = cropping.jq( "#image_preview_" +  mode + "+ div").children("img");
         img.css('opacity', opacity);
     }
 }
 
 function revertAction (event) {
     event.preventDefault();
-    var cropping = event.data.c;
-    var mode = event.data.m;
-    var element = event.data.e;
+    var cropping = event.data.c,
+        mode = event.data.m,
+        element = event.data.e;
     itemBannerInstance.relCoords[mode].currentChangeStatus = null;
     element.css('visibility', 'hidden');
     var temp = cropping.jcObjects[mode].coordsForSelect;
