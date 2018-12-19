@@ -5,6 +5,7 @@ var itemBannerInstance = {
     coordIdentifiers: [],
     relCoords: {},
     croppings: {},
+    buttonWorkouts: {},
     getResult: function () {
         if (typeof this.result === "undefined") {
             this.result = this.figureOutIsIt()
@@ -31,16 +32,15 @@ var itemBannerInstance = {
                     entryChangeStatus:null
                 };
             });
-            ibi.buttonWorkouts = {
-                freezing: function(cropping, mode) {
+            ibi.buttonWorkouts.freezing = function(cropping, mode) {
                     var element = cropping.jq( "#ib_crop_enable_" +  mode),
                         writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen;
                     element.html(writtenOn);
                     element.off( "click" );
                     element.on('click', {c: cropping, m: mode, e: element}, freezingAction);
                     return element;
-                },
-                highlight: function(cropping, mode) {
+            };
+            ibi.buttonWorkouts.highlight = function(cropping, mode) {
                     var element = cropping.jq( "#ib_crop_highlight_" +  mode);
                     element.html(outerVariables.highlight);
                     element.off( "mousedown" );
@@ -48,18 +48,17 @@ var itemBannerInstance = {
                     element.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
                     element.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity}, highlightAction);
                     return element;
-                },
-                revert: function(cropping, mode) {
+            };
+            ibi.buttonWorkouts.revert = function(cropping, mode) {
                     var element = cropping.jq( "#ib_crop_revert_" +  mode);
                     element.html(outerVariables.revert);
                     element.off( "click" );
                     var visibility = (ibi.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
                     element.css('visibility', visibility);
-                    var disabled = cropping.jcObjects[mode].disabled;
-                    element.css('disabled', disabled);
+                    if (cropping.jcObjects[mode].disabled === true)
+                    element.attr('disabled', 'disabled');
                     element.on('click', {c: cropping, m: mode, e:element}, revertAction);
                     return element;
-                }
             }
         }
         return ibi.result;
@@ -121,12 +120,7 @@ $j( document ).ready(function () {
                 itemBannerInstance.croppings.main.attach();
             }
         });
-        $j( window ).unload(function () {
-            if (!$j.isEmptyObject(itemBannerInstance.croppings.preview) &&
-                !itemBannerInstance.croppings.preview.windowObject.closed) {
-                itemBannerInstance.croppings.preview.windowObject.close();
-            }
-        });
+        $j( window ).unload(closePreviewWindowIfOpened);
     }
 });
 
@@ -349,6 +343,13 @@ function imagePreview(element){
             itemBannerInstance.modes.forEach(function (mode) {
                 passed[mode] = false;
             });
+            var windowFocusingElements = [
+                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
+                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
+                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
+                $j( ".ib_containers" )
+            ];
+
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
                     itemBannerInstance.croppings.preview = new Cropping(win, ['highlight', 'revert']);
@@ -391,9 +392,9 @@ function imagePreview(element){
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
 
-                $j( ".ib_containers" ).click(function () {
-                    itemBannerInstance.croppings.preview.windowObject.focus();
-                });
+                for (var i = 0; i < 4; i++) {
+                    windowFocusingElements[i].on('click', bringPreviewWindowInFront);
+                }
             }
             Event.observe(win, 'unload', function () {
                 itemBannerInstance.modes.forEach(function (mode) {
@@ -410,7 +411,9 @@ function imagePreview(element){
                     var returnVisibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
                     itemBannerInstance.croppings.main.jcObjects[mode].buttons.revert.jqObject.css('visibility', returnVisibility);
                 });
-                $j( ".ib_containers" ).off('click');
+                for (var i = 0; i < 4; i++) {
+                    windowFocusingElements[i].off('click', bringPreviewWindowInFront);
+                }
             });
         }
     }
@@ -463,12 +466,21 @@ function revertAction (event) {
     cropping.jcObjects[mode].coordsForSelect = temp;
 }
 
+function bringPreviewWindowInFront(event) {
+    event.preventDefault();
+    itemBannerInstance.croppings.preview.windowObject.focus();
+}
+
+function closePreviewWindowIfOpened() {
+    if (!$j.isEmptyObject(itemBannerInstance.croppings.preview) &&
+        !itemBannerInstance.croppings.preview.windowObject.closed) {
+        itemBannerInstance.croppings.preview.windowObject.close();
+    }
+}
+
 function extendOnclick(onclick) {
     if (typeof outerVariables !== "undefined") {
-        if (!$j.isEmptyObject(itemBannerInstance.croppings.preview) &&
-            !itemBannerInstance.croppings.preview.windowObject.closed) {
-            itemBannerInstance.croppings.preview.windowObject.close();
-        }
+        closePreviewWindowIfOpened();
         itemBannerInstance.uploadRelCoords();
     }
     eval(onclick);
