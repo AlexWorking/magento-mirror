@@ -38,14 +38,16 @@ var itemBannerInstance = {
                     element.html(writtenOn);
                     element.off( "click" );
                     element.on('click', {c: cropping, m: mode, e: element}, freezingAction);
+                    return element;
                 },
                 highlight: function(cropping, mode) {
-                    var button = cropping.jq( "#ib_crop_highlight_" +  mode);
+                    var element = cropping.jq( "#ib_crop_highlight_" +  mode);
                     button.html(outerVariables.highlight);
-                    button.off( "mousedown" );
-                    button.off( "mouseup" );
-                    button.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
-                    button.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity}, highlightAction);
+                    element.off( "mousedown" );
+                    element.off( "mouseup" );
+                    element.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
+                    element.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity}, highlightAction);
+                    return element;
                 },
                 revert: function(cropping, mode) {
                     var element = cropping.jq( "#ib_crop_revert_" +  mode);
@@ -56,6 +58,7 @@ var itemBannerInstance = {
                     var disabled = cropping.jcObjects[mode].disabled;
                     element.css('disabled', disabled);
                     element.on('click', {c: cropping, m: mode, e:element}, revertAction);
+                    return element;
                 }
             }
         }
@@ -113,10 +116,7 @@ $j( document ).ready(function () {
             }
             if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
                 itemBannerInstance.pullFromOrigRelCoords();
-                itemBannerInstance.croppings.main = new Cropping(
-                    false,
-                    [itemBannerInstance.buttonWorkouts.freezing, itemBannerInstance.buttonWorkouts.revert]
-                );
+                itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
                 itemBannerInstance.croppings.main.attach();
             }
         });
@@ -129,7 +129,7 @@ $j( document ).ready(function () {
     }
 });
 
-function Cropping(currentWindow, buttonWorkoutCallbacks) {
+function Cropping(currentWindow, buttons) {
 
     this.windowObject = (currentWindow !== false) ? currentWindow : window;
 
@@ -201,9 +201,6 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
             if (itemBannerInstance.relCoords[mode].currentChangeStatus === true) {
                 itemBannerInstance.relCoords[mode].currentChangeStatus = false;
             }
-            buttonWorkoutCallbacks.forEach(function (func) {
-                func(p, mode);
-            });
         });
     };
 
@@ -241,6 +238,30 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
                     }
                 }
             },
+            toggleButtonsPseudoDisable: function () {
+                var buttonsProp = p.jcObjects[mode].buttons;
+                Object.keys(buttonsProp).forEach(function (buttonName) {
+                    if (button.pseudoDisabled === false) {
+                        buttonsProp[buttonName].jqObject.off('click').on('click', function (event) {
+                            event.preventDefault();
+                        }).addClass('ib_pseudo_disable');
+                        if(buttonsProp[buttonName].attrDisabled) {
+                            buttonsProp[buttonName].jqObject.removeAttr('disabled');
+                        }
+                        buttonsProp[buttonName].pseudoDisabled = true;
+                    } else {
+                        buttonsProp[buttonName].jqObject.off('click').on(
+                            'click',
+                            {c: itemBannerInstance.croppings.main, m: mode, e: button.jqObject},
+                            eval(button.name + 'Action')
+                        ).removeClass('ib_pseudo_disable');
+                        if(buttonsProp[buttonName].attrDisabled) {
+                            buttonsProp[buttonName].jqObject.attr('disabled', 'disabled');
+                        }
+                        buttonsProp[buttonName].pseudoDisabled = false;
+                    }
+                });
+            },
             bgColor: 'transparent',
             bgOpacity: .2,
             aspectRatio: 1 / eval('outerVariables.' + mode + 'AspectRatio'),
@@ -249,8 +270,16 @@ function Cropping(currentWindow, buttonWorkoutCallbacks) {
             coordsToFill: (p.isMainWindowCopping) ? 'aCoords' : 'bCoords',
             disabled: p.isMainWindowCopping,
             api: undefined,
+            buttons: {},
             actual: false
         };
+        buttons.forEach(function (button) {
+            p.jcObjects[mode][buttons][button] = {
+                jqObject: itemBannerInstance.buttonWorkouts[button](p, mode),
+                attrDisabled: this.jqObject.attr('disabled'),
+                pseudoDisabled: false
+            };
+        });
     });
 }
 
@@ -314,11 +343,7 @@ function imagePreview(element){
             });
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
-                    itemBannerInstance.croppings.preview = new Cropping(
-                        win,
-                        [itemBannerInstance.buttonWorkouts.highlight, itemBannerInstance.buttonWorkouts.revert]
-                    );
-
+                    itemBannerInstance.croppings.preview = new Cropping(win, ['highlight', 'revert']);
                 } else {
                     itemBannerInstance.croppings.preview.updateWindowObject(win);
                     itemBannerInstance.modes.forEach(function (mode) {
@@ -347,6 +372,7 @@ function imagePreview(element){
                             itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                             passed[mode] = true;
                         }
+                        itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
                     });
                     win.close();
                 });
@@ -355,13 +381,6 @@ function imagePreview(element){
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
 
-                $j( 'button[class^="ib_crop_enable"]' ).off('click').on('click', function (event) {
-                    event.preventDefault();
-                });
-                $j( 'button[class^="ib_crop_revert"]' ).off('click').on('click', function (event) {
-                    event.preventDefault().removeAttr('disabled');
-                });
-                $j( 'button[class^="ib_crop"]' ).addClass('ib_false_disable');
                 $j( ".ib_containers" ).click(function () {
                     itemBannerInstance.croppings.preview.windowObject.focus();
                 });
@@ -373,25 +392,13 @@ function imagePreview(element){
                             itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
                         }
                         itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
-                        $j( '#ib_crop_enable_' + mode ).off('click').on(
-                            'click',
-                            {c: itemBannerInstance.croppings.main, m: mode, e: $j( '#ib_crop_enable_' + mode )},
-                            freezingAction
-                        );
-                        $j( '#ib_crop_revert_' + mode ).off('click').on(
-                            'click',
-                            {c: itemBannerInstance.croppings.main, m: mode, e: $j( '#ib_crop_revert_' + mode )},
-                            revertAction
-                        );
                         if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
                             itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-                        } else {
-                            $j( '#ib_crop_revert_' + mode ).attr('disabled', 'disabled');
                         }
                     }
+                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
                 });
                 $j( ".ib_containers" ).off('click');
-                $j( 'button[class^="ib_crop"]' ).removeClass('ib_false_disable');
             });
         }
     }
@@ -406,11 +413,13 @@ function freezingAction(event) {
     if(element.html() === outerVariables.frozen) {
         cropping.jcObjects[mode].api.enable();
         cropping.jcObjects[mode].disabled = false;
+        cropping.jcObjects[mode].buttons.revert.attrDisabled = false;
         element.html(outerVariables.unfrozen);
         revertButton.removeAttr('disabled');
     } else {
         cropping.jcObjects[mode].api.disable();
         cropping.jcObjects[mode].disabled = true;
+        cropping.jcObjects[mode].buttons.revert.attrDisabled = true;
         element.html(outerVariables.frozen);
         revertButton.attr('disabled', 'disabled');
     }
