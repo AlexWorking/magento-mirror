@@ -8,14 +8,14 @@ var itemBannerInstance = {
     buttonWorkouts: {},
     getResult: function () {
         if (typeof this.result === "undefined") {
-            this.result = this.figureOutIsIt()
+            this.result = this.figureOutIsItAndInit()
         }
         return this.result;
     },
-    figureOutIsIt: function () {
+    figureOutIsItAndInit: function () {
         var ibi = this;
         ibi.result = ($j("#type").val() === 'itembanner/banner');
-        if (ibi.result === true) {
+        if (ibi.result === true && typeof outerVariables !== "undefined") {
             ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
             ibi.croppings.main = {};
             ibi.croppings.preview = {};
