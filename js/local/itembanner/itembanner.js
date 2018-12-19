@@ -42,7 +42,7 @@ var itemBannerInstance = {
                 },
                 highlight: function(cropping, mode) {
                     var element = cropping.jq( "#ib_crop_highlight_" +  mode);
-                    button.html(outerVariables.highlight);
+                    element.html(outerVariables.highlight);
                     element.off( "mousedown" );
                     element.off( "mouseup" );
                     element.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
@@ -117,6 +117,7 @@ $j( document ).ready(function () {
             if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
                 itemBannerInstance.pullFromOrigRelCoords();
                 itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
+                itemBannerInstance.croppings.main.workoutButtons();
                 itemBannerInstance.croppings.main.attach();
             }
         });
@@ -167,7 +168,7 @@ function Cropping(currentWindow, buttons) {
     };
 
     this.calculateSelect = function (mode, fromRelCoordsOf) {
-        var coords = itemBannerInstance.relCoords[mode][fromRelCoordsOf]
+        var coords = itemBannerInstance.relCoords[mode][fromRelCoordsOf];
         if (coords[4] > 0 && coords[5] > 0) {
             var selectArray = [];
             var dimension = 'width';
@@ -177,6 +178,20 @@ function Cropping(currentWindow, buttons) {
             }
         }
         return selectArray;
+    };
+
+    this.workoutButtons = function (hereMode) {
+        var hereModes = (!hereMode) ? modes : [hereMode];
+        hereModes.forEach(function (mode) {
+            buttons.forEach(function (button) {
+                var jqObject =itemBannerInstance.buttonWorkouts[button](p, mode);
+                p.jcObjects[mode].buttons[button] = {
+                    jqObject: jqObject,
+                    attrDisabled: jqObject.attr('disabled'),
+                    pseudoDisabled: false
+                };
+            });
+        });
     };
 
     this.attach = function (hereMode) {
@@ -241,7 +256,7 @@ function Cropping(currentWindow, buttons) {
             toggleButtonsPseudoDisable: function () {
                 var buttonsProp = p.jcObjects[mode].buttons;
                 Object.keys(buttonsProp).forEach(function (buttonName) {
-                    if (button.pseudoDisabled === false) {
+                    if (buttonsProp[buttonName].pseudoDisabled === false) {
                         buttonsProp[buttonName].jqObject.off('click').on('click', function (event) {
                             event.preventDefault();
                         }).addClass('ib_pseudo_disable');
@@ -252,8 +267,8 @@ function Cropping(currentWindow, buttons) {
                     } else {
                         buttonsProp[buttonName].jqObject.off('click').on(
                             'click',
-                            {c: itemBannerInstance.croppings.main, m: mode, e: button.jqObject},
-                            eval(button.name + 'Action')
+                            {c: itemBannerInstance.croppings.main, m: mode, e: buttonsProp[buttonName].jqObject},
+                            eval(buttonName + 'Action')
                         ).removeClass('ib_pseudo_disable');
                         if(buttonsProp[buttonName].attrDisabled) {
                             buttonsProp[buttonName].jqObject.attr('disabled', 'disabled');
@@ -273,13 +288,6 @@ function Cropping(currentWindow, buttons) {
             buttons: {},
             actual: false
         };
-        buttons.forEach(function (button) {
-            p.jcObjects[mode][buttons][button] = {
-                jqObject: itemBannerInstance.buttonWorkouts[button](p, mode),
-                attrDisabled: this.jqObject.attr('disabled'),
-                pseudoDisabled: false
-            };
-        });
     });
 }
 
@@ -344,6 +352,7 @@ function imagePreview(element){
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
                     itemBannerInstance.croppings.preview = new Cropping(win, ['highlight', 'revert']);
+                    itemBannerInstance.croppings.preview.workoutButtons();
                 } else {
                     itemBannerInstance.croppings.preview.updateWindowObject(win);
                     itemBannerInstance.modes.forEach(function (mode) {
@@ -351,6 +360,7 @@ function imagePreview(element){
                             itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
                             itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
                         }
+                        itemBannerInstance.croppings.preview.workoutButtons(mode);
                     });
                 }
                 itemBannerInstance.croppings.preview.attach();
@@ -359,6 +369,7 @@ function imagePreview(element){
                     if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
                         itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
                     }
+                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
                 });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     itemBannerInstance.modes.forEach(function (mode) {
@@ -372,7 +383,6 @@ function imagePreview(element){
                             itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                             passed[mode] = true;
                         }
-                        itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
                     });
                     win.close();
                 });
@@ -397,6 +407,8 @@ function imagePreview(element){
                         }
                     }
                     itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
+                    var returnVisibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
+                    itemBannerInstance.croppings.main.jcObjects[mode].buttons.revert.jqObject.css('visibility', returnVisibility);
                 });
                 $j( ".ib_containers" ).off('click');
             });
