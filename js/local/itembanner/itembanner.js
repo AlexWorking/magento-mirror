@@ -1,8 +1,9 @@
 var itemBannerInstance = {
     result: undefined,
+    coordIdentifiers: undefined,
+    imageRelatedJqElements: undefined,
     modes: [],
     inputIds: [],
-    coordIdentifiers: [],
     relCoords: {},
     croppings: {},
     buttonWorkouts: {},
@@ -17,8 +18,12 @@ var itemBannerInstance = {
         ibi.result = ($j("#type").val() === 'itembanner/banner');
         if (ibi.result === true && typeof outerVariables !== "undefined") {
             ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
-            ibi.croppings.main = {};
-            ibi.croppings.preview = {};
+            ibi.imageRelatedJqElements = {
+                preview: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
+                file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
+                delete: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
+                containers: $j( ".ib_containers" )
+            };
             ibi.modes = ['grid', 'list'];
             ibi.modes.forEach(function (mode) {
                 ibi.inputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
@@ -32,6 +37,8 @@ var itemBannerInstance = {
                     entryChangeStatus:null
                 };
             });
+            ibi.croppings.main = {};
+            ibi.croppings.preview = {};
             ibi.buttonWorkouts.freezing = function(cropping, mode) {
                     var element = cropping.jq( "#ib_crop_enable_" +  mode),
                         writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen;
@@ -109,18 +116,18 @@ $j( document ).ready(function () {
             $j(this).attr('onclick', onclick);
         });
 
-        $j( "#widget_instace_tabs_properties_section" ).click( function () {
-            if (typeof outerVariables === "undefined") {
-                return;
-            }
-            if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
-                itemBannerInstance.pullFromOrigRelCoords();
-                itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
-                itemBannerInstance.croppings.main.workoutButtons();
-                itemBannerInstance.croppings.main.attach();
-            }
-        });
-        $j( window ).unload(closePreviewWindowIfOpened);
+        if (typeof outerVariables !== "undefined") {
+            $j( "#widget_instace_tabs_properties_section" ).click( function () {
+                if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
+                    itemBannerInstance.pullFromOrigRelCoords();
+                    itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
+                    itemBannerInstance.croppings.main.workoutButtons();
+                    itemBannerInstance.croppings.main.attach();
+                }
+            });
+            itemBannerInstance.imageRelatedJqElements.file.on('change', saveDialog);
+            $j( window ).unload(closePreviewWindowIfOpened);
+        }
     }
 });
 
@@ -343,13 +350,6 @@ function imagePreview(element){
             itemBannerInstance.modes.forEach(function (mode) {
                 passed[mode] = false;
             });
-            var windowFocusingElements = [
-                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
-                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
-                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
-                $j( ".ib_containers" )
-            ];
-
             function msCallback(){
                 if ($j.isEmptyObject(itemBannerInstance.croppings.preview)) {
                     itemBannerInstance.croppings.preview = new Cropping(win, ['highlight', 'revert']);
@@ -391,10 +391,9 @@ function imagePreview(element){
                 var widthForResize = container.offsetWidth;
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
-
-                for (var i = 0; i < 4; i++) {
-                    windowFocusingElements[i].on('click', bringPreviewWindowInFront);
-                }
+                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+                    itemBannerInstance.imageRelatedJqElements[element].on('click', bringPreviewWindowInFront);
+                });
             }
             Event.observe(win, 'unload', function () {
                 itemBannerInstance.modes.forEach(function (mode) {
@@ -411,9 +410,9 @@ function imagePreview(element){
                     var returnVisibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
                     itemBannerInstance.croppings.main.jcObjects[mode].buttons.revert.jqObject.css('visibility', returnVisibility);
                 });
-                for (var i = 0; i < 4; i++) {
-                    windowFocusingElements[i].off('click', bringPreviewWindowInFront);
-                }
+                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+                    itemBannerInstance.imageRelatedJqElements[element].off('click', bringPreviewWindowInFront);
+                });
             });
         }
     }
@@ -469,6 +468,33 @@ function revertAction (event) {
 function bringPreviewWindowInFront(event) {
     event.preventDefault();
     itemBannerInstance.croppings.preview.windowObject.focus();
+}
+
+function saveDialog(event) {
+    $j( "<div/>", {
+        id: 'save_dialog'
+    })
+    .html('Would You like to proceed with the new image?(The instance will be saved!)')
+    .appendTo(itemBannerInstance.imageRelatedJqElements.file);
+    $j( "#save_dialog" ).dialog({
+        autoOpen: true,
+        modal: true,
+        buttons: [{
+            text: "Ok",
+            icon: "ui-icon-circle-check",
+            click: function () {
+                saveAndContinueEdit();
+                $j( this ).dialog( "close" );
+            }
+        },
+        {
+            text: "Cancel",
+            icon: "ui-icon-cancel",
+            click: function () {
+                jQuery( this ).dialog( "close" );
+            }
+        }]
+    });
 }
 
 function closePreviewWindowIfOpened() {
