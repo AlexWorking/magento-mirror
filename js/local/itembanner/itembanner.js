@@ -125,7 +125,7 @@ $j( document ).ready(function () {
                     itemBannerInstance.croppings.main.attach();
                 }
             });
-            itemBannerInstance.imageRelatedJqElements.file.on('change', saveDialog);
+            itemBannerInstance.imageRelatedJqElements.file.on('change', saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
         }
     }
@@ -372,6 +372,13 @@ function imagePreview(element){
                     }
                     itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
                 });
+                var container = win.document.getElementsByTagName('div')[0];
+                var widthForResize = container.offsetWidth;
+                var heightForResize = container.offsetHeight;
+                win.resizeTo(widthForResize + 40, heightForResize + 100);
+                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+                    itemBannerInstance.imageRelatedJqElements[element].on('click', bringPreviewWindowInFront);
+                });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     itemBannerInstance.modes.forEach(function (mode) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
@@ -386,13 +393,6 @@ function imagePreview(element){
                         }
                     });
                     win.close();
-                });
-                var container = win.document.getElementsByTagName('div')[0];
-                var widthForResize = container.offsetWidth;
-                var heightForResize = container.offsetHeight;
-                win.resizeTo(widthForResize + 40, heightForResize + 100);
-                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
-                    itemBannerInstance.imageRelatedJqElements[element].on('click', bringPreviewWindowInFront);
                 });
             }
             Event.observe(win, 'unload', function () {
@@ -470,13 +470,17 @@ function bringPreviewWindowInFront(event) {
     itemBannerInstance.croppings.preview.windowObject.focus();
 }
 
-function saveDialog(event) {
-    $j( "<div/>", {
-        id: 'save_dialog'
-    })
-    .html('Would You like to proceed with the new image?(The instance will be saved!)')
-    .appendTo(itemBannerInstance.imageRelatedJqElements.file);
-    $j( "#save_dialog" ).dialog({
+function saveDialogOne(event) {
+    var dilogDiv = $j( "#save_dialog" );
+    if (dilogDiv.length === 0) {
+        dilogDiv = $j( "<div/>", {
+            id: 'save_dialog'
+        })
+    }
+    dilogDiv.attr('title', 'Change image?')
+        .html('Would You like to proceed with the new image?(The instance will be saved!)')
+        .appendTo(itemBannerInstance.imageRelatedJqElements.file);
+    dilogDiv.dialog({
         autoOpen: true,
         modal: true,
         buttons: [{
@@ -491,7 +495,46 @@ function saveDialog(event) {
             text: "Cancel",
             icon: "ui-icon-cancel",
             click: function () {
-                jQuery( this ).dialog( "close" );
+                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+                    if (element === 'file') {
+                        return;
+                    }
+                    itemBannerInstance.imageRelatedJqElements[element].off('click').on('click', {e: dilogDiv}, saveDialogTwo);
+                });
+                $j( this ).dialog( "close" );
+            }
+        }]
+    });
+}
+
+function saveDialogTwo(event) {
+    event.preventDefault();
+    var dilogDiv = event.data.e;
+    dilogDiv.html('Second message Second message Second message').attr('title', 'Chose image.');
+    dilogDiv.dialog({
+        autoOpen: true,
+        modal: true,
+        buttons: [{
+            text: "Current Image",
+            icon: "ui-icon-circle-check",
+            click: function () {
+                saveAndContinueEdit();
+                $j( this ).dialog( "close" );
+            }
+        },
+        {
+        text: "New Image",
+        icon: "ui-icon-circle-check",
+        click: function () {
+            itemBannerInstance.imageRelatedJqElements.file.val('');
+            $j( this ).dialog( "close" );
+        }
+    },
+        {
+            text: "Neither of two",
+            icon: "ui-icon-cancel",
+            click: function () {
+                $j( this ).dialog( "close" );
             }
         }]
     });
