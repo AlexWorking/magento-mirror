@@ -125,7 +125,7 @@ $j( document ).ready(function () {
                     itemBannerInstance.croppings.main.attach();
                 }
             });
-            itemBannerInstance.imageRelatedJqElements.file.on('change', saveDialogOne);
+            itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
         }
     }
@@ -471,15 +471,24 @@ function bringPreviewWindowInFront(event) {
 }
 
 function saveDialogOne(event) {
+    var element = event.data.e;
+    if (element.val() === '') {
+        Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+            if (element === 'file') {
+                return;
+            }
+            itemBannerInstance.imageRelatedJqElements[element].off('click', saveDialogTwo);
+        });
+        return;
+    }
     var dilogDiv = $j( "#save_dialog" );
     if (dilogDiv.length === 0) {
         dilogDiv = $j( "<div/>", {
             id: 'save_dialog'
-        })
+        }).appendTo(itemBannerInstance.imageRelatedJqElements.file);
     }
     dilogDiv.attr('title', 'Change image?')
-        .html('Would You like to proceed with the new image?(The instance will be saved!)')
-        .appendTo(itemBannerInstance.imageRelatedJqElements.file);
+        .html('Would You like to proceed with the new image?(The instance will be saved!)');
     dilogDiv.dialog({
         autoOpen: true,
         modal: true,
@@ -499,7 +508,7 @@ function saveDialogOne(event) {
                     if (element === 'file') {
                         return;
                     }
-                    itemBannerInstance.imageRelatedJqElements[element].off('click').on('click', {e: dilogDiv}, saveDialogTwo);
+                    itemBannerInstance.imageRelatedJqElements[element].on('click', {e: dilogDiv}, saveDialogTwo);
                 });
                 $j( this ).dialog( "close" );
             }
