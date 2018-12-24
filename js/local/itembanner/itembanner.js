@@ -211,6 +211,7 @@ function Cropping(currentWindow, buttons) {
                 }
             );
             if (p.jcObjects[mode].disabled === true) {
+                $j( ".content-header-floating").css('z-index', 601);
                 p.jcObjects[mode].api.disable();
             }
             p.jcObjects[mode].actual = true;
@@ -310,6 +311,9 @@ function imagePreview(element){
                 itemBannerInstance.croppings.preview.windowObject.focus();
                 return;
             }
+            else if (itemBannerInstance.imageRelatedJqElements.file.val() !== '') {
+                return;
+            }
             win = win.open('', 'preview', 'width=1200,height=1200,resizable=1,scrollbars=1');
             win.document.open();
             win.document.write('<head>');
@@ -377,7 +381,7 @@ function imagePreview(element){
                 var heightForResize = container.offsetHeight;
                 win.resizeTo(widthForResize + 40, heightForResize + 100);
                 Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
-                    itemBannerInstance.imageRelatedJqElements[element].on('click', bringPreviewWindowInFront);
+                    itemBannerInstance.imageRelatedJqElements[element].on('click', bringPreviewWindowForward);
                 });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
                     itemBannerInstance.modes.forEach(function (mode) {
@@ -411,7 +415,7 @@ function imagePreview(element){
                     itemBannerInstance.croppings.main.jcObjects[mode].buttons.revert.jqObject.css('visibility', returnVisibility);
                 });
                 Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
-                    itemBannerInstance.imageRelatedJqElements[element].off('click', bringPreviewWindowInFront);
+                    itemBannerInstance.imageRelatedJqElements[element].off('click', bringPreviewWindowForward);
                 });
             });
         }
@@ -465,7 +469,7 @@ function revertAction (event) {
     cropping.jcObjects[mode].coordsForSelect = temp;
 }
 
-function bringPreviewWindowInFront(event) {
+function bringPreviewWindowForward(event) {
     event.preventDefault();
     itemBannerInstance.croppings.preview.windowObject.focus();
 }
@@ -473,6 +477,12 @@ function bringPreviewWindowInFront(event) {
 function saveDialogOne(event) {
     var element = event.data.e;
     if (element.val() === '') {
+        itemBannerInstance.modes.forEach(function (mode) {
+            itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
+            if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
+                itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
+            }
+        });
         Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
             if (element === 'file') {
                 return;
@@ -485,11 +495,20 @@ function saveDialogOne(event) {
     if (dilogDiv.length === 0) {
         dilogDiv = $j( "<div/>", {
             id: 'save_dialog'
-        }).appendTo(itemBannerInstance.imageRelatedJqElements.file);
+        });
     }
     dilogDiv.attr('title', 'Change image?')
         .html('Would You like to proceed with the new image?(The instance will be saved!)');
     dilogDiv.dialog({
+        create: function (event, ui) {
+            $j( ".ui-dialog" ).css('z-index', 602);
+        },
+        open: function (event, ui) {
+            $j("body").css({ overflow: 'hidden' })
+        },
+        beforeClose: function(event, ui) {
+            $j("body").css({ overflow: 'inherit' })
+        },
         autoOpen: true,
         modal: true,
         buttons: [{
@@ -504,6 +523,12 @@ function saveDialogOne(event) {
             text: "Cancel",
             icon: "ui-icon-cancel",
             click: function () {
+                itemBannerInstance.modes.forEach(function (mode) {
+                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
+                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
+                        itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
+                    }
+                });
                 Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
                     if (element === 'file') {
                         return;
@@ -511,7 +536,7 @@ function saveDialogOne(event) {
                     itemBannerInstance.imageRelatedJqElements[element].on('click', {e: dilogDiv}, saveDialogTwo);
                 });
                 $j( this ).dialog( "close" );
-            }
+             }
         }]
     });
 }
@@ -521,10 +546,39 @@ function saveDialogTwo(event) {
     var dilogDiv = event.data.e;
     dilogDiv.html('Second message Second message Second message').attr('title', 'Chose image.');
     dilogDiv.dialog({
+        create: function (event, ui) {
+            $j( ".ui-dialog" ).css('z-index', 602);
+        },
+        open: function (event, ui) {
+            $j("body").css({ overflow: 'hidden' })
+        },
+        beforeClose: function(event, ui) {
+            $j("body").css({ overflow: 'inherit' })
+        },
         autoOpen: true,
         modal: true,
         buttons: [{
             text: "Current Image",
+            icon: "ui-icon-circle-check",
+            click: function () {
+                itemBannerInstance.imageRelatedJqElements.file.val('');
+                itemBannerInstance.modes.forEach(function (mode) {
+                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
+                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
+                        itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
+                    }
+                });
+                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+                    if (element === 'file') {
+                        return;
+                    }
+                    itemBannerInstance.imageRelatedJqElements[element].off('click', saveDialogTwo);
+                });
+                $j( this ).dialog( "close" );
+            }
+        },
+        {
+            text: "New Image",
             icon: "ui-icon-circle-check",
             click: function () {
                 saveAndContinueEdit();
@@ -532,18 +586,10 @@ function saveDialogTwo(event) {
             }
         },
         {
-        text: "New Image",
-        icon: "ui-icon-circle-check",
-        click: function () {
-            itemBannerInstance.imageRelatedJqElements.file.val('');
-            $j( this ).dialog( "close" );
-        }
-    },
-        {
-            text: "Neither of two",
-            icon: "ui-icon-cancel",
-            click: function () {
-                $j( this ).dialog( "close" );
+                text: "Neither of two",
+                icon: "ui-icon-cancel",
+                click: function () {
+                    $j( this ).dialog( "close" );
             }
         }]
     });
