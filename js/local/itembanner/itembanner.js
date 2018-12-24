@@ -103,6 +103,12 @@ var itemBannerInstance = {
         this.croppings.main.jcObjects[mode].coordsToFill = this.relCoords[mode].forPost;
         this.croppings.main.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
         this.croppings.preview.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
+    },
+    emptyRelCoords: function () {
+        var ibi = this;
+        ibi.modes.forEach(function (mode) {
+            $j( "#" + ibi.inputIds[mode] ).val('');
+        });
     }
 };
 
@@ -123,6 +129,7 @@ $j( document ).ready(function () {
                     itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
                     itemBannerInstance.croppings.main.workoutButtons();
                     itemBannerInstance.croppings.main.attach();
+                    $j( ".content-header-floating").css('z-index', 601);
                 }
             });
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
@@ -198,10 +205,10 @@ function Cropping(currentWindow, buttons) {
     this.attach = function (hereMode) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
-            if (p.jcObjects[mode].actual === true) {
-                p.jcObjects[mode].actual = null;
+            if (p.jcObjects[mode].isSelectActual === true) {
+                p.jcObjects[mode].isSelectActual = null;
             }
-            else if (p.jcObjects[mode].actual === false) {
+            else if (p.jcObjects[mode].isSelectActual === false) {
                 p.jcObjects[mode].manageSelect();
             }
             p.jq( "#image_preview_" + mode ).Jcrop(
@@ -211,10 +218,9 @@ function Cropping(currentWindow, buttons) {
                 }
             );
             if (p.jcObjects[mode].disabled === true) {
-                $j( ".content-header-floating").css('z-index', 601);
                 p.jcObjects[mode].api.disable();
             }
-            p.jcObjects[mode].actual = true;
+            p.jcObjects[mode].isSelectActual = true;
             if (itemBannerInstance.relCoords[mode].currentChangeStatus === true) {
                 itemBannerInstance.relCoords[mode].currentChangeStatus = false;
             }
@@ -228,7 +234,7 @@ function Cropping(currentWindow, buttons) {
                     p.windowObject.alert('The cropping square is not large enough!');
                     p.jcObjects[mode].api.release();
                 } else {
-                    if (p.jcObjects[mode].actual === true) {
+                    if (p.jcObjects[mode].isSelectActual === true) {
                         p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
                         itemBannerInstance.relCoords[mode].currentChangeStatus = true;
                     }
@@ -278,6 +284,13 @@ function Cropping(currentWindow, buttons) {
                         buttonsProp[buttonName].pseudoDisabled = false;
                     }
                 });
+
+                return p.jcObjects[mode];
+            },
+            toggleApiDisable: function (fulfill) {
+                if (p.jcObjects[mode].disabled === false) {
+                    p.jcObjects[mode].api[fulfill]();
+                }
             },
             bgColor: 'transparent',
             bgOpacity: .2,
@@ -288,7 +301,7 @@ function Cropping(currentWindow, buttons) {
             disabled: p.isMainWindowCopping,
             api: undefined,
             buttons: {},
-            actual: false
+            isSelectActual: false
         };
     });
 }
@@ -363,7 +376,7 @@ function imagePreview(element){
                     itemBannerInstance.modes.forEach(function (mode) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
                             itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
-                            itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
+                            itemBannerInstance.croppings.preview.jcObjects[mode].isSelectActual = false;
                         }
                         itemBannerInstance.croppings.preview.workoutButtons(mode);
                     });
@@ -371,10 +384,7 @@ function imagePreview(element){
                 itemBannerInstance.croppings.preview.attach();
                 itemBannerInstance.modes.forEach(function (mode) {
                     itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
-                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
-                        itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
-                    }
-                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
+                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('disable');
                 });
                 var container = win.document.getElementsByTagName('div')[0];
                 var widthForResize = container.offsetWidth;
@@ -389,7 +399,7 @@ function imagePreview(element){
                             itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
                             itemBannerInstance.swapCoordsToFill(mode);
                             Object.keys(itemBannerInstance.croppings).forEach(function (cropping) {
-                                itemBannerInstance.croppings[cropping].jcObjects[mode].actual = false;
+                                itemBannerInstance.croppings[cropping].jcObjects[mode].isSelectActual = false;
                             });
                             itemBannerInstance.croppings.main.attach(mode);
                             itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
@@ -403,12 +413,10 @@ function imagePreview(element){
                 itemBannerInstance.modes.forEach(function (mode) {
                     if (passed[mode] === false) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === null && itemBannerInstance.relCoords[mode].entryChangeStatus !== null) {
-                            itemBannerInstance.croppings.preview.jcObjects[mode].actual = false;
+                            itemBannerInstance.croppings.preview.jcObjects[mode].isSelectActual = false;
                         }
                         itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
-                        if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
-                            itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-                        }
+                        itemBannerInstance.croppings.main.jcObjects[mode].toggleApiDisable('enable');
                     }
                     itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
                     var returnVisibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
@@ -464,7 +472,7 @@ function revertAction (event) {
     var temp = cropping.jcObjects[mode].coordsForSelect;
     cropping.jcObjects[mode].coordsForSelect = cropping.jcObjects[mode].coordsToFill;
     itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
-    cropping.jcObjects[mode].actual = false;
+    cropping.jcObjects[mode].isSelectActual = false;
     cropping.attach(mode);
     cropping.jcObjects[mode].coordsForSelect = temp;
 }
@@ -478,10 +486,7 @@ function saveDialogOne(event) {
     var element = event.data.e;
     if (element.val() === '') {
         itemBannerInstance.modes.forEach(function (mode) {
-            itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
-            if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
-                itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-            }
+            itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('enable');
         });
         Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
             if (element === 'file') {
@@ -489,17 +494,18 @@ function saveDialogOne(event) {
             }
             itemBannerInstance.imageRelatedJqElements[element].off('click', saveDialogTwo);
         });
+        $j("span.ui-dialog-title").text('Change Image?');
         return;
     }
-    var dilogDiv = $j( "#save_dialog" );
-    if (dilogDiv.length === 0) {
-        dilogDiv = $j( "<div/>", {
+    var dialogDiv = $j( "#save_dialog" );
+    if (dialogDiv.length === 0) {
+        dialogDiv = $j( "<div/>", {
             id: 'save_dialog'
         });
     }
-    dilogDiv.attr('title', 'Change image?')
+    dialogDiv.attr('title', 'Change Image?')
         .html('Would You like to proceed with the new image?(The instance will be saved!)');
-    dilogDiv.dialog({
+    dialogDiv.dialog({
         create: function (event, ui) {
             $j( ".ui-dialog" ).css('z-index', 602);
         },
@@ -509,12 +515,14 @@ function saveDialogOne(event) {
         beforeClose: function(event, ui) {
             $j("body").css({ overflow: 'inherit' })
         },
+        close: cancelDialog(),
         autoOpen: true,
         modal: true,
         buttons: [{
             text: "Ok",
             icon: "ui-icon-circle-check",
             click: function () {
+                itemBannerInstance.emptyRelCoords();
                 saveAndContinueEdit();
                 $j( this ).dialog( "close" );
             }
@@ -523,50 +531,39 @@ function saveDialogOne(event) {
             text: "Cancel",
             icon: "ui-icon-cancel",
             click: function () {
-                itemBannerInstance.modes.forEach(function (mode) {
-                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
-                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
-                        itemBannerInstance.croppings.main.jcObjects[mode].api.disable();
-                    }
-                });
-                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
-                    if (element === 'file') {
-                        return;
-                    }
-                    itemBannerInstance.imageRelatedJqElements[element].on('click', {e: dilogDiv}, saveDialogTwo);
-                });
                 $j( this ).dialog( "close" );
-             }
+            }
         }]
     });
+
+    function cancelDialog() {
+        itemBannerInstance.modes.forEach(function (mode) {
+            itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('disable');
+        });
+        Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+            if (element === 'file') {
+                return;
+            }
+            itemBannerInstance.imageRelatedJqElements[element].on('click', {e: dialogDiv}, saveDialogTwo);
+        });
+    }
 }
 
 function saveDialogTwo(event) {
     event.preventDefault();
-    var dilogDiv = event.data.e;
-    dilogDiv.html('Second message Second message Second message').attr('title', 'Chose image.');
-    dilogDiv.dialog({
-        create: function (event, ui) {
-            $j( ".ui-dialog" ).css('z-index', 602);
-        },
-        open: function (event, ui) {
-            $j("body").css({ overflow: 'hidden' })
-        },
-        beforeClose: function(event, ui) {
-            $j("body").css({ overflow: 'inherit' })
-        },
-        autoOpen: true,
-        modal: true,
+    var dialogDiv = event.data.e;
+    dialogDiv.html('Please chose the Image You would like to precede to cropping on');
+    $j("span.ui-dialog-title").text('Chose Image');
+    dialogDiv.dialog({
+        close: undefined,
         buttons: [{
-            text: "Current Image",
+            text: "Current Image!",
             icon: "ui-icon-circle-check",
             click: function () {
                 itemBannerInstance.imageRelatedJqElements.file.val('');
+                $j("span.ui-dialog-title").text('Change Image?');
                 itemBannerInstance.modes.forEach(function (mode) {
-                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
-                    if (itemBannerInstance.croppings.main.jcObjects[mode].disabled === false) {
-                        itemBannerInstance.croppings.main.jcObjects[mode].api.enable();
-                    }
+                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('enable');
                 });
                 Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
                     if (element === 'file') {
@@ -581,15 +578,28 @@ function saveDialogTwo(event) {
             text: "New Image",
             icon: "ui-icon-circle-check",
             click: function () {
+                itemBannerInstance.emptyRelCoords();
                 saveAndContinueEdit();
                 $j( this ).dialog( "close" );
             }
         },
         {
-                text: "Neither of two",
-                icon: "ui-icon-cancel",
-                click: function () {
-                    $j( this ).dialog( "close" );
+            text: "Neither of two",
+            icon: "ui-icon-cancel",
+            click: function () {
+                $j( this ).dialog( "close" );
+                $j("span.ui-dialog-title").text('Cropping Banned!');
+                dialogDiv.html("Please notice");
+                dialogDiv.dialog({
+                    close: undefined,
+                    buttons: [{
+                        text: "Ok",
+                        icon: "ui-icon-circle-check",
+                        click: function () {
+                            $j( this ).dialog( "close" );
+                        }
+                    }]
+                });
             }
         }]
     });
