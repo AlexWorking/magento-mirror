@@ -22,9 +22,13 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             if ($parent['image']['delete']) {
                 //TODO disable widget
                 $parent['image'] = null;
+                $parent['rel_coords_grid'] = Mage::helper('core')->jsonEncode([]);
+                $parent['rel_coords_list'] = Mage::helper('core')->jsonEncode([]);
             }
             elseif ($uploaded = $this->imageUpload()) {
                 $parent['image'] = $uploaded;
+                $parent['rel_coords_grid'] = Mage::helper('core')->jsonEncode([]);
+                $parent['rel_coords_list'] = Mage::helper('core')->jsonEncode([]);
             }
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
                 $parent['image'] = $image;

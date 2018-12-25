@@ -103,12 +103,6 @@ var itemBannerInstance = {
         this.croppings.main.jcObjects[mode].coordsToFill = this.relCoords[mode].forPost;
         this.croppings.main.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
         this.croppings.preview.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
-    },
-    emptyRelCoords: function () {
-        var ibi = this;
-        ibi.modes.forEach(function (mode) {
-            $j( "#" + ibi.inputIds[mode] ).val('');
-        });
     }
 };
 
@@ -515,14 +509,13 @@ function saveDialogOne(event) {
         beforeClose: function(event, ui) {
             $j("body").css({ overflow: 'inherit' })
         },
-        close: cancelDialog(),
+        close: cancelDialog,
         autoOpen: true,
         modal: true,
         buttons: [{
             text: "Ok",
             icon: "ui-icon-circle-check",
             click: function () {
-                itemBannerInstance.emptyRelCoords();
                 saveAndContinueEdit();
                 $j( this ).dialog( "close" );
             }
@@ -578,7 +571,6 @@ function saveDialogTwo(event) {
             text: "New Image",
             icon: "ui-icon-circle-check",
             click: function () {
-                itemBannerInstance.emptyRelCoords();
                 saveAndContinueEdit();
                 $j( this ).dialog( "close" );
             }
