@@ -49,6 +49,26 @@
                 <type>text</type>
                 <value>[]</value>
             </rel_coords_list>
+            <title>
+                <label>Title for Itembanner Widget</label>
+                <visible>1</visible>
+                <type>text</type>
+            </title>
+            <description>
+                <label>Description for Itembanner Widget</label>
+                <visible>1</visible>
+                <type>text</type>
+            </description>
+            <link>
+                <label>Link for Itembanner Widget Popup</label>
+                <visible>1</visible>
+                <type>text</type>
+            </link>
+            <goto>
+                <label>Link Clicks Count</label>
+                <visible>1</visible>
+                <type>text</type>
+            </goto>
             <template translate="label">
                 <label>Template</label>
                 <visible>1</visible>

@@ -25,4 +25,38 @@
  */
 ?>
 
-<img style="width: 100%; height: 100%;" src="<?php echo $this->getImageUrl()?>" alt="Problems with Image Loading">
+<script>
+    function renderPopup() {
+        var dialogDiv = $j( "#ib_popup" );
+        if (dialogDiv.length === 0) {
+            dialogDiv = $j( "<div/>", {
+                id: 'ib_popup'
+            });
+        dialogDiv.attr('title', <?= $this->getData('title'); ?>)
+            .html('<?= $this->getData('description'); ?>');
+        }
+        dialogDiv.dialog({
+            create: function (event, ui) {
+                $j( ".ui-dialog" ).css('z-index', 602);
+            },
+            //close: cancelDialog,
+            autoOpen: true,
+            buttons: [{
+                text: "Ok",
+                icon: "ui-icon-circle-check",
+                click: function () {
+                    saveAndContinueEdit();
+                    $j( this ).dialog( "close" );
+                }
+            },
+                {
+                    text: "Cancel",
+                    icon: "ui-icon-cancel",
+                    click: function () {
+                        $j( this ).dialog( "close" );
+                    }
+                }]
+        });
+    }
+</script>
+<img style="width: 100%; height: 100%;" src="<?php echo $this->getImageUrl()?>" alt="Problems with Image Loading" onclick="renderPopup()">

@@ -3,7 +3,8 @@ var itemBannerInstance = {
     coordIdentifiers: undefined,
     imageRelatedJqElements: undefined,
     modes: [],
-    inputIds: [],
+    relCordsInputIds: {},
+    popupInputIds: {},
     relCoords: {},
     croppings: {},
     buttonWorkouts: {},
@@ -18,6 +19,10 @@ var itemBannerInstance = {
         ibi.result = ($j("#type").val() === 'itembanner/banner');
         if (ibi.result === true && typeof outerVariables !== "undefined") {
             ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
+            ibi.popupInputIds = {
+                title: outerVariables.instanceHtmlIdPrefix + '_title',
+                description: outerVariables.instanceHtmlIdPrefix + '_description'
+            };
             ibi.imageRelatedJqElements = {
                 preview: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
                 file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
@@ -26,9 +31,9 @@ var itemBannerInstance = {
             };
             ibi.modes = ['grid', 'list'];
             ibi.modes.forEach(function (mode) {
-                ibi.inputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
+                ibi.relCordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
                 ibi.relCoords[mode] = {
-                    original: JSON.parse($j( "#" + ibi.inputIds[mode] ).val()),
+                    original: JSON.parse($j( "#" + ibi.relCordsInputIds[mode] ).val()),
                     aCoords: [],
                     bCoords: [],
                     forPost: 'aCoords',
@@ -91,7 +96,7 @@ var itemBannerInstance = {
         var arrayToUpload;
         ibi.modes.forEach(function (mode) {
             arrayToUpload = ibi.relCoords[mode].forPost;
-            $j( "#" + ibi.inputIds[mode] ).attr(
+            $j( "#" + ibi.relCordsInputIds[mode] ).attr(
                 'value',
                 JSON.stringify(ibi.relCoords[mode][arrayToUpload])
             );
@@ -128,6 +133,9 @@ $j( document ).ready(function () {
             });
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
+            $j( "#" + itemBannerInstance.popupInputIds.title ).attr('maxlength', 100);
+            $j( "#" + itemBannerInstance.popupInputIds.description ).attr('maxlength', 300);
+            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ).addClass('validate-url');
         }
     }
 });
