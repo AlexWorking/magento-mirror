@@ -42,21 +42,11 @@
             //close: cancelDialog,
             autoOpen: true,
             buttons: [{
-                text: "Ok",
-                icon: "ui-icon-circle-check",
+                text: "Go to",
                 click: function () {
-                    saveAndContinueEdit();
-                    $j( this ).dialog( "close" );
+                    setLocation("<?= $this->getData('link'); ?>");
                 }
-            },
-                {
-                    text: "Cancel",
-                    icon: "ui-icon-cancel",
-                    click: function () {
-                        $j( this ).dialog( "close" );
-                    }
-                }]
-        });
+            });
     }
 </script>
 <img style="width: 100%; height: 100%;" src="<?php echo $this->getImageUrl()?>" alt="Problems with Image Loading" onclick="renderPopup()">
