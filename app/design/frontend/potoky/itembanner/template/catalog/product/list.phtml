@@ -26,10 +26,9 @@
 ?>
 <script>
     var counter = 0;
-    var bannerOnClicks = [];
-    function getBannerOnclick (identifier, title, description, link) {
+    var dialogDivs = [];
+    function pushDialogDiv(identifier, title, description, link) {
         var popup = function() {
-            var dialogDivs = [];
             var dialogDiv = $j( "#ib_popup_" + identifier );
             if (dialogDiv.length === 0) {
                 dialogDiv = $j( "<div/>", {
@@ -57,13 +56,17 @@
             theButton.button({classes: {
                 "ui-button": "ib_popup_button"
             }});
-            dialogDivs.push(dialogDiv);
-            return function () {
-                dialogDiv.dialog('open');
-            }
+            return dialogDiv;
         };
-        bannerOnClicks.push(popup());
+        dialogDivs.push(popup());
     }
+
+    function getBannerOnClick(j) {
+        return function () {
+            dialogDivs[j].dialog('open');
+        }
+    }
+
 </script>
 <?php
 /**
