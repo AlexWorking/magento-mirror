@@ -26,30 +26,12 @@
 ?>
 
 <script>
-    function renderPopup() {
-        var dialogDiv = $j( "#ib_popup_<?= $this->getNameInLayout(); ?>" );
-        if (dialogDiv.length === 0) {
-            dialogDiv = $j( "<div/>", {
-                id: 'ib_popup_<?= $this->getNameInLayout(); ?>'
-        });
-        dialogDiv.attr('title', "<?= $this->getData('title'); ?>")
-            .html("<?= $this->getData('description'); ?>");
-        }
-        dialogDiv.dialog({
-            appendTo: "#<?= $this->getNameInLayout(); ?>",
-            create: function (event, ui) {
-                $j(".ui-dialog").css('z-index', 602);
-            },
-            //close: cancelDialog,
-            autoOpen: true,
-            buttons: [{
-                text: "Go to",
-                click: function () {
-                    window.open("<?= $this->getData('link'); ?>");
-                    $j(".ui-dialog").button('disable');
-                }
-            }]
-        });
-    }
+    getBannerOnclick(
+        '<?= $this->getNameInLayout(); ?>',
+        '<?= $this->getData('title'); ?>',
+        '<?= $this->getData('description'); ?>',
+        '<?= $this->getData('link'); ?>',
+        counter
+    );
 </script>
-<img style="width: 100%; height: 100%;" src="<?php echo $this->getImageUrl()?>" alt="Problems with Image Loading" onclick="renderPopup()">
+<img style="width: 100%; height: 100%;" src="<?php echo $this->getImageUrl()?>" alt="Problems with Image Loading" onclick="bannerOnClicks[1]()">
