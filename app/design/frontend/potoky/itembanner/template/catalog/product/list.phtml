@@ -28,37 +28,40 @@
     var counter = 0;
     var dialogDivs = [];
     function pushDialogDiv(identifier, title, description, link) {
-        var popup = function() {
-            var dialogDiv = $j( "#ib_popup_" + identifier );
-            if (dialogDiv.length === 0) {
-                dialogDiv = $j( "<div/>", {
-                    id: 'ib_popup_' + identifier
-                });
-                dialogDiv.attr('title', title)
-                    .html(description);
-            }
-            var theButton;
-            dialogDiv.dialog({
-                appendTo: "#" + identifier,
-                create: function (event, ui) {
-                    theButton = dialogDiv.parent().children( ".ui-dialog-buttonpane" ).find( "button" );
-                    $j(".ui-dialog").css('z-index', 602);
-                },
-                autoOpen: false,
-                buttons: [{
-                    text: "Go to",
-                    click: function () {
-                        window.open(link);
-                        theButton.button('disable');
-                    }
-                }]
+        var dialogDiv = $j( "#ib-popup-" + identifier );
+        if (dialogDiv.length === 0) {
+            dialogDiv = $j( "<div/>", {
+                id: 'ib-popup-' + identifier
             });
-            theButton.button({classes: {
-                "ui-button": "ib_popup_button"
-            }});
-            return dialogDiv;
-        };
-        dialogDivs.push(popup());
+            dialogDiv.attr('title', title)
+                .html(description);
+        }
+        var theButton;
+        dialogDiv.dialog({
+            classes: {
+                "ui-dialog-titlebar": "ib-popup-titlebar",
+                "ui-dialog-content": "ib-popup-content",
+                "ui-dialog-buttonpane": "ib-popup-buttonpane"
+            },
+            appendTo: "#" + identifier,
+            create: function (event, ui) {
+                theButton = dialogDiv.parent().children( ".ui-dialog-buttonpane" ).find( "button" );
+                $j(".ui-dialog").css('z-index', 602);
+            },
+            autoOpen: false,
+            buttons: [{
+                text: "Go to",
+                click: function () {
+                    window.open(link);
+                    theButton.button('disable');
+                }
+            }]
+        });
+        theButton.button({classes: {
+            "ui-button": "ib-popup-button"
+        }});
+        dialogDivs.push(dialogDiv);
+        $j( "<div/>" ).addClass('ib-popup-assisting').insertBefore(dialogDiv);
     }
 
     function getBannerOnClick(j) {

@@ -1,0 +1,14 @@
+
+.ui-dialog-titlebar.ib-popup-titlebar {
+    background-color: orangered;
+    border: none;
+    font-size: 16px;
+    text-align: center;
+}
+
+.ib-popup-assisting {
+    width: 291px;
+    height: 15px;
+    background-color: orangered;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}

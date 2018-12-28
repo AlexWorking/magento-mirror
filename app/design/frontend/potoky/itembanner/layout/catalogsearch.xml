@@ -35,6 +35,10 @@
                 <rel>stylesheet</rel>
                 <href>http://review3.school.com/skin/adminhtml/default/default/itembanner/jquery-ui.min.css</href>
             </action>
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/popup.css</name>
+            </action>
         </reference>
 
         <reference name="header">
