@@ -36,29 +36,37 @@
             dialogDiv.attr('title', title)
                 .html(description);
         }
-        var theButton;
+        var acceptButton;
+        var closeButton;
         dialogDiv.dialog({
             classes: {
                 "ui-dialog-titlebar": "ib-popup-titlebar",
                 "ui-dialog-content": "ib-popup-content",
-                "ui-dialog-buttonpane": "ib-popup-buttonpane"
+                "ui-dialog-buttonpane": "ib-popup-buttonpane",
+                "ui-dialog-title": "ib-popup-title"
             },
             appendTo: "#" + identifier,
             create: function (event, ui) {
-                theButton = dialogDiv.parent().children( ".ui-dialog-buttonpane" ).find( "button" );
+                acceptButton = dialogDiv.parent().children( ".ui-dialog-buttonpane" ).find( "button" );
+                closeButton = dialogDiv.parent().children( ".ui-dialog-titlebar" ).find( "button" );
                 $j(".ui-dialog").css('z-index', 602);
             },
             autoOpen: false,
+            maxHeight: 320,
+            modal:true,
             buttons: [{
                 text: "Go to",
                 click: function () {
                     window.open(link);
-                    theButton.button('disable');
+                    acceptButton.button('disable');
                 }
             }]
         });
-        theButton.button({classes: {
-            "ui-button": "ib-popup-button"
+        acceptButton.button({classes: {
+            "ui-button": "ib-popup-accept-button"
+        }});
+        closeButton.button({classes: {
+            "ui-button": "ib-popup-close-button"
         }});
         dialogDivs.push(dialogDiv);
         $j( "<div/>" ).addClass('ib-popup-assisting').insertBefore(dialogDiv);
