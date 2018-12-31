@@ -25,6 +25,7 @@
  */
 ?>
 <script>
+    'use strict';
     var counter = 0;
     var dialogDivs = [];
     function pushDialogDiv(identifier, title, description, link) {
@@ -40,16 +41,16 @@
         var closeButton;
         dialogDiv.dialog({
             classes: {
-                "ui-dialog-titlebar": "ib-popup-titlebar",
-                "ui-dialog-content": "ib-popup-content",
-                "ui-dialog-buttonpane": "ib-popup-buttonpane",
-                "ui-dialog-title": "ib-popup-title"
+                "ui-dialog-titlebar": "ib-popup",
+                "ui-dialog-title": "ib-popup",
+                "ui-dialog-content": "ib-popup",
+                "ui-dialog-buttonpane": "ib-popup",
+                "ui-dialog-buttonset": "ib-popup"
             },
             appendTo: "#" + identifier,
             create: function (event, ui) {
                 acceptButton = dialogDiv.parent().children( ".ui-dialog-buttonpane" ).find( "button" );
                 closeButton = dialogDiv.parent().children( ".ui-dialog-titlebar" ).find( "button" );
-                $j(".ui-dialog").css('z-index', 602);
             },
             autoOpen: false,
             width: 400,
@@ -57,6 +58,7 @@
             modal:true,
             resizable: false,
             buttons: [{
+                width: 360,
                 text: "Go to",
                 click: function () {
                     window.open(link);
@@ -65,10 +67,10 @@
             }]
         });
         acceptButton.button({classes: {
-            "ui-button": "ib-popup-accept-button"
+            "ui-button": "ib-popup"
         }});
         closeButton.button({classes: {
-            "ui-button": "ib-popup-close-button"
+            "ui-button": "ib-popup"
         }});
         dialogDivs.push(dialogDiv);
         $j( "<svg width='392.41' height='18'><polygon style='fill:orangered' points='0,0 392.41,0 196.205,18'/></svg>" ).insertBefore(dialogDiv);
