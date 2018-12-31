@@ -31,8 +31,10 @@
         '<?= $this->getNameInLayout(); ?>',
         '<?= $this->getData('title'); ?>',
         '<?= $this->getData('description'); ?>',
-        '<?= $this->getData('link'); ?>',
+        '<?= $this->getData('link'); ?>'
     );
-    document.currentScript.previousElementSibling.onclick = getBannerOnClick(counter);
+    var scripts = document.getElementsByTagName( 'script' );
+    currentScript = scripts[scripts.length - 1];
+    currentScript.previousElementSibling.onclick = getBannerOnClick(counter);
     counter++
 </script>

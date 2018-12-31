@@ -52,8 +52,10 @@
                 $j(".ui-dialog").css('z-index', 602);
             },
             autoOpen: false,
+            width: 400,
             maxHeight: 320,
             modal:true,
+            resizable: false,
             buttons: [{
                 text: "Go to",
                 click: function () {
@@ -69,7 +71,7 @@
             "ui-button": "ib-popup-close-button"
         }});
         dialogDivs.push(dialogDiv);
-        $j( "<div/>" ).addClass('ib-popup-assisting').insertBefore(dialogDiv);
+        $j( "<svg width='392.41' height='18'><polygon style='fill:orangered' points='0,0 392.41,0 196.205,18'/></svg>" ).insertBefore(dialogDiv);
     }
 
     function getBannerOnClick(j) {

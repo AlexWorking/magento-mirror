@@ -13,11 +13,8 @@
     white-space: normal;
 }
 
-.ib-popup-assisting {
-    width: 291px;
-    height: 15px;
-    background-color: orangered;
-    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+.ib-popup-buttonpane {
+    text-align: center;
 }
 
 .ui-widget.ui-button-icon-only.ui-dialog-titlebar-close.ui-button.ib-popup-close-button {
@@ -32,7 +29,7 @@
 }
 
 .ui-button-icon.ui-icon.ui-icon-closethick {
-    background-image: url(images/ui-icons_ffffff_256x240.png);
+    background-image: url(images/ui-icons_ffffff_256x240.png) !important;
 }
 
 .ib-popup-content {
