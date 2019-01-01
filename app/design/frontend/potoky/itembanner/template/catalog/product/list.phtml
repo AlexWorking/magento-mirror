@@ -28,7 +28,7 @@
     'use strict';
     var counter = 0;
     var dialogDivs = [];
-    function pushDialogDiv(identifier, title, description, link) {
+    function pushDialogDiv(identifier, title, description, link, instanceId) {
         var dialogDiv = $j( "#ib-popup-" + identifier );
         if (dialogDiv.length === 0) {
             dialogDiv = $j( "<div/>", {
@@ -58,11 +58,18 @@
             modal:true,
             resizable: false,
             buttons: [{
-                width: 360,
+                width: '100%',
                 text: "Go to",
                 click: function () {
                     window.open(link);
                     acceptButton.button('disable');
+                    closeButton.css('outline', 'none');
+                    /*$j.ajax({
+                        url: "admin/widget_instance/save/instance_id/" + instanceId,
+                        type: "GET",
+                        data: instanceId,
+                        async: false
+                    });*/
                 }
             }]
         });

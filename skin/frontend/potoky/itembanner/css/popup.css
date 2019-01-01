@@ -26,6 +26,8 @@
 
 .ui-widget.ui-button.ib-popup {
     margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .ui-widget.ui-button-icon-only.ui-dialog-titlebar-close.ui-button.ib-popup {
@@ -40,11 +42,12 @@
 }
 
 .ui-button-icon.ui-icon.ui-icon-closethick {
-    background-image: url(images/ui-icons_ffffff_256x240.png) !important;
+    background-image: url(images/ui-icons_ffffff_256x240.png);
 }
 
-.ui-dialog-content.ib-popup {
+.ui-dialog-content.ib-popup.ui-widget-content {
     font-size: 14px;
     font-weight: bold;
+    text-align: left;
 
 }

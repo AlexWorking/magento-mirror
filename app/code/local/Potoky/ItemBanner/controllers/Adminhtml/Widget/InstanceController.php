@@ -17,7 +17,7 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         $parent = parent::_prepareParameters();
 
         $currentWidgetInstance = Mage::registry('current_widget_instance');
-        if($currentWidgetInstance &&
+        if ($currentWidgetInstance &&
             $currentWidgetInstance->getType() == 'itembanner/banner') {
             if ($parent['image']['delete']) {
                 //TODO disable widget
