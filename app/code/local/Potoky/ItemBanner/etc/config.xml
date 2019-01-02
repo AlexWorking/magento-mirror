@@ -8,6 +8,7 @@
     <default>
         <cms>
             <itembanner>
+                <rendering_type>1</rendering_type>
                 <grid_cropping_aspect_ratio>2.25</grid_cropping_aspect_ratio>
                 <list_cropping_aspect_ratio>0.42</list_cropping_aspect_ratio>
             </itembanner>
@@ -108,5 +109,14 @@
                 </observers>
             </controller_action_layout_generate_blocks_after>
         </events>
+        <routers>
+            <itembanner>
+                <use>standard</use>d
+                <args>
+                    <module>Potoky_ItemBanner</module>
+                    <frontName>itembanner</frontName>
+                </args>
+            </itembanner>
+        </routers>
     </frontend>
 </config>

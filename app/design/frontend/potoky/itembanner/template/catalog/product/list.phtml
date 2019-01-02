@@ -64,12 +64,12 @@
                     window.open(link);
                     acceptButton.button('disable');
                     closeButton.css('outline', 'none');
-                    /*$j.ajax({
-                        url: "admin/widget_instance/save/instance_id/" + instanceId,
+                    $j.ajax({
+                        url: "/itembanner/ajax/clickincrement",
                         type: "GET",
-                        data: instanceId,
+                        data: {instanceId: instanceId},
                         async: false
-                    });*/
+                    });
                 }
             }]
         });

@@ -6,7 +6,7 @@
         <parameters>
             <instance_id>
                 <label>Current Instance Id</label>
-                <visible>0</visible>
+                <visible>1</visible>
                 <type>text</type>
             </instance_id>
             <is_active>
