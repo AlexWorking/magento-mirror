@@ -11,6 +11,7 @@
 .ib-popup .ui-dialog-title.ib-popup {
     float: none;
     white-space: normal;
+    word-wrap: break-word;
 }
 
 .ui-dialog-buttonpane.ib-popup.ui-widget-content.ui-helper-clearfix {

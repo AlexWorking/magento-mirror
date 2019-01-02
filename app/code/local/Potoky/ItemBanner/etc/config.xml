@@ -56,6 +56,17 @@
                 </setup>
             </itembanner_setup>
         </resources>
+        <events>
+            <widget_widget_instance_save_before>
+                <observers>
+                    <additional_before_save_actions>
+                        <type>singleton</type>
+                        <class>Potoky_ItemBanner_Model_Observer</class>
+                        <method>additionalBeforeSave</method>
+                    </additional_before_save_actions>
+                </observers>
+            </widget_widget_instance_save_before>
+        </events>
     </global>
     <admin>
         <routers>
@@ -77,15 +88,6 @@
             </updates>
         </layout>
         <events>
-            <widget_widget_instance_save_before>
-                <observers>
-                    <additional_before_save_actions>
-                        <type>singleton</type>
-                        <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>addSearchHandles</method>
-                    </additional_before_save_actions>
-                </observers>
-            </widget_widget_instance_save_before>
             <widget_widget_instance_save_after>
                 <observers>
                     <itembanner_info_to_db>

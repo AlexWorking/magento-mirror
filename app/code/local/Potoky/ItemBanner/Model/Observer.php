@@ -2,6 +2,13 @@
 
 class Potoky_ItemBanner_Model_Observer
 {
+    private static $saveWithoutController;
+
+    public static function setSaveWithoutController($boolean)
+    {
+        self::$saveWithoutController = $boolean;
+    }
+
     /**
      * To be written
      *
@@ -9,25 +16,55 @@ class Potoky_ItemBanner_Model_Observer
      * @return $this
      * @throws Mage_Core_Exception
      */
-    public function addSearchHandles(Varien_Event_Observer $observer)
+    public function additionalBeforeSave(Varien_Event_Observer $observer)
     {
         /* @var $widgetInstance Mage_Widget_Model_Widget_Instance */
         $widgetInstance = $observer->getEvent()->getObject();
 
-        if($widgetInstance->getType() != "itembanner/banner") {
+        if ($widgetInstance->getType() != "itembanner/banner") {
 
             return $this;
         }
 
-        $pageGroups = $widgetInstance->getData('page_groups');
-        foreach ($pageGroups as &$pageGroup) {
-            if (in_array('catalog_category_layered', $pageGroup['layout_handle_updates']) ||
-                in_array('catalog_category_default', $pageGroup['layout_handle_updates'])) {
-                $pageGroup['layout_handle_updates'][] = 'catalogsearch_result_index';
-                $pageGroup['layout_handle_updates'][] = 'catalogsearch_advanced_result';
+        if (self::$saveWithoutController) {
+            $origPageGroups = $widgetInstance->getOrigData('page_groups');
+            $pageGroups = [];
+            $pageGroupIds = [];
+            $parameters = $widgetInstance->getWidgetParameters();
+            foreach ($origPageGroups as $number => $origPageGroup) {
+                $pageGroups[$number]['page_id'] = $origPageGroup['page_id'];
+                $pageGroups[$number]['group'] = $origPageGroup['page_group'];
+                $pageGroups[$number]['layout_handle'] = $origPageGroup['layout_handle'];
+                $pageGroups[$number]['block_reference'] = $origPageGroup['block_reference'];
+                $pageGroups[$number]['for'] = $origPageGroup['page_for'];
+                $pageGroups[$number]['entities'] = $origPageGroup['entities'];
+                $pageGroups[$number]['template'] = $origPageGroup['page_template'];
+                $pageGroups[$number]['layout_handle_updates'][] = $origPageGroup['layout_handle'];
+
+                if (in_array('catalog_category_layered', $pageGroups[$number]['layout_handle_updates']) ||
+                    in_array('catalog_category_default', $pageGroups[$number]['layout_handle_updates'])) {
+                    $pageGroups[$number]['layout_handle_updates'][] = 'catalogsearch_result_index';
+                    $pageGroups[$number]['layout_handle_updates'][] = 'catalogsearch_advanced_result';
+                }
+
+                $pageGroupIds[] = $origPageGroup['page_id'];
             }
+            $parameters['goto']++;
+            $widgetInstance->setData('widget_parameters', $parameters);
+            $widgetInstance->setData('page_group_ids', $pageGroupIds);
+            unset($parameters);
+        } else {
+            $pageGroups = $widgetInstance->getData('page_groups');
+            foreach ($pageGroups as &$pageGroup) {
+                if (in_array('catalog_category_layered', $pageGroup['layout_handle_updates']) ||
+                    in_array('catalog_category_default', $pageGroup['layout_handle_updates'])) {
+                    $pageGroup['layout_handle_updates'][] = 'catalogsearch_result_index';
+                    $pageGroup['layout_handle_updates'][] = 'catalogsearch_advanced_result';
+                }
+            }
+            unset($pageGroup);
         }
-        unset($pageGroup);
+
         $widgetInstance->setData('page_groups', $pageGroups);
 
         return $this;
