@@ -30,7 +30,6 @@ class Potoky_ItemBanner_Model_Observer
             $origPageGroups = $widgetInstance->getOrigData('page_groups');
             $pageGroups = [];
             $pageGroupIds = [];
-            $parameters = $widgetInstance->getWidgetParameters();
             foreach ($origPageGroups as $number => $origPageGroup) {
                 $pageGroups[$number]['page_id'] = $origPageGroup['page_id'];
                 $pageGroups[$number]['group'] = $origPageGroup['page_group'];
@@ -49,10 +48,8 @@ class Potoky_ItemBanner_Model_Observer
 
                 $pageGroupIds[] = $origPageGroup['page_id'];
             }
-            $parameters['goto']++;
-            $widgetInstance->setData('widget_parameters', $parameters);
             $widgetInstance->setData('page_group_ids', $pageGroupIds);
-            unset($parameters);
+            self::$saveWithoutController = false;
         } else {
             $pageGroups = $widgetInstance->getData('page_groups');
             foreach ($pageGroups as &$pageGroup) {

@@ -4,11 +4,6 @@
             <name>Banner inserted into products</name>
             <description type="desc">Depending on set position appears in place of a product block in the product list or grid</description>
         <parameters>
-            <instance_id>
-                <label>Current Instance Id</label>
-                <visible>1</visible>
-                <type>text</type>
-            </instance_id>
             <is_active>
                 <label>Is This Banner Active</label>
                 <visible>1</visible>
@@ -34,7 +29,7 @@
                 <label>Image For Banner</label>
                 <visible>1</visible>
                 <required>0</required>
-                <type>image</type>
+                <type>ib_image</type>
                 <note>*.jpg, *.png, *.gif, *.jpeg</note>
             </image>
             <rel_coords_grid>
@@ -68,6 +63,7 @@
                 <label>Link Clicks Count</label>
                 <visible>1</visible>
                 <type>text</type>
+                <readonly>readonly</readonly>
             </goto>
             <template translate="label">
                 <label>Template</label>
