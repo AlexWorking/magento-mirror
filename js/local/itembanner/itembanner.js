@@ -133,8 +133,6 @@ $j( document ).ready(function () {
             });
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
-            $j( "#" + itemBannerInstance.popupInputIds.title ).attr('maxlength', 100);
-            $j( "#" + itemBannerInstance.popupInputIds.description ).attr('maxlength', 300);
             $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ).addClass('validate-url');
         }
     }

@@ -36,6 +36,7 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
                 $this->manageRelCoords($image, $parent['rel_coords_list'], 'list');
             }
         }
+
         $parent['instance_id'] = $currentWidgetInstance->getId();
 
         return $parent;

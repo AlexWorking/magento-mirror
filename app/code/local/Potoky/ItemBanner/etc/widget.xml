@@ -63,7 +63,6 @@
                 <label>Link Clicks Count</label>
                 <visible>1</visible>
                 <type>text</type>
-                <readonly>readonly</readonly>
             </goto>
             <template translate="label">
                 <label>Template</label>

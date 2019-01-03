@@ -37,6 +37,13 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
             if ($parent->getData('name') === 'parameters[goto]') {
                 $parent->setData('readonly', 'readonly');
             }
+            elseif ($parent->getData('name') === 'parameters[title]') {
+                $parent->setData('maxlength', '100');
+            }
+            elseif ($parent->getData('name') === 'parameters[description]') {
+                $parent->setData('maxlength', '300');
+                $parent->setWysiwyg(true);
+            }
         }
 
         return $parent;
