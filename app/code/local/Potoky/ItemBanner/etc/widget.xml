@@ -52,7 +52,7 @@
             <description>
                 <label>Description for Itembanner Widget</label>
                 <visible>1</visible>
-                <type>ib_editor</type>
+                <type>editor</type>
             </description>
             <link>
                 <label>Link for Itembanner Widget Popup</label>

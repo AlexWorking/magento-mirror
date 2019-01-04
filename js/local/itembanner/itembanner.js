@@ -134,6 +134,27 @@ $j( document ).ready(function () {
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
             $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ).addClass('validate-url');
+            Validation.addAllThese([
+                ['validate-inner-text-length', 'The text here is not allowed to have more than 300 characters', function(v, elm) {
+                    var reMax = new RegExp(/^maximum-length-[0-9]+$/);
+                    var result = true;
+                    var iframe = document.getElementById(outerVariables.instanceHtmlIdPrefix + '_description_ifr');
+                    var wyz = (iframe === null) ? iframe : iframe.contentWindow.document.getElementById('tinymce');
+                    $w(elm.className).each(function(name, index) {
+                        if (name.match(reMax) && result) {
+                            var length = name.split('-')[2];
+                            if (wyz === null) {
+                                var text = elm.value.stripTags();
+                                result = (text.length <= length)
+                            } else {
+                                result = (wyz.innerText.length <= length)
+                            }
+                        }
+                    });
+                    return result;
+                }]
+            ]);
+
         }
     }
 });

@@ -2,6 +2,8 @@
 
 class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties extends Mage_Widget_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties
 {
+    private $specialFields = ['parameters[goto]', 'parameters[title]', 'parameters[description]'];
+
     /**
      * Fieldset getter/instantiation
      *
@@ -17,7 +19,6 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
 
         if ($this->getWidgetType() == 'itembanner/banner') {
             $parent->addType('ib_image', 'Potoky_ItemBanner_Block_Adminhtml_Widget_Helper_Image');
-            $parent->addType('ib_editor', 'Potoky_ItemBanner_Block_Adminhtml_Widget_Helper_Editor');
             $imageBlock = $this->getLayout()->createBlock('itembanner/adminhtml_widget_cropped');
             $this->setChild('itembanner_cropped', $imageBlock);
             $this->setTemplate('itembanner/form.phtml');
@@ -35,15 +36,20 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
     protected function _addField($parameter)
     {
         if ($parent = parent::_addField($parameter)) {
-            if ($parent->getData('name') === 'parameters[goto]') {
-                $parent->setData('readonly', 'readonly');
-            }
-            elseif ($parent->getData('name') === 'parameters[title]') {
-                $parent->setData('maxlength', '100');
-            }
-            elseif ($parent->getData('name') === 'parameters[description]') {
-                $parent->setWysiwyg(true);
-                $parent->setData('maxlength', '5');
+            $name = $parent->getData('name');
+            if (in_array($name, $this->specialFields)) {
+                switch ($name) {
+                    case 'parameters[goto]':
+                        $parent->setData('readonly', 'readonly');
+                        break;
+                    case 'parameters[title]':
+                        $parent->setData('maxlength', '100');
+                        break;
+                    case 'parameters[description]':
+                        $parent->setdata('wysiwyg', true);
+                        $parent->addClass('validate-inner-text-length maximum-length-5');
+                        break;
+                }
             }
         }
 
