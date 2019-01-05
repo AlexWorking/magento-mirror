@@ -28,10 +28,20 @@
     margin: 10px;
 }
 
+#ib_cancel {
+    margin-top: 20px;
+    margin-right: 0.1em;
+    width: 150px;
+    height: 30px;
+    cursor: hand;
+}
+
 #ib_submit {
     margin-top: 20px;
-    width: 300px;
+    margin-left: 0.1em;
+    width: 150px;
     height: 30px;
+    cursor: hand;
 }
 
 .ib_crop_enable, .ib_crop_highlight {

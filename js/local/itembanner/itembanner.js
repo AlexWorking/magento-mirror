@@ -375,6 +375,7 @@ function imagePreview(element){
             win.document.write('<button class="ib_crop_revert" id="ib_crop_revert_list"></button>');
             win.document.write('</h4>');
             win.document.write('</div>');
+            win.document.write('<input type="submit" id="ib_cancel" value="' + outerVariables.cancelText + '" autofocus="autofocus"/>');
             win.document.write('<input type="submit" id="ib_submit" value="' + outerVariables.submitText + '"/>');
             win.document.write('</div>');
             win.document.write('</body>');
@@ -427,6 +428,9 @@ function imagePreview(element){
                             passed[mode] = true;
                         }
                     });
+                    win.close();
+                });
+                win.document.getElementById("ib_cancel").addEventListener("click", function () {
                     win.close();
                 });
             }
