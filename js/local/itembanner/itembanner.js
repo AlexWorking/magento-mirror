@@ -1,5 +1,5 @@
 var itemBannerInstance = {
-    result: undefined,
+    isIt: undefined,
     coordIdentifiers: undefined,
     imageRelatedJqElements: undefined,
     modes: [],
@@ -8,71 +8,63 @@ var itemBannerInstance = {
     relCoords: {},
     croppings: {},
     buttonWorkouts: {},
-    getResult: function () {
-        if (typeof this.result === "undefined") {
-            this.result = this.figureOutIsItAndInit()
-        }
-        return this.result;
-    },
-    figureOutIsItAndInit: function () {
+    init: function () {
         var ibi = this;
-        ibi.result = ($j("#type").val() === 'itembanner/banner');
-        if (ibi.result === true && typeof outerVariables !== "undefined") {
-            ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
-            ibi.popupInputIds = {
-                title: outerVariables.instanceHtmlIdPrefix + '_title',
-                description: outerVariables.instanceHtmlIdPrefix + '_description'
+        ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
+        ibi.popupInputIds = {
+            title: outerVariables.instanceHtmlIdPrefix + '_title',
+            description: outerVariables.instanceHtmlIdPrefix + '_description'
+        };
+        ibi.imageRelatedJqElements = {
+            preview: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
+            file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
+            delete: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
+            containers: $j( ".ib_containers" )
+        };
+        ibi.modes = ['grid', 'list'];
+        ibi.modes.forEach(function (mode) {
+            ibi.relCordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
+            ibi.relCoords[mode] = {
+                original: JSON.parse($j( "#" + ibi.relCordsInputIds[mode] ).val()),
+                aCoords: [],
+                bCoords: [],
+                forPost: 'aCoords',
+                currentChangeStatus: null,
+                entryChangeStatus:null
             };
-            ibi.imageRelatedJqElements = {
-                preview: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
-                file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
-                delete: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
-                containers: $j( ".ib_containers" )
-            };
-            ibi.modes = ['grid', 'list'];
-            ibi.modes.forEach(function (mode) {
-                ibi.relCordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
-                ibi.relCoords[mode] = {
-                    original: JSON.parse($j( "#" + ibi.relCordsInputIds[mode] ).val()),
-                    aCoords: [],
-                    bCoords: [],
-                    forPost: 'aCoords',
-                    currentChangeStatus: null,
-                    entryChangeStatus:null
-                };
-            });
-            ibi.croppings.main = {};
-            ibi.croppings.preview = {};
-            ibi.buttonWorkouts.freezing = function(cropping, mode) {
-                    var element = cropping.jq( "#ib_crop_enable_" +  mode),
-                        writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen;
-                    element.html(writtenOn);
-                    element.off( "click" );
-                    element.on('click', {c: cropping, m: mode, e: element}, freezingAction);
-                    return element;
-            };
-            ibi.buttonWorkouts.highlight = function(cropping, mode) {
-                    var element = cropping.jq( "#ib_crop_highlight_" +  mode);
-                    element.html(outerVariables.highlight);
-                    element.off( "mousedown" );
-                    element.off( "mouseup" );
-                    element.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
-                    element.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity}, highlightAction);
-                    return element;
-            };
-            ibi.buttonWorkouts.revert = function(cropping, mode) {
-                    var element = cropping.jq( "#ib_crop_revert_" +  mode);
-                    element.html(outerVariables.revert);
-                    element.off( "click" );
-                    var visibility = (ibi.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
-                    element.css('visibility', visibility);
-                    if (cropping.jcObjects[mode].disabled === true)
+        });
+        ibi.croppings.main = {};
+        ibi.croppings.preview = {};
+        ibi.buttonWorkouts = {
+            freezing: function(cropping, mode) {
+            var element = cropping.jq( "#ib_crop_enable_" +  mode),
+                writtenOn = (cropping.jcObjects[mode].disabled) ? outerVariables.frozen : outerVariables.unfrozen;
+            element.html(writtenOn);
+            element.off( "click" );
+            element.on('click', {c: cropping, m: mode, e: element}, freezingAction);
+            return element;
+            },
+            highlight: function(cropping, mode) {
+                var element = cropping.jq( "#ib_crop_highlight_" +  mode);
+                element.html(outerVariables.highlight);
+                element.off( "mousedown" );
+                element.off( "mouseup" );
+                element.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
+                element.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity}, highlightAction);
+                return element;
+            },
+            revert: function(cropping, mode) {
+                var element = cropping.jq( "#ib_crop_revert_" +  mode);
+                element.html(outerVariables.revert);
+                element.off( "click" );
+                var visibility = (ibi.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
+                element.css('visibility', visibility);
+                if (cropping.jcObjects[mode].disabled === true)
                     element.attr('disabled', 'disabled');
-                    element.on('click', {c: cropping, m: mode, e:element}, revertAction);
-                    return element;
+                element.on('click', {c: cropping, m: mode, e:element}, revertAction);
+                return element;
             }
         }
-        return ibi.result;
     },
     pullFromOrigRelCoords: function (mode, toCoords) {
         var ibi = this;
@@ -114,7 +106,8 @@ var itemBannerInstance = {
 };
 
 $j( document ).ready(function () {
-    if (itemBannerInstance.getResult()) {
+    itemBannerInstance.isIt = ($j("#type").val() === 'itembanner/banner');
+    if (itemBannerInstance.isIt) {
         var formJq = $j( "#edit_form");
         formJq.attr("enctype", "multipart/form-data" );
         $j( ".scalable.save" ).each(function () {
@@ -124,6 +117,7 @@ $j( document ).ready(function () {
         });
 
         if (typeof outerVariables !== "undefined") {
+            itemBannerInstance.init();
             $j( "#widget_instace_tabs_properties_section" ).click( function () {
                 if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
                     itemBannerInstance.pullFromOrigRelCoords();
@@ -211,6 +205,13 @@ function Cropping(currentWindow, buttons) {
         return selectArray;
     };
 
+    this.onTrueSelect = function (mode) {
+        if (p.jcObjects[mode].isSelectActual === true) {
+            p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+            itemBannerInstance.relCoords[mode].currentChangeStatus = true;
+        }
+    };
+
     this.workoutButtons = function (hereMode) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
@@ -257,10 +258,7 @@ function Cropping(currentWindow, buttons) {
                     p.windowObject.alert('The cropping square is not large enough!');
                     p.jcObjects[mode].api.release();
                 } else {
-                    if (p.jcObjects[mode].isSelectActual === true) {
-                        p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
-                        itemBannerInstance.relCoords[mode].currentChangeStatus = true;
-                    }
+                    p.onTrueSelect(mode);
                     var dimension = 'width';
                     for (var i = 0; i < 6; i++) {
                         itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill][i] = c[coordIdentifiers[i]] / p.image[dimension];
@@ -269,10 +267,7 @@ function Cropping(currentWindow, buttons) {
                 }
             },
             onRelease: function () {
-                if (p.jcObjects[mode].isSelectActual === true) {
-                    p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
-                    itemBannerInstance.relCoords[mode].currentChangeStatus = true;
-                }
+                p.onTrueSelect(mode);
                 itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
             },
             manageSelect: function () {
@@ -334,7 +329,7 @@ function Cropping(currentWindow, buttons) {
 function imagePreview(element){
     if($(element)){
         var win = window;
-        if(!itemBannerInstance.getResult()) {
+        if(!itemBannerInstance.isIt) {
             win = win.open('', 'preview', 'width=400,height=400,resizable=1,scrollbars=1');
             win.document.open();
             win.document.write('<body style="padding:0;margin:0"><img src="'+$(element).src+'" id="image_preview"/></body>');
