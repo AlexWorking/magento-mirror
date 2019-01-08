@@ -58,7 +58,6 @@
             modal:true,
             resizable: false,
             buttons: [{
-                width: '100%',
                 text: "Go to",
                 click: function () {
                     window.open(link);
@@ -86,6 +85,7 @@
     function getBannerOnClick(j) {
         return function () {
             dialogDivs[j].dialog('open');
+            $j( ".ui-dialog-buttonset.ib-popup" ).children().css('width', '100%');
         }
     }
 
