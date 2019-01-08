@@ -37,7 +37,6 @@ var itemBannerInstance = {
                     aCoords: [],
                     bCoords: [],
                     forPost: 'aCoords',
-                    temporary: 'bCoords',
                     currentChangeStatus: null,
                     entryChangeStatus:null
                 };
@@ -80,11 +79,14 @@ var itemBannerInstance = {
         var modes = (mode && mode !== false) ? [mode] : ibi.modes;
         modes.forEach(function (mode) {
             if (typeof toCoords === "undefined") {
+                ibi.relCoords[mode].aCoords = [];
+                ibi.relCoords[mode].bCoords = [];
                 ibi.relCoords[mode].original.forEach(function (val, ind) {
                     ibi.relCoords[mode].aCoords[ind] = val;
                     ibi.relCoords[mode].bCoords[ind] = val;
                 });
             } else {
+                ibi.relCoords[mode][toCoords] = [];
                 ibi.relCoords[mode].original.forEach(function (val, ind) {
                     ibi.relCoords[mode][toCoords][ind] = val;
                 });
@@ -267,9 +269,11 @@ function Cropping(currentWindow, buttons) {
                 }
             },
             onRelease: function () {
-                p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+                if (p.jcObjects[mode].isSelectActual === true) {
+                    p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+                    itemBannerInstance.relCoords[mode].currentChangeStatus = true;
+                }
                 itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
-                itemBannerInstance.relCoords[mode].currentChangeStatus = true;
             },
             manageSelect: function () {
                 var selectArray = p.calculateSelect(mode, p.jcObjects[mode].coordsForSelect);
@@ -277,7 +281,7 @@ function Cropping(currentWindow, buttons) {
                     p.jcObjects[mode].setSelect = selectArray;
                 } else {
                     delete p.jcObjects[mode].setSelect;
-                    if (p.isMainWindowCopping && typeof p.jcObjects[mode].api !== "undefined") {
+                    if (typeof p.jcObjects[mode].api !== "undefined") {
                         p.jcObjects[mode].api.release();
                     }
                 }
@@ -576,9 +580,10 @@ function saveDialogOne(event) {
 function saveDialogTwo(event) {
     event.preventDefault();
     var dialogDiv = event.data.e;
-    dialogDiv.html('Please chose the Image You would like to precede to cropping on');
+    dialogDiv.html('Please chose the Image You would like to precede to cropping with');
     $j("span.ui-dialog-title").text('Chose Image');
     dialogDiv.dialog({
+        width: "auto",
         close: undefined,
         buttons: [{
             text: "Current Image!",
@@ -612,7 +617,7 @@ function saveDialogTwo(event) {
             click: function () {
                 $j( this ).dialog( "close" );
                 $j("span.ui-dialog-title").text('Cropping Banned!');
-                dialogDiv.html("Please notice");
+                dialogDiv.html("Please notice!<br/>In order to fulfill any cropping You will first need to chose between the images.");
                 dialogDiv.dialog({
                     close: undefined,
                     buttons: [{
