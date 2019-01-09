@@ -14,14 +14,12 @@
             <position_in_grid>
                 <label>The Position of the Banner in the Grid</label>
                 <visible>1</visible>
-                <required>1</required>
                 <type>text</type>
                 <note>Position in Grid</note>
             </position_in_grid>
             <position_in_list>
                 <label>The Position of the Banner in the List</label>
                 <visible>1</visible>
-                <required>1</required>
                 <type>text</type>
                 <note>Position in List</note>
             </position_in_list>

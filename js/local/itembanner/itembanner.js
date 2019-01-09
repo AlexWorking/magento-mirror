@@ -118,18 +118,18 @@ $j( document ).ready(function () {
 
         if (typeof outerVariables !== "undefined") {
             itemBannerInstance.init();
-            $j( "#widget_instace_tabs_properties_section" ).click( function () {
-                if ($j.isEmptyObject(itemBannerInstance.croppings.main)) {
-                    itemBannerInstance.pullFromOrigRelCoords();
-                    itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
-                    itemBannerInstance.croppings.main.workoutButtons();
-                    itemBannerInstance.croppings.main.attach();
-                    $j( ".content-header-floating").css('z-index', 601);
-                }
+            $j( "#widget_instace_tabs_properties_section" ).one('click', function () {
+                itemBannerInstance.pullFromOrigRelCoords();
+                itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
+                itemBannerInstance.croppings.main.workoutButtons();
+                itemBannerInstance.croppings.main.attach();
+                $j( ".content-header-floating").css('z-index', 601);
             });
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
             $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ).addClass('validate-url');
+            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_grid" ).addClass('validate-digits');
+            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_list" ).addClass('validate-digits');
             Validation.addAllThese([
                 ['validate-inner-text-length', 'The text here is not allowed to have more than 300 characters', function(v, elm) {
                     var reMax = new RegExp(/^maximum-length-[0-9]+$/);
@@ -546,6 +546,7 @@ function saveDialogOne(event) {
             text: "Ok",
             icon: "ui-icon-circle-check",
             click: function () {
+                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" ).val(0);
                 saveAndContinueEdit();
                 $j( this ).dialog( "close" );
             }
@@ -636,7 +637,24 @@ function closePreviewWindowIfOpened() {
 }
 
 function extendOnclick(onclick) {
-    if (typeof outerVariables !== "undefined") {
+    if(!$j.isEmptyObject(itemBannerInstance.croppings.main)) {
+        if ($j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" ).val() === '1') {
+            var areForPostCoordsEmpty = false;
+            var errorMessage = 'The banner can not be activatet because';
+            itemBannerInstance.modes.forEach(function (mode) {
+                var forPostCoords = itemBannerInstance.relCoords[mode].forPost;
+                if (itemBannerInstance.relCoords[mode][forPostCoords].length === 0) {
+                    errorMessage = errorMessage  + '\nThe ' + mode + ' mode cropping is not defined' + ',';
+                    areForPostCoordsEmpty = true;
+                }
+            });
+            if (areForPostCoordsEmpty) {
+                errorMessage = errorMessage.slice(0, -1) + '.';
+                alert(errorMessage);
+                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" ).val('0');
+                return;
+            }
+        }
         closePreviewWindowIfOpened();
         itemBannerInstance.uploadRelCoords();
     }
