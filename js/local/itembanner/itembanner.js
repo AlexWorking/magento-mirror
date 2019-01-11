@@ -197,21 +197,21 @@ function Cropping(currentWindow, buttons) {
         p.jq = p.windowObject.jQuery
     };
 
-    this.calculateSelect = function (mode, fromRelCoordsOf) {
+    this.calculateSelection = function (mode, fromRelCoordsOf) {
         var coords = itemBannerInstance.relCoords[mode][fromRelCoordsOf];
         if (coords[4] > 0 && coords[5] > 0) {
-            var selectArray = [];
+            var selectionArray = [];
             var dimension = 'width';
             for (var i = 0; i < 4; i++) {
-                selectArray.push(coords[i] * p.image[dimension]);
+                selectionArray.push(coords[i] * p.image[dimension]);
                 dimension = (dimension === 'width') ? 'height' : 'width';
             }
         }
-        return selectArray;
+        return selectionArray;
     };
 
     this.onTrueSelect = function (mode) {
-        if (p.jcObjects[mode].isSelectActual === true) {
+        if (p.jcObjects[mode].isSelectionActual === true) {
             p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
             itemBannerInstance.relCoords[mode].currentChangeStatus = true;
         }
@@ -234,18 +234,23 @@ function Cropping(currentWindow, buttons) {
     this.attach = function (hereMode) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
-            if (p.jcObjects[mode].isSelectActual === true) {
-                p.jcObjects[mode].isSelectActual = null;
+            if (p.jcObjects[mode].isSelectionActual === true) {
+                p.jcObjects[mode].isSelectionActual = null;
             }
-            else if (p.jcObjects[mode].isSelectActual === false) {
-                p.jcObjects[mode].manageSelect();
+            else if (p.jcObjects[mode].isSelectionActual === false) {
+                p.jcObjects[mode].manageSelection();
             }
-            p.jq( "#image_preview_" + mode ).Jcrop(
+            p.jq( p.jcObjects[mode].imageDomId ).Jcrop(
                 p.jcObjects[mode],
                 function () {
                     p.jcObjects[mode].api = this;
                 }
             );
+            if (typeof p.jcObjects[mode].selection !== "undefined") {
+                p.jcObjects[mode].api.animateTo(p.jcObjects[mode].selection);
+            } else {
+                p.jcObjects[mode].api.release();
+            }
             if (p.jcObjects[mode].disabled === true) {
                 p.jcObjects[mode].api.disable();
             }
@@ -255,7 +260,7 @@ function Cropping(currentWindow, buttons) {
             } else {
                 onClickElement.off('mouseup', adjustAspectRatio)
             }
-            p.jcObjects[mode].isSelectActual = true;
+            p.jcObjects[mode].isSelectionActual = true;
             if (itemBannerInstance.relCoords[mode].currentChangeStatus === true) {
                 itemBannerInstance.relCoords[mode].currentChangeStatus = false;
             }
@@ -281,15 +286,12 @@ function Cropping(currentWindow, buttons) {
                 p.onTrueSelect(mode);
                 itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
             },
-            manageSelect: function () {
-                var selectArray = p.calculateSelect(mode, p.jcObjects[mode].coordsForSelect);
-                if (selectArray) {
-                    p.jcObjects[mode].setSelect = selectArray;
+            manageSelection: function () {
+                var selectionArray = p.calculateSelection(mode, p.jcObjects[mode].coordsForSelect);
+                if (selectionArray) {
+                    p.jcObjects[mode].selection = selectionArray;
                 } else {
-                    delete p.jcObjects[mode].setSelect;
-                    if (typeof p.jcObjects[mode].api !== "undefined") {
-                        p.jcObjects[mode].api.release();
-                    }
+                    delete p.jcObjects[mode].selection;
                 }
             },
             toggleButtonsPseudoDisable: function () {
@@ -326,14 +328,14 @@ function Cropping(currentWindow, buttons) {
             bgColor: 'transparent',
             bgOpacity: .2,
             aspectRatio: itemBannerInstance.aspectRatios[mode].original,
-            setSelect: undefined,
+            selection: undefined,
             coordsForSelect: 'aCoords',
             coordsToFill: (p.isMainWindowCopping) ? 'aCoords' : 'bCoords',
             disabled: p.isMainWindowCopping,
             api: undefined,
             buttons: {},
             imageDomId: "#image_preview_" + mode,
-            isSelectActual: false
+            isSelectionActual: false
         };
     });
 }
@@ -412,7 +414,7 @@ function imagePreview(element){
                     itemBannerInstance.modes.forEach(function (mode) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
                             itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
-                            itemBannerInstance.croppings.preview.jcObjects[mode].isSelectActual = false;
+                            itemBannerInstance.croppings.preview.jcObjects[mode].isSelectionActual = false;
                         }
                         itemBannerInstance.croppings.preview.workoutButtons(mode);
                         itemBannerInstance.croppings.preview.jcObjects[mode].aspectRatio = itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio
@@ -436,7 +438,7 @@ function imagePreview(element){
                             itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
                             itemBannerInstance.swapCoordsToFill(mode);
                             Object.keys(itemBannerInstance.croppings).forEach(function (cropping) {
-                                itemBannerInstance.croppings[cropping].jcObjects[mode].isSelectActual = false;
+                                itemBannerInstance.croppings[cropping].jcObjects[mode].isSelectionActual = false;
                             });
                             itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio = itemBannerInstance.croppings.preview.jcObjects[mode].aspectRatio;
                             itemBannerInstance.croppings.main.attach(mode);
@@ -454,7 +456,7 @@ function imagePreview(element){
                 itemBannerInstance.modes.forEach(function (mode) {
                     if (passed[mode] === false) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === null && itemBannerInstance.relCoords[mode].entryChangeStatus !== null) {
-                            itemBannerInstance.croppings.preview.jcObjects[mode].isSelectActual = false;
+                            itemBannerInstance.croppings.preview.jcObjects[mode].isSelectionActual = false;
                         }
                         itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
                         itemBannerInstance.croppings.main.jcObjects[mode].toggleApiDisable('enable');
@@ -514,7 +516,7 @@ function revertAction (event) {
     cropping.jcObjects[mode].coordsForSelect = cropping.jcObjects[mode].coordsToFill;
     itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
     cropping.jcObjects[mode].aspectRatio = itemBannerInstance.aspectRatios[mode].original;
-    cropping.jcObjects[mode].isSelectActual = false;
+    cropping.jcObjects[mode].isSelectionActual = false;
     cropping.attach(mode);
     cropping.jcObjects[mode].coordsForSelect = temp;
 }
@@ -653,11 +655,11 @@ function adjustAspectRatio(event) {
     var onclickElement = event.data.o;
     var jcObject = cropping.jcObjects[mode];
     if (jcObject.disabled === false) {
-        jcObject.isSelectActual = false;
+        jcObject.isSelectionActual = false;
         jcObject.aspectRatio = itemBannerInstance.aspectRatios[mode].current;
         cropping.attach(mode);
         onclickElement.off('mouseup', adjustAspectRatio);
-        cropping.windowObject.alert('The aspect ratio for this mode has been changed in configuration!');
+        cropping.windowObject.alert('Please notice!\nThe aspect ratio for this mode has been changed in configuration!');
     }
 }
 
