@@ -211,10 +211,8 @@ function Cropping(currentWindow, buttons) {
     };
 
     this.onTrueSelect = function (mode) {
-        if (p.jcObjects[mode].isSelectionActual === true) {
-            p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
-            itemBannerInstance.relCoords[mode].currentChangeStatus = true;
-        }
+        p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+        itemBannerInstance.relCoords[mode].currentChangeStatus = true;
     };
 
     this.workoutButtons = function (hereMode) {
@@ -247,22 +245,29 @@ function Cropping(currentWindow, buttons) {
                 }
             );
             if (typeof p.jcObjects[mode].selection !== "undefined") {
-                p.jcObjects[mode].api.animateTo(p.jcObjects[mode].selection);
+                p.jcObjects[mode].api.animateTo(p.jcObjects[mode].selection, afterActions);
+                if (itemBannerInstance.relCoords[mode].currentChangeStatus !== null) {
+                    p.jq( "#ib_crop_revert_" +  mode).css('visibility', 'visible');
+                }
             } else {
                 p.jcObjects[mode].api.release();
+                afterActions();
             }
-            if (p.jcObjects[mode].disabled === true) {
-                p.jcObjects[mode].api.disable();
-            }
-            var onClickElement = p.jq( p.jcObjects[mode].imageDomId ).next( "div.jcrop-holder" );
-            if (p.jcObjects[mode].aspectRatio !== itemBannerInstance.aspectRatios[mode].current) {
-                onClickElement.on('mouseup', {c: p, m: mode, o: onClickElement}, adjustAspectRatio)
-            } else {
-                onClickElement.off('mouseup', adjustAspectRatio)
-            }
-            p.jcObjects[mode].isSelectionActual = true;
-            if (itemBannerInstance.relCoords[mode].currentChangeStatus === true) {
-                itemBannerInstance.relCoords[mode].currentChangeStatus = false;
+
+            function afterActions() {
+                if (p.jcObjects[mode].disabled === true) {
+                    p.jcObjects[mode].api.disable();
+                }
+                var onClickElement = p.jq( p.jcObjects[mode].imageDomId ).next( "div.jcrop-holder" );
+                if (p.jcObjects[mode].aspectRatio !== itemBannerInstance.aspectRatios[mode].current) {
+                    onClickElement.on('mouseup', {c: p, m: mode, o: onClickElement}, adjustAspectRatio)
+                } else {
+                    onClickElement.off('mouseup', adjustAspectRatio)
+                }
+                p.jcObjects[mode].isSelectionActual = true;
+                if (itemBannerInstance.relCoords[mode].currentChangeStatus === true) {
+                    itemBannerInstance.relCoords[mode].currentChangeStatus = false;
+                }
             }
         });
     };
@@ -270,20 +275,24 @@ function Cropping(currentWindow, buttons) {
     modes.forEach(function (mode) {
         p.jcObjects[mode] = {
             onSelect: function (c) {
-                if (c[coordIdentifiers[4]] * c[coordIdentifiers[5]] < p.image.minSquare) {
+                if (c[coordIdentifiers[4]] * c[coordIdentifiers[5]] > p.image.minSquare) {
+                    if (p.jcObjects[mode].isSelectionActual === true) {
+                        p.onTrueSelect(mode);
+                        var dimension = 'width';
+                        for (var i = 0; i < 6; i++) {
+                            itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill][i] = c[coordIdentifiers[i]] / p.image[dimension];
+                            dimension = (dimension === 'width') ? 'height' : 'width';
+                        }
+                    }
+                } else {
                     p.windowObject.alert('The cropping square is not large enough!');
                     p.jcObjects[mode].api.release();
-                } else {
-                    p.onTrueSelect(mode);
-                    var dimension = 'width';
-                    for (var i = 0; i < 6; i++) {
-                        itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill][i] = c[coordIdentifiers[i]] / p.image[dimension];
-                        dimension = (dimension === 'width') ? 'height' : 'width';
-                    }
                 }
             },
             onRelease: function () {
-                p.onTrueSelect(mode);
+                if (p.jcObjects[mode].isSelectionActual === true) {
+                    p.onTrueSelect(mode);
+                }
                 itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
             },
             manageSelection: function () {
@@ -657,6 +666,7 @@ function adjustAspectRatio(event) {
     if (jcObject.disabled === false) {
         jcObject.isSelectionActual = false;
         jcObject.aspectRatio = itemBannerInstance.aspectRatios[mode].current;
+        itemBannerInstance.relCoords[mode].currentChangeStatus = true;
         cropping.attach(mode);
         onclickElement.off('mouseup', adjustAspectRatio);
         cropping.windowObject.alert('Please notice!\nThe aspect ratio for this mode has been changed in configuration!');
