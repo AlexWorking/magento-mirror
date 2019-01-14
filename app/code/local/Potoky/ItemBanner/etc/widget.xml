@@ -11,6 +11,13 @@
                 <type>select</type>
                 <source_model>adminhtml/system_config_source_yesno</source_model>
             </is_active>
+            <image>
+                <label>Image For Banner</label>
+                <visible>1</visible>
+                <required>0</required>
+                <type>ib_image</type>
+                <note>*.jpg, *.png, *.gif, *.jpeg</note>
+            </image>
             <position_in_grid>
                 <label>The Position of the Banner in the Grid</label>
                 <visible>1</visible>
@@ -23,25 +30,28 @@
                 <type>text</type>
                 <note>Position in List</note>
             </position_in_list>
-            <image>
-                <label>Image For Banner</label>
-                <visible>1</visible>
-                <required>0</required>
-                <type>ib_image</type>
-                <note>*.jpg, *.png, *.gif, *.jpeg</note>
-            </image>
             <rel_coords_grid>
-                <label>Coordinates of the Grid Mode Croppeing</label>
+                <label>Coordinates of the Grid Mode Selection</label>
                 <visible>1</visible>
                 <type>text</type>
                 <value>[]</value>
             </rel_coords_grid>
             <rel_coords_list>
-                <label>Coordinates of the List Mode Croppeing</label>
+                <label>Coordinates of the List Mode Selection</label>
                 <visible>1</visible>
                 <type>text</type>
                 <value>[]</value>
             </rel_coords_list>
+            <orig_aspect_ratio_grid>
+                <label>Original Aspect Ratio of the Grid Mode Croppeing</label>
+                <visible>1</visible>
+                <type>text</type>
+            </orig_aspect_ratio_grid>
+            <orig_aspect_ratio_list>
+                <label>Original Aspect Ratio of the List Mode Croppeing</label>
+                <visible>1</visible>
+                <type>text</type>
+            </orig_aspect_ratio_list>
             <title>
                 <label>Title for Itembanner Widget</label>
                 <visible>1</visible>

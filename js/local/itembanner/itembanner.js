@@ -34,8 +34,8 @@ var itemBannerInstance = {
                 entryChangeStatus:null
             };
             ibi.aspectRatios[mode] = {
-                original: (itemBannerInstance.relCoords[mode].original[5] > 0) ? (itemBannerInstance.relCoords[mode].original[4] / itemBannerInstance.relCoords[mode].original[5]).toFixed(4) : undefined,
-                current: (outerVariables[mode + 'AspectRatio'] > 0) ? (1 / outerVariables[mode + 'AspectRatio']).toFixed(4) : undefined
+                orig: parseFloat($j( "#" + outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode).val()),
+                config: outerVariables[mode + 'AspectRatio']
             }
         });
         ibi.croppings.main = {};
@@ -54,8 +54,8 @@ var itemBannerInstance = {
                 element.html(outerVariables.highlight);
                 element.off( "mousedown" );
                 element.off( "mouseup" );
-                element.on('mousedown', {c: cropping, m: mode, o: 0}, highlightAction);
-                element.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity}, highlightAction);
+                element.on('mousedown', {c: cropping, m: mode, o: 0, a: 'disable'}, highlightAction);
+                element.on('mouseup', {c: cropping, m: mode, o: cropping.jcObjects[mode].bgOpacity, a: 'enable'}, highlightAction);
                 return element;
             },
             revert: function(cropping, mode) {
@@ -107,6 +107,13 @@ var itemBannerInstance = {
         this.croppings.main.jcObjects[mode].coordsToFill = this.relCoords[mode].forPost;
         this.croppings.main.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
         this.croppings.preview.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
+    },
+    adaptAspectRatio: function (mode, type) {
+        var number = this.aspectRatios[mode][type];
+        if (typeof number !== "undefined") {
+            return 1 / number;
+        }
+        return null;
     }
 };
 
@@ -127,7 +134,7 @@ $j( document ).ready(function () {
                 itemBannerInstance.pullFromOrigRelCoords();
                 itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
                 itemBannerInstance.croppings.main.workoutButtons();
-                itemBannerInstance.croppings.main.attach();
+                itemBannerInstance.croppings.main.manage();
                 $j( ".content-header-floating").css('z-index', 601);
             });
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
@@ -229,21 +236,20 @@ function Cropping(currentWindow, buttons) {
         });
     };
 
-    this.attach = function (hereMode) {
+    this.manage = function (noAttach, hereMode) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
-            if (p.jcObjects[mode].isSelectionActual === true) {
-                p.jcObjects[mode].isSelectionActual = null;
-            }
-            else if (p.jcObjects[mode].isSelectionActual === false) {
+            if (p.jcObjects[mode].isSelectionActual === false) {
                 p.jcObjects[mode].manageSelection();
             }
-            p.jq( p.jcObjects[mode].imageDomId ).Jcrop(
-                p.jcObjects[mode],
-                function () {
-                    p.jcObjects[mode].api = this;
-                }
-            );
+            if (noAttach !== true) {
+                p.jq( p.jcObjects[mode].imageDomId ).Jcrop(
+                    p.jcObjects[mode],
+                    function () {
+                        p.jcObjects[mode].api = this;
+                    }
+                );
+            }
             if (typeof p.jcObjects[mode].selection !== "undefined") {
                 p.jcObjects[mode].api.animateTo(p.jcObjects[mode].selection, afterActions);
                 if (itemBannerInstance.relCoords[mode].currentChangeStatus !== null) {
@@ -259,7 +265,7 @@ function Cropping(currentWindow, buttons) {
                     p.jcObjects[mode].api.disable();
                 }
                 var onClickElement = p.jq( p.jcObjects[mode].imageDomId ).next( "div.jcrop-holder" );
-                if (p.jcObjects[mode].aspectRatio !== itemBannerInstance.aspectRatios[mode].current) {
+                if (itemBannerInstance.aspectRatios[mode].orig !== itemBannerInstance.aspectRatios[mode].config) {
                     onClickElement.on('mouseup', {c: p, m: mode, o: onClickElement}, adjustAspectRatio)
                 } else {
                     onClickElement.off('mouseup', adjustAspectRatio)
@@ -292,8 +298,8 @@ function Cropping(currentWindow, buttons) {
             onRelease: function () {
                 if (p.jcObjects[mode].isSelectionActual === true) {
                     p.onTrueSelect(mode);
+                    itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
                 }
-                itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsToFill] = [];
             },
             manageSelection: function () {
                 var selectionArray = p.calculateSelection(mode, p.jcObjects[mode].coordsForSelect);
@@ -336,7 +342,7 @@ function Cropping(currentWindow, buttons) {
             },
             bgColor: 'transparent',
             bgOpacity: .2,
-            aspectRatio: itemBannerInstance.aspectRatios[mode].original,
+            aspectRatio: itemBannerInstance.adaptAspectRatio(mode, 'orig'),
             selection: undefined,
             coordsForSelect: 'aCoords',
             coordsToFill: (p.isMainWindowCopping) ? 'aCoords' : 'bCoords',
@@ -429,7 +435,7 @@ function imagePreview(element){
                         itemBannerInstance.croppings.preview.jcObjects[mode].aspectRatio = itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio
                     });
                 }
-                itemBannerInstance.croppings.preview.attach();
+                itemBannerInstance.croppings.preview.manage();
                 itemBannerInstance.modes.forEach(function (mode) {
                     itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                     itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('disable');
@@ -442,6 +448,7 @@ function imagePreview(element){
                     itemBannerInstance.imageRelatedJqElements[element].on('click', bringPreviewWindowForward);
                 });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
+                    win.close();
                     itemBannerInstance.modes.forEach(function (mode) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
                             itemBannerInstance.relCoords[mode].currentChangeStatus !== itemBannerInstance.relCoords[mode].entryChangeStatus) {
@@ -450,12 +457,11 @@ function imagePreview(element){
                                 itemBannerInstance.croppings[cropping].jcObjects[mode].isSelectionActual = false;
                             });
                             itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio = itemBannerInstance.croppings.preview.jcObjects[mode].aspectRatio;
-                            itemBannerInstance.croppings.main.attach(mode);
+                            itemBannerInstance.croppings.main.manage(true, mode);
                             itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                             passed[mode] = true;
                         }
                     });
-                    win.close();
                 });
                 win.document.getElementById("ib_cancel").addEventListener("click", function () {
                     win.close();
@@ -509,8 +515,10 @@ function highlightAction(event) {
         mode = event.data.m;
     if (itemBannerInstance.relCoords[mode][cropping.jcObjects[mode].coordsToFill].length > 0) {
         var opacity = event.data.o,
+            action = event.data.a,
             img = cropping.jq( "#image_preview_" +  mode + "+ div").children("img");
         img.css('opacity', opacity);
+        cropping.jcObjects[mode].api[action]();
     }
 }
 
@@ -524,9 +532,9 @@ function revertAction (event) {
     var temp = cropping.jcObjects[mode].coordsForSelect;
     cropping.jcObjects[mode].coordsForSelect = cropping.jcObjects[mode].coordsToFill;
     itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
-    cropping.jcObjects[mode].aspectRatio = itemBannerInstance.aspectRatios[mode].original;
+    cropping.jcObjects[mode].aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'orig');
     cropping.jcObjects[mode].isSelectionActual = false;
-    cropping.attach(mode);
+    cropping.manage(true, mode);
     cropping.jcObjects[mode].coordsForSelect = temp;
 }
 
@@ -665,9 +673,9 @@ function adjustAspectRatio(event) {
     var jcObject = cropping.jcObjects[mode];
     if (jcObject.disabled === false) {
         jcObject.isSelectionActual = false;
-        jcObject.aspectRatio = itemBannerInstance.aspectRatios[mode].current;
+        jcObject.aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'config');
         itemBannerInstance.relCoords[mode].currentChangeStatus = true;
-        cropping.attach(mode);
+        cropping.manage(true, mode);
         onclickElement.off('mouseup', adjustAspectRatio);
         cropping.windowObject.alert('Please notice!\nThe aspect ratio for this mode has been changed in configuration!');
     }
@@ -691,6 +699,7 @@ function extendOnclick(onclick) {
                     errorMessage = errorMessage  + '\nThe ' + mode + ' mode cropping is not defined' + ',';
                     areForPostCoordsEmpty = true;
                 }
+                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode).val(itemBannerInstance.aspectRatios[mode].config);
             });
             if (areForPostCoordsEmpty) {
                 errorMessage = errorMessage.slice(0, -1) + '.';
