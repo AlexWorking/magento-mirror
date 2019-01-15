@@ -416,6 +416,15 @@ function imagePreview(element){
             } else {
                 Event.observe(win, 'load', msCallback);
             }
+            var underSubmit = false;
+            Event.observe(win, 'unload', function () {
+                if (underSubmit === false) {
+                    itemBannerInstance.modes.forEach(passedCallback);
+                }
+                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
+                    itemBannerInstance.imageRelatedJqElements[element].off('click', bringPreviewWindowForward);
+                });
+            });
             var passed = {};
             itemBannerInstance.modes.forEach(function (mode) {
                 passed[mode] = false;
@@ -452,6 +461,7 @@ function imagePreview(element){
                     itemBannerInstance.imageRelatedJqElements[element].on('click', bringPreviewWindowForward);
                 });
                 win.document.getElementById("ib_submit").addEventListener("click", function () {
+                    underSubmit = true;
                     win.close();
                     itemBannerInstance.modes.forEach(function (mode) {
                         if (itemBannerInstance.relCoords[mode].currentChangeStatus === true ||
@@ -464,6 +474,7 @@ function imagePreview(element){
                             itemBannerInstance.croppings.main.manage(true, mode, function () {
                                 itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                                 passed[mode] = true;
+                                passedCallback(mode);
                             });
                         }
                     });
@@ -472,23 +483,16 @@ function imagePreview(element){
                     win.close();
                 });
             }
-            Event.observe(win, 'unload', function () {
-                itemBannerInstance.modes.forEach(function (mode) {
-                    if (passed[mode] === false) {
-                        if (itemBannerInstance.relCoords[mode].currentChangeStatus === null && itemBannerInstance.relCoords[mode].entryChangeStatus !== null) {
-                            itemBannerInstance.croppings.preview.jcObjects[mode].isSelectionActual = false;
-                        }
-                        itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
-                        itemBannerInstance.croppings.main.jcObjects[mode].toggleApiDisable('enable');
-                    }
-                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
-                    var returnVisibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
-                    itemBannerInstance.croppings.main.jcObjects[mode].buttons.revert.jqObject.css('visibility', returnVisibility);
-                });
-                Object.keys(itemBannerInstance.imageRelatedJqElements).forEach(function (element) {
-                    itemBannerInstance.imageRelatedJqElements[element].off('click', bringPreviewWindowForward);
-                });
-            });
+            function passedCallback(mode) {
+                if (itemBannerInstance.relCoords[mode].currentChangeStatus === null && itemBannerInstance.relCoords[mode].entryChangeStatus !== null) {
+                    itemBannerInstance.croppings.preview.jcObjects[mode].isSelectionActual = false;
+                }
+                itemBannerInstance.relCoords[mode].currentChangeStatus = itemBannerInstance.relCoords[mode].entryChangeStatus;
+                itemBannerInstance.croppings.main.jcObjects[mode].toggleApiDisable('enable');
+                itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable();
+                var returnVisibility = (itemBannerInstance.relCoords[mode].currentChangeStatus === null) ? 'hidden' : 'visible';
+                itemBannerInstance.croppings.main.jcObjects[mode].buttons.revert.jqObject.css('visibility', returnVisibility);
+            }
         }
     }
 }
