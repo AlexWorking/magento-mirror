@@ -236,7 +236,7 @@ function Cropping(currentWindow, buttons) {
         });
     };
 
-    this.manage = function (noAttach, hereMode) {
+    this.manage = function (noAttach, hereMode, callback) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
             if (p.jcObjects[mode].isSelectionActual === false) {
@@ -273,6 +273,9 @@ function Cropping(currentWindow, buttons) {
                 p.jcObjects[mode].isSelectionActual = true;
                 if (itemBannerInstance.relCoords[mode].currentChangeStatus === true) {
                     itemBannerInstance.relCoords[mode].currentChangeStatus = false;
+                }
+                if (callback) {
+                    callback();
                 }
             }
         });
@@ -435,10 +438,11 @@ function imagePreview(element){
                         itemBannerInstance.croppings.preview.jcObjects[mode].aspectRatio = itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio
                     });
                 }
-                itemBannerInstance.croppings.preview.manage();
                 itemBannerInstance.modes.forEach(function (mode) {
-                    itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
-                    itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('disable');
+                    itemBannerInstance.croppings.preview.manage(false, mode, function () {
+                        itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
+                        itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('disable');
+                    });
                 });
                 var container = win.document.getElementsByTagName('div')[0];
                 var widthForResize = container.offsetWidth;
@@ -457,9 +461,10 @@ function imagePreview(element){
                                 itemBannerInstance.croppings[cropping].jcObjects[mode].isSelectionActual = false;
                             });
                             itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio = itemBannerInstance.croppings.preview.jcObjects[mode].aspectRatio;
-                            itemBannerInstance.croppings.main.manage(true, mode);
-                            itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
-                            passed[mode] = true;
+                            itemBannerInstance.croppings.main.manage(true, mode, function () {
+                                itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
+                                passed[mode] = true;
+                            });
                         }
                     });
                 });
@@ -534,8 +539,9 @@ function revertAction (event) {
     itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
     cropping.jcObjects[mode].aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'orig');
     cropping.jcObjects[mode].isSelectionActual = false;
-    cropping.manage(true, mode);
-    cropping.jcObjects[mode].coordsForSelect = temp;
+    cropping.manage(true, mode, function () {
+        cropping.jcObjects[mode].coordsForSelect = temp;
+    });
 }
 
 function bringPreviewWindowForward(event) {
@@ -675,9 +681,10 @@ function adjustAspectRatio(event) {
         jcObject.isSelectionActual = false;
         jcObject.aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'config');
         itemBannerInstance.relCoords[mode].currentChangeStatus = true;
-        cropping.manage(true, mode);
-        onclickElement.off('mouseup', adjustAspectRatio);
-        cropping.windowObject.alert('Please notice!\nThe aspect ratio for this mode has been changed in configuration!');
+        cropping.manage(true, mode, function () {
+            onclickElement.off('mouseup', adjustAspectRatio);
+            cropping.windowObject.alert('Please notice!\nThe aspect ratio for this mode has been changed in configuration!');
+        });
     }
 }
 
