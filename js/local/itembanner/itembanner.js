@@ -35,8 +35,10 @@ var itemBannerInstance = {
             };
             ibi.aspectRatios[mode] = {
                 orig: parseFloat($j( "#" + outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode).val()),
-                config: outerVariables[mode + 'AspectRatio']
-            }
+                config: outerVariables[mode + 'AspectRatio'],
+                differ: undefined
+            };
+            ibi.aspectRatios[mode].differ = (ibi.aspectRatios[mode].orig !== ibi.aspectRatios[mode].config)
         });
         ibi.croppings.main = {};
         ibi.croppings.preview = {};
@@ -134,7 +136,7 @@ $j( document ).ready(function () {
                 itemBannerInstance.pullFromOrigRelCoords();
                 itemBannerInstance.croppings.main = new Cropping(false, ['freezing', 'revert']);
                 itemBannerInstance.croppings.main.workoutButtons();
-                itemBannerInstance.croppings.main.manage(false, false, function () {
+                itemBannerInstance.croppings.main.manage(true, false, function () {
                     $j( ".content-header-floating").css('z-index', 601);
                 });
             });
@@ -237,13 +239,13 @@ function Cropping(currentWindow, buttons) {
         });
     };
 
-    this.manage = function (noAttach, hereMode, callback) {
+    this.manage = function (doAttach, hereMode, callback) {
         var hereModes = (!hereMode) ? modes : [hereMode];
         hereModes.forEach(function (mode) {
             if (p.jcObjects[mode].isSelectionActual === false) {
                 p.jcObjects[mode].manageSelection();
             }
-            if (noAttach !== true) {
+            if (doAttach === true) {
                 p.jq( p.jcObjects[mode].imageDomId ).Jcrop(
                     p.jcObjects[mode],
                     function () {
@@ -266,7 +268,7 @@ function Cropping(currentWindow, buttons) {
                     p.jcObjects[mode].api.disable();
                 }
                 var onClickElement = p.jq( p.jcObjects[mode].imageDomId ).next( "div.jcrop-holder" );
-                if (itemBannerInstance.aspectRatios[mode].orig !== itemBannerInstance.aspectRatios[mode].config) {
+                if (p.jcObjects[mode].aspectRatio !== itemBannerInstance.adaptAspectRatio(mode, 'config')) {
                     onClickElement.on('mouseup', {c: p, m: mode, o: onClickElement}, adjustAspectRatio)
                 } else {
                     onClickElement.off('mouseup', adjustAspectRatio)
@@ -447,7 +449,7 @@ function imagePreview(element){
                     });
                 }
                 itemBannerInstance.modes.forEach(function (mode) {
-                    itemBannerInstance.croppings.preview.manage(false, mode, function () {
+                    itemBannerInstance.croppings.preview.manage(true, mode, function () {
                         itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                         itemBannerInstance.croppings.main.jcObjects[mode].toggleButtonsPseudoDisable().toggleApiDisable('disable');
                     });
@@ -469,12 +471,18 @@ function imagePreview(element){
                             Object.keys(itemBannerInstance.croppings).forEach(function (cropping) {
                                 itemBannerInstance.croppings[cropping].jcObjects[mode].isSelectionActual = false;
                             });
+                            var temp = itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio;
                             itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio = itemBannerInstance.croppings.preview.jcObjects[mode].aspectRatio;
-                            itemBannerInstance.croppings.main.manage(true, mode, function () {
+                            itemBannerInstance.croppings.main.manage(
+                                (itemBannerInstance.croppings.main.jcObjects[mode].aspectRatio !== temp),
+                                mode,
+                                function () {
                                 itemBannerInstance.relCoords[mode].entryChangeStatus = itemBannerInstance.relCoords[mode].currentChangeStatus;
                                 passed[mode] = true;
                                 passedCallback(mode);
                             });
+                        } else {
+                            passedCallback(mode);
                         }
                     });
                 });
@@ -542,7 +550,7 @@ function revertAction (event) {
     itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
     cropping.jcObjects[mode].aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'orig');
     cropping.jcObjects[mode].isSelectionActual = false;
-    cropping.manage(false, mode, function () {
+    cropping.manage(itemBannerInstance.aspectRatios[mode].differ, mode, function () {
         cropping.jcObjects[mode].coordsForSelect = temp;
     });
 }
@@ -685,7 +693,7 @@ function adjustAspectRatio(event) {
         jcObject.aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'config');
         itemBannerInstance.relCoords[mode].currentChangeStatus = true;
         cropping.windowObject.alert('Please notice!\nThe aspect ratio for this mode has been changed in configuration!');
-        cropping.manage(false, mode, function () {
+        cropping.manage(true, mode, function () {
             onclickElement.off('mouseup', adjustAspectRatio);
         });
     }
