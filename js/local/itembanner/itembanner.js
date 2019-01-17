@@ -689,7 +689,7 @@ function adjustAspectRatio(event) {
     var mode = event.data.m;
     var onclickElement = event.data.o;
     var jcObject = cropping.jcObjects[mode];
-    if (jcObject.disabled === false) {
+    if (jcObject.disabled === false && jcObject.buttons[Object.keys(jcObject.buttons)[0]].pseudoDisabled === false) {
         jcObject.isSelectionActual = false;
         jcObject.needsAdjustment = true;
         jcObject.aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'config');
