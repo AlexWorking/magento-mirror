@@ -3,7 +3,8 @@ var itemBannerInstance = {
     coordIdentifiers: undefined,
     imageRelatedJqElements: undefined,
     modes: [],
-    relCordsInputIds: {},
+    relCoordsInputIds: {},
+    aspectRatioInputIds: {},
     popupInputIds: {},
     relCoords: {},
     aspectRatios: {},
@@ -24,9 +25,10 @@ var itemBannerInstance = {
         };
         ibi.modes = ['grid', 'list'];
         ibi.modes.forEach(function (mode) {
-            ibi.relCordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
+            ibi.relCoordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
+            ibi.aspectRatioInputIds[mode] = outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode;
             ibi.relCoords[mode] = {
-                original: JSON.parse($j( "#" + ibi.relCordsInputIds[mode] ).val()),
+                original: JSON.parse($j( "#" + ibi.relCoordsInputIds[mode] ).val()),
                 aCoords: [],
                 bCoords: [],
                 forPost: 'aCoords',
@@ -36,6 +38,7 @@ var itemBannerInstance = {
             ibi.aspectRatios[mode] = {
                 orig: parseFloat($j( "#" + outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode).val()),
                 config: outerVariables[mode + 'AspectRatio'],
+                forPost: 'orig',
                 differ: undefined
             };
             ibi.aspectRatios[mode].differ = (ibi.aspectRatios[mode].orig !== ibi.aspectRatios[mode].config)
@@ -92,15 +95,23 @@ var itemBannerInstance = {
             }
         });
     },
-    uploadRelCoords: function () {
+    uploadRelCoordsAndAspectRatios: function () {
         var ibi = this;
         var arrayToUpload;
+        var ratioToUpload;
+        var ratioValue;
         ibi.modes.forEach(function (mode) {
             arrayToUpload = ibi.relCoords[mode].forPost;
-            $j( "#" + ibi.relCordsInputIds[mode] ).attr(
+            $j( "#" + ibi.relCoordsInputIds[mode] ).attr(
                 'value',
                 JSON.stringify(ibi.relCoords[mode][arrayToUpload])
             );
+            ratioToUpload = ibi.aspectRatios[mode].forPost;
+            ratioValue = (ibi.relCoords[mode][arrayToUpload].length > 0) ? itemBannerInstance.aspectRatios[mode][ratioToUpload] : '';
+            $j( "#" + ibi.aspectRatioInputIds[mode] ).attr(
+                'value',
+                ratioValue
+            )
         });
     },
     swapCoordsToFill: function (mode) {
@@ -111,11 +122,17 @@ var itemBannerInstance = {
         this.croppings.preview.jcObjects[mode].coordsForSelect = this.relCoords[mode].forPost;
     },
     adaptAspectRatio: function (mode, type) {
-        var number = this.aspectRatios[mode][type];
-        if (typeof number !== "undefined") {
-            return 1 / number;
+        var number;
+        if (type === 'orig' && isNaN(this.aspectRatios[mode].orig)) {
+            number = this.aspectRatios[mode].config;
+            this.aspectRatios[mode].forPost = 'config';
+        } else {
+            number = this.aspectRatios[mode][type];
         }
-        return null;
+        if (typeof number !== "undefined") {
+            number = 1 / number;
+        }
+        return number;
     }
 };
 
@@ -550,6 +567,7 @@ function revertAction (event) {
     cropping.jcObjects[mode].coordsForSelect = cropping.jcObjects[mode].coordsToFill;
     itemBannerInstance.pullFromOrigRelCoords(mode, cropping.jcObjects[mode].coordsForSelect);
     cropping.jcObjects[mode].aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'orig');
+    itemBannerInstance.aspectRatios[mode].forPost = 'orig';
     cropping.jcObjects[mode].isSelectionActual = false;
     cropping.manage(itemBannerInstance.aspectRatios[mode].differ, mode, function () {
         cropping.jcObjects[mode].coordsForSelect = temp;
@@ -693,6 +711,7 @@ function adjustAspectRatio(event) {
         jcObject.isSelectionActual = false;
         jcObject.needsAdjustment = true;
         jcObject.aspectRatio = itemBannerInstance.adaptAspectRatio(mode, 'config');
+        itemBannerInstance.aspectRatios[mode].forPost = 'config';
         cropping.windowObject.alert('Please notice!\nThe aspect ratio for this mode has been changed in configuration!');
         cropping.manage(true, mode, function () {
             onclickElement.off('mouseup', adjustAspectRatio);
@@ -720,7 +739,6 @@ function extendOnclick(onclick) {
                     errorMessage = errorMessage  + '\nThe ' + mode + ' mode cropping is not defined' + ',';
                     areForPostCoordsEmpty = true;
                 }
-                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode).val(itemBannerInstance.aspectRatios[mode].config);
             });
             if (areForPostCoordsEmpty) {
                 errorMessage = errorMessage.slice(0, -1) + '.';
@@ -730,7 +748,7 @@ function extendOnclick(onclick) {
             }
         }
         closePreviewWindowIfOpened();
-        itemBannerInstance.uploadRelCoords();
+        itemBannerInstance.uploadRelCoordsAndAspectRatios();
     }
     eval(onclick);
 }
