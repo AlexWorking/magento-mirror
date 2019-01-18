@@ -48,6 +48,11 @@
                     <product_collection>Potoky_ItemBanner_Model_Resource_Product_Collection</product_collection>
                 </rewrite>
             </catalog_resource>
+            <catalogsearch_resource>
+                <rewrite>
+                    <fulltext_collection>Potoky_ItemBanner_Model_Resource_Fulltext_Collection</fulltext_collection>
+                </rewrite>
+            </catalogsearch_resource>
         </models>
         <resources>
             <itembanner_setup>
