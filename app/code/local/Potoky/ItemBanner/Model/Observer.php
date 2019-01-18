@@ -9,6 +9,11 @@ class Potoky_ItemBanner_Model_Observer
         self::$saveWithoutController = $boolean;
     }
 
+    public static function getSaveWithoutController()
+    {
+        return self::$saveWithoutController;
+    }
+
     /**
      * To be written
      *

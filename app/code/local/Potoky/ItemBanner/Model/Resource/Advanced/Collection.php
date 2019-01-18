@@ -2,11 +2,11 @@
 
 /**
  * Created by PhpStorm.
- * User: Alex
- * Date: 1/18/2019
- * Time: 1:16 AM
+ * User: light
+ * Date: 1/19/2019
+ * Time: 1:17 AM
  */
-class Potoky_ItemBanner_Model_Resource_Fulltext_Collection extends Mage_CatalogSearch_Model_Resource_Fulltext_Collection
+class Potoky_ItemBanner_Model_Resource_Advanced_Collection extends Mage_CatalogSearch_Model_Resource_Advanced_Collection
 {
     private $bannersQty = 0;
 

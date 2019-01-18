@@ -51,8 +51,14 @@
             <catalogsearch_resource>
                 <rewrite>
                     <fulltext_collection>Potoky_ItemBanner_Model_Resource_Fulltext_Collection</fulltext_collection>
+                    <advanced_collection>Potoky_ItemBanner_Model_Resource_Advanced_Collection</advanced_collection>
                 </rewrite>
             </catalogsearch_resource>
+            <widget_resource>
+                <rewrite>
+                    <widget_instance>Potoky_ItemBanner_Model_Resource_Widget_Instance</widget_instance>
+                </rewrite>
+            </widget_resource>
         </models>
         <resources>
             <itembanner_setup>
