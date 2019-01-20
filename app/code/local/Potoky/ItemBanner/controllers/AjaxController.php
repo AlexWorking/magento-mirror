@@ -19,11 +19,11 @@ class Potoky_ItemBanner_AjaxController extends Mage_Core_Controller_Front_Action
             return;
         }
 
+        $resource = $widgetInstance->getResource();
+        $writeAdapter = $resource->getWriteConnection();
         $parameters = $widgetInstance->getWidgetParameters();
         $parameters['goto']++;
-        $widgetInstance->setData('widget_parameters', $parameters);
-        Potoky_ItemBanner_Model_Observer::setSaveWithoutController(true);
-
-        $widgetInstance->save();
+        $data = ['widget_parameters' => serialize($parameters)];
+        $writeAdapter->update($resource->getMainTable(), $data, array('instance_id = ?' => (int)$instanceId));
     }
 }
