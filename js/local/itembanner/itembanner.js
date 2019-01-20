@@ -28,7 +28,7 @@ var itemBannerInstance = {
             ibi.relCoordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
             ibi.aspectRatioInputIds[mode] = outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode;
             ibi.relCoords[mode] = {
-                original: JSON.parse($j( "#" + ibi.relCoordsInputIds[mode] ).val()),
+                original: $j( "#" + ibi.relCoordsInputIds[mode] ).val(),
                 aCoords: [],
                 bCoords: [],
                 forPost: 'aCoords',
@@ -78,21 +78,12 @@ var itemBannerInstance = {
     },
     pullFromOrigRelCoords: function (mode, toCoords) {
         var ibi = this;
-        var modes = (mode && mode !== false) ? [mode] : ibi.modes;
+        var modes = (mode) ? [mode] : ibi.modes;
+        var toCoordses = (toCoords) ? [toCoords] : ['aCoords', 'bCoords'];
         modes.forEach(function (mode) {
-            if (typeof toCoords === "undefined") {
-                ibi.relCoords[mode].aCoords = [];
-                ibi.relCoords[mode].bCoords = [];
-                ibi.relCoords[mode].original.forEach(function (val, ind) {
-                    ibi.relCoords[mode].aCoords[ind] = val;
-                    ibi.relCoords[mode].bCoords[ind] = val;
-                });
-            } else {
-                ibi.relCoords[mode][toCoords] = [];
-                ibi.relCoords[mode].original.forEach(function (val, ind) {
-                    ibi.relCoords[mode][toCoords][ind] = val;
-                });
-            }
+            toCoordses.forEach(function (toCoords, ind, arr) {
+                arr[ind] = JSON.parse(ibi.relCoords[mode].original);
+            })
         });
     },
     uploadRelCoordsAndAspectRatios: function () {
