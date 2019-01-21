@@ -35,6 +35,17 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
                 $this->manageRelCoords($image, $parent['rel_coords_grid'], 'grid');
                 $this->manageRelCoords($image, $parent['rel_coords_list'], 'list');
             }
+
+            if ($parent['is_active'] == 1) {
+                $result = $this->validateActivationEligibility($parent);
+                if ($result !== true) {
+                    Mage::throwException(
+                        $result,
+                        'adminhtml/session'
+                    );
+                    $parent['is_active'] = 0;
+                }
+            }
         }
 
         $parent['instance_id'] = $currentWidgetInstance->getId();
@@ -85,5 +96,58 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             (1 - $relCoords[3]) * $image->getOriginalHeight()
         );
         $image->save($modeImageFile);
+    }
+
+    private function validateActivationEligibility($parameters)
+    {
+        $errorMessage = 'The banner can not be activatet because';
+        $errorCount = 0;
+
+        if (!filter_var($parameters['position_in_grid'], FILTER_VALIDATE_INT)) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('position_in_grid');
+            $errorCount++;
+        }
+
+        if (!filter_var($parameters['position_in_list'], FILTER_VALIDATE_INT)) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('position_in_list');
+            $errorCount++;
+        }
+
+        if (empty($parameters['rel_coords_grid'])) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('rel_coords_grid');
+            $errorCount++;
+        }
+
+        if (empty($parameters['rel_coords_list'])) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('rel_coords_list');
+            $errorCount++;
+        }
+
+        if (empty($parameters['title'])) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('title');
+            $errorCount++;
+        }
+        else {
+            $parameters['title'] =  htmlspecialchars($parameters['title']);
+        }
+
+        if (empty($parameters['description'])) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('description');
+            $errorCount++;
+        }
+        else {
+            $parameters['title'] =  htmlspecialchars($parameters['description']);
+        }
+
+        if (!filter_var($parameters['link'], FILTER_VALIDATE_URL)) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('link');
+            $errorCount++;
+        }
+
+        if ($errorCount > 0) {
+            return $errorMessage;
+        }
+
+        return true;
     }
 }

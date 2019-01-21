@@ -12,8 +12,6 @@ class Potoky_ItemBanner_Model_File_Validator_Image extends Mage_Core_Model_File_
                 ->__('At least one original size of the image is less than 800 px. The Image has not been saved'),
                 'adminhtml/session'
             );
-
-            return false;
         }
 
         return parent::validate($filePath);

@@ -13,9 +13,8 @@
         frozen: "<?= Mage::helper('itembanner')->__('Unfreeze') ?>",
         unfrozen: "<?= Mage::helper('itembanner')->__('Freeze') ?>",
         highlight: "<?= Mage::helper('itembanner')->__('Highlight') ?>",
-        revert: "<?= Mage::helper('itembanner')->__('revert ⮌') ?>",
-        origImageWidth: "<?= $this->getOrigDimension('width') ?>",
-        origImageHeight: "<?= $this->getOrigDimension('height') ?>",
+        revert: "<?= Mage::helper('itembanner')->__('revert') ?>"  + ' ⮌',
+        origImageSquare: "<?= $this->getImageSquare() ?>",
         instanceHtmlIdPrefix: "<?= 'options_fieldset'. md5('itembanner/banner')?>"
     }
 </script>

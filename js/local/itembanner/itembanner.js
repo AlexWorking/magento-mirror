@@ -205,7 +205,7 @@ function Cropping(currentWindow, buttons) {
             if (dimension === 'width') {
                 dimension = 'height'
             } else {
-                p.image.minSquare = (square / (outerVariables.origImageWidth * outerVariables.origImageHeight)) * 10000;
+                p.image.minSquare = (square / outerVariables.origImageSquare) * 10000;
             }
         });
     })();

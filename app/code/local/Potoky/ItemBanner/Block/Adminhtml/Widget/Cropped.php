@@ -4,14 +4,14 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
 {
     private $imageUrl;
 
-    private $origDimensions = [];
+    private $imageSquare;
 
     protected function _construct()
     {
         parent::_construct();
 
         $this->imageUrl = $this->prepareImageUrl();
-        $this->origDimensions = $this->measureImage();
+        $this->imageSquare = $this->measureImageSquare();
         if (Mage::helper('itembanner')->getCurrentInstance()->getWidgetParameters()['image']) {
             $this->setTemplate('itembanner/cropped.phtml');
         } else {
@@ -25,13 +25,11 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
         );
     }
 
-    private function measureImage() {
+    private function measureImageSquare()
+    {
         $imageData = getimagesize($this->imageUrl);
 
-        return [
-            'width'  => $imageData[0],
-            'height' => $imageData[1]
-        ];
+        return $imageData[0] * $imageData[1];
     }
 
     public function getImageUrl()
@@ -39,8 +37,8 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
         return $this->imageUrl;
     }
 
-    public function getOrigDimension($dimension)
+    public function getImageSquare()
     {
-        return $this->origDimensions[$dimension];
+        return $this->imageSquare;
     }
 }

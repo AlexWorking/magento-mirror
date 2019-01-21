@@ -40,34 +40,6 @@ class Potoky_ItemBanner_Model_Observer
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function registerInfoToDb(Varien_Event_Observer $observer)
-    {
-        $widgetInstance = $observer->getEvent()->getObject();
-
-        $itemBannerInfo = Mage::getModel('itembanner/bannerinfo');
-        if ($widgetInstance->isObjectNew()) {
-            $itemBannerInfo ->setData([
-                'instance_id' => $widgetInstance->getId(),
-                'is_active'   => $widgetInstance->getWidgetParameters()['is_active']
-            ]);
-        } else {
-            $itemBannerInfo->load($widgetInstance->getId(), 'instance_id');
-            $itemBannerInfo->setData(
-                'is_active',
-                $widgetInstance->getWidgetParameters()['is_active']
-            );
-        }
-        $itemBannerInfo->save();
-
-        return $this;
-    }
-
-    /**
-     * To be written
-     *
-     * @param Varien_Event_Observer $observer
-     * @return $this
-     */
     public function prepareDisplayBanners($observer)
     {
         $layout = $observer->getLayout();

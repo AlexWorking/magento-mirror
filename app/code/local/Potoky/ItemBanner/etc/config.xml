@@ -98,17 +98,6 @@
                 </itembanner>
             </updates>
         </layout>
-        <events>
-            <widget_widget_instance_save_after>
-                <observers>
-                    <itembanner_info_to_db>
-                        <type>singleton</type>
-                        <class>Potoky_ItemBanner_Model_Observer</class>
-                        <method>registerInfoToDb</method>
-                    </itembanner_info_to_db>
-                </observers>
-            </widget_widget_instance_save_after>
-        </events>
     </adminhtml>
     <frontend>
         <events>

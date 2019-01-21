@@ -2,9 +2,38 @@
 
 class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    private $origDimensions = [];
-
     private static $currentInstance;
+
+    private static $errorsRelatedArray = [
+        'position_in_grid' => [
+            null,
+            'Position of the banner for the Grid mode is not correctly defined.'
+        ],
+        'position_in_list' => [
+            null,
+            'Position of the banner for the List mode is not correctly defined.'
+        ],
+        'rel_coords_grid' => [
+            null,
+            'Grid mode selection is not defined.'
+        ],
+        'rel_coords_list' => [
+            null,
+            'List mode selection is not defined.'
+        ],
+        'title' => [
+            null,
+            'The title for the banner popup is empty.'
+        ],
+        'description' => [
+            null,
+            'The description for the banner popup is empty.'
+        ],
+        'link' => [
+            null,
+            'The link for the banner popup is empty or incorrect.'
+        ]
+    ];
 
     public function getBannerPriorityArray()
     {
@@ -37,6 +66,22 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
         $path = str_replace($baseDir . DS, "", $path);
 
         return Mage::getBaseUrl('media') . str_replace(DS, '/', $path);
+    }
+
+    public function getErrorsRelatedData($field = null)
+    {
+        if (current(self::$errorsRelatedArray)[0] === null) {
+            foreach (self::$errorsRelatedArray as $error) {
+                $error[0] = false;
+                $error[1] = $this->__($error);
+            }
+        }
+
+        if ($field) {
+            return self::$errorsRelatedArray[$field];
+        }
+
+        return self::$errorsRelatedArray;
     }
 
     public function getCurrentInstance()
