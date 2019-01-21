@@ -81,8 +81,8 @@ var itemBannerInstance = {
         var modes = (mode) ? [mode] : ibi.modes;
         var toCoordses = (toCoords) ? [toCoords] : ['aCoords', 'bCoords'];
         modes.forEach(function (mode) {
-            toCoordses.forEach(function (toCoords, ind, arr) {
-                arr[ind] = JSON.parse(ibi.relCoords[mode].original);
+            toCoordses.forEach(function (toCoords) {
+                ibi.relCoords[mode][toCoords] = JSON.parse(ibi.relCoords[mode].original)
             })
         });
     },

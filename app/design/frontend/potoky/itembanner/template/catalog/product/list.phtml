@@ -26,14 +26,12 @@
 ?>
 <script>
     'use strict';
-    var counter = 0;
-    var dialogDivs = [];
     function pushDialogDiv(identifier, title, description, link, instanceId) {
         var dialogDiv = $j( "#ib-popup-" + identifier );
         if (dialogDiv.length === 0) {
             dialogDiv = $j( "<div/>", {
                 id: 'ib-popup-' + identifier
-            });
+            }).appendTo( "#" + identifier );
             dialogDiv.attr('title', title)
                 .html(description);
         }
@@ -78,13 +76,13 @@
         closeButton.button({classes: {
             "ui-button": "ib-popup"
         }});
-        dialogDivs.push(dialogDiv);
         $j( "<svg width='392.41' height='18'><polygon style='fill:orangered' points='0,0 392.41,0 196.205,18'/></svg>" ).insertBefore(dialogDiv);
+        return dialogDiv;
     }
 
-    function getBannerOnClick(j) {
+    function getBannerOnClick(dialogDiv) {
         return function () {
-            dialogDivs[j].dialog('open');
+            dialogDiv.dialog('open');
             $j( ".ui-dialog-buttonset.ib-popup" ).children().css('width', '100%');
         }
     }

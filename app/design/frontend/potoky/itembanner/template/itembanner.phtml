@@ -27,7 +27,7 @@
 
 <img style="width: 100%; height: 100%;" src="<?php echo $this->getImageUrl()?>" alt="Problems with Image Loading">
 <script>
-    pushDialogDiv(
+    var dialogDiv = pushDialogDiv(
         '<?= $this->getNameInLayout(); ?>',
         '<?= $this->getData('title'); ?>',
         '<?= $this->getData('description'); ?>',
@@ -36,6 +36,5 @@
     );
     var scripts = document.getElementsByTagName( 'script' );
     currentScript = scripts[scripts.length - 1];
-    currentScript.previousElementSibling.onclick = getBannerOnClick(counter);
-    counter++
+    currentScript.previousElementSibling.onclick = getBannerOnClick(dialogDiv)
 </script>
