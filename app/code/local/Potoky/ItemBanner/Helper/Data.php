@@ -5,9 +5,9 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
     private static $currentInstance;
 
     private static $errorMessages = [
-        'image' => 'At least one original size of the image is less than 800 px. The Image has not been saved',
-        'position_in_grid' => 'Position of the banner for the Grid mode is not correctly defined.',
-        'position_in_list' => 'Position of the banner for the List mode is not correctly defined.',
+        'image' => 'At least one original size of the image is less than 800 px. The New Image has not been saved.',
+        'position_in_grid' => 'Position of the banner for the Grid mode is not correctly defined. Must by a natural number.',
+        'position_in_list' => 'Position of the banner for the List mode is not correctly defined. Must by a natural number.',
         'rel_coords_grid' => 'Grid mode selection is not defined.',
         'rel_coords_list' => 'List mode selection is not defined.',
         'title' => 'The title for the banner popup is empty.',

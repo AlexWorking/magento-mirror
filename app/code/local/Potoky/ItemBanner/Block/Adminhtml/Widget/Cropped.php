@@ -2,10 +2,25 @@
 
 class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Block_Template
 {
+    /**
+     * Original image url
+     *
+     * @var string
+     */
     private $imageUrl;
 
+    /**
+     * Original image url
+     *
+     * @var int
+     */
     private $imageSquare;
 
+    /**
+     * Parent construct plus setting $this properties plus setting template
+     *
+     * @return void
+     */
     protected function _construct()
     {
         parent::_construct();
@@ -19,12 +34,22 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
         }
     }
 
+    /**
+     * Prepare original image url
+     *
+     * @return mixed
+     */
     private function prepareImageUrl() {
         return Mage::helper('itembanner')->getImageUri(
             Mage::registry('current_widget_instance')->getWidgetParameters()['image']
         );
     }
 
+    /**
+     * Measure original image square
+     *
+     * @return mixed
+     */
     private function measureImageSquare()
     {
         $imageData = getimagesize($this->imageUrl);

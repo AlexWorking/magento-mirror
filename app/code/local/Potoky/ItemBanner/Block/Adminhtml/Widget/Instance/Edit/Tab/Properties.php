@@ -2,6 +2,11 @@
 
 class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties extends Mage_Widget_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties
 {
+    /**
+     * Form fields that need adjustment
+     *
+     * @var array
+     */
     private $specialFields = ['parameters[goto]', 'parameters[title]', 'parameters[description]'];
 
     /**
@@ -28,7 +33,7 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
     }
 
     /**
-     * Add field to Options form based on option configuration
+     * Add field to Options form based on option configuration and adjusts $this->specialFields
      *
      * @param Varien_Object $parameter
      * @return Varien_Data_Form_Element_Abstract
@@ -56,6 +61,13 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
         return $parent;
     }
 
+    /**
+     * Prepare block children and data.
+     * Set widget type and widget parameters if available.
+     * Load TinyMce to the page for wysiwyg
+     *
+     * @return Mage_Widget_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties
+     */
     protected function _preparelayout()
     {
         if (Mage::getSingleton('cms/wysiwyg_config')->isEnabled()) {
