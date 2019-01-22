@@ -541,7 +541,7 @@ function highlightAction(event) {
     if (itemBannerInstance.relCoords[mode][cropping.jcObjects[mode].coordsToFill].length > 0) {
         var opacity = event.data.o,
             action = event.data.a,
-            img = cropping.jq( "#image_preview_" +  mode + "+ div").children("img");
+            img = cropping.jq( cropping.jcObjects[mode].imageDomId + "+ div").children("img");
         img.css('opacity', opacity);
         cropping.jcObjects[mode].api[action]();
     }
@@ -723,11 +723,11 @@ function extendOnclick(onclick) {
     if(!$j.isEmptyObject(itemBannerInstance.croppings.main)) {
         if ($j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" ).val() === '1') {
             var areForPostCoordsEmpty = false;
-            var errorMessage = 'The banner can not be activatet because';
+            var errorMessage = 'The banner can not be activated because';
             itemBannerInstance.modes.forEach(function (mode) {
                 var forPostCoords = itemBannerInstance.relCoords[mode].forPost;
                 if (itemBannerInstance.relCoords[mode][forPostCoords].length === 0) {
-                    errorMessage = errorMessage  + '\nThe ' + mode + ' mode cropping is not defined' + ',';
+                    errorMessage = errorMessage  + '\nThe ' + mode + ' mode selection is not defined' + ',';
                     areForPostCoordsEmpty = true;
                 }
             });

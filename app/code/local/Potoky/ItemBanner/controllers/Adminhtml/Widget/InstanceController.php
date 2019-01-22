@@ -100,32 +100,32 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
 
     private function validateActivationEligibility($parameters)
     {
-        $errorMessage = 'The banner can not be activatet because';
-        $errorCount = 0;
+        $errorMessage = 'The banner can not be activated because';
+        $errorPresent = false;
 
         if (!filter_var($parameters['position_in_grid'], FILTER_VALIDATE_INT)) {
             $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('position_in_grid');
-            $errorCount++;
+            $errorPresent = true;
         }
 
         if (!filter_var($parameters['position_in_list'], FILTER_VALIDATE_INT)) {
             $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('position_in_list');
-            $errorCount++;
+            $errorPresent = true;
         }
 
         if (empty($parameters['rel_coords_grid'])) {
             $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('rel_coords_grid');
-            $errorCount++;
+            $errorPresent = true;
         }
 
         if (empty($parameters['rel_coords_list'])) {
             $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('rel_coords_list');
-            $errorCount++;
+            $errorPresent = true;
         }
 
         if (empty($parameters['title'])) {
             $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('title');
-            $errorCount++;
+            $errorPresent = true;
         }
         else {
             $parameters['title'] =  htmlspecialchars($parameters['title']);
@@ -133,7 +133,7 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
 
         if (empty($parameters['description'])) {
             $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('description');
-            $errorCount++;
+            $errorPresent = true;
         }
         else {
             $parameters['title'] =  htmlspecialchars($parameters['description']);
@@ -141,10 +141,10 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
 
         if (!filter_var($parameters['link'], FILTER_VALIDATE_URL)) {
             $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('link');
-            $errorCount++;
+            $errorPresent = true;
         }
 
-        if ($errorCount > 0) {
+        if ($errorPresent) {
             return $errorMessage;
         }
 
