@@ -5,6 +5,10 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
     private static $currentInstance;
 
     private static $errorsRelatedArray = [
+        'image' => [
+            null,
+            'At least one original size of the image is less than 800 px. The Image has not been saved'
+        ],
         'position_in_grid' => [
             null,
             'Position of the banner for the Grid mode is not correctly defined.'
