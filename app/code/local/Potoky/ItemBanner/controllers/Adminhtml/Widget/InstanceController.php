@@ -36,15 +36,11 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
                 $this->manageRelCoords($image, $parent['rel_coords_list'], 'list');
             }
 
-            if ($parent['is_active'] == 1) {
-                $result = $this->validateActivationEligibility($parent);
-                if ($result !== true) {
-                    Mage::throwException(
-                        $result,
-                        'adminhtml/session'
-                    );
-                    $parent['is_active'] = 0;
-                }
+            $validationResult = $this->validateActivationEligibility($parent);
+            $parent = $validationResult[0];
+            if ($parent['is_active'] == 1 && $validationResult[1] != '') {
+                Mage::throwException($validationResult[1], 'adminhtml/session');
+                $parent['is_active'] = 0;
             }
         }
 
@@ -104,50 +100,42 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         $errorPresent = false;
 
         if (!filter_var($parameters['position_in_grid'], FILTER_VALIDATE_INT)) {
-            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('position_in_grid');
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorMessage('position_in_grid');
             $errorPresent = true;
         }
 
         if (!filter_var($parameters['position_in_list'], FILTER_VALIDATE_INT)) {
-            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('position_in_list');
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorMessage('position_in_list');
             $errorPresent = true;
         }
 
         if (empty($parameters['rel_coords_grid'])) {
-            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('rel_coords_grid');
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorMessage('rel_coords_grid');
             $errorPresent = true;
         }
 
         if (empty($parameters['rel_coords_list'])) {
-            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('rel_coords_list');
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorMessage('rel_coords_list');
             $errorPresent = true;
         }
 
-        if (empty($parameters['title'])) {
-            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('title');
+        if (empty($parameters['title']) || strlen($parameters['title']) > 100) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorMessage('title');
             $errorPresent = true;
-        }
-        else {
-            $parameters['title'] =  htmlspecialchars($parameters['title']);
         }
 
-        if (empty($parameters['description'])) {
-            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('description');
+        if (empty($parameters['description']) || strlen(strip_tags($parameters['description'])) > 300) {
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorMessage('description');
             $errorPresent = true;
-        }
-        else {
-            $parameters['title'] =  htmlspecialchars($parameters['description']);
         }
 
         if (!filter_var($parameters['link'], FILTER_VALIDATE_URL)) {
-            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorsRelatedData('link');
+            $errorMessage .= '\n' . Mage::helper('itembanner')->getErrorMessage('link');
             $errorPresent = true;
         }
 
-        if ($errorPresent) {
-            return $errorMessage;
-        }
+        $errorMessage = ($errorPresent) ? $errorMessage : '';
 
-        return true;
+        return [$parameters, $errorMessage];
     }
 }
