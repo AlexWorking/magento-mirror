@@ -151,8 +151,8 @@ $j( document ).ready(function () {
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
             $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ).addClass('validate-url');
-            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_grid" ).addClass('validate-digits');
-            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_list" ).addClass('validate-digits');
+            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_grid" ).addClass('validate-digits validate-digits-range digits-range-1-');
+            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_list" ).addClass('validate-digits validate-digits-range digits-range-1-');
             Validation.addAllThese([
                 ['validate-inner-text-length', 'The text here is not allowed to have more than 300 characters', function(v, elm) {
                     var reMax = new RegExp(/^maximum-length-[0-9]+$/);

@@ -146,12 +146,12 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             $errorPresent = true;
         }
 
-        if (empty($parameters['title']) || strlen($parameters['title']) > 4) {
+        if (empty($parameters['title']) || strlen($parameters['title']) > 100) {
             $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('title');
             $errorPresent = true;
         }
 
-        if (empty($parameters['description']) || strlen(strip_tags($parameters['description'])) > 7) {
+        if (empty($parameters['description']) || strlen(strip_tags($parameters['description'])) > 300) {
             $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('description');
             $errorPresent = true;
         }
