@@ -27,7 +27,7 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Cropped extends Mage_Adminhtml_Bl
 
         $this->imageUrl = $this->prepareImageUrl();
         $this->imageSquare = $this->measureImageSquare();
-        if (Mage::helper('itembanner')->getCurrentInstance()->getWidgetParameters()['image']) {
+        if (Mage::registry('current_widget_instance')->getWidgetParameters()['image']) {
             $this->setTemplate('itembanner/cropped.phtml');
         } else {
             $this->setTemplate('');

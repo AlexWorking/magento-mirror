@@ -2,8 +2,12 @@
 
 class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    private static $currentInstance;
-
+    /**
+     * An associative array with instance parameters and corresponding error messages used in
+     * activeness eligibility validation
+     *
+     * @var array
+     */
     private static $errorMessages = [
         'image' => 'At least one original size of the image is less than 800 px. The New Image has not been saved.',
         'position_in_grid' => 'Position of the banner for the Grid mode is not correctly defined. Must by a natural number.',
@@ -15,13 +19,17 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
         'link' => 'The link for the banner popup is empty or incorrect.'
     ];
 
+    /**
+     * Return an associative array with instance ids and corresponding priority positions
+     *
+     * @return array
+     */
     public function getBannerPriorityArray()
     {
         $collection = Mage::getModel('widget/widget_instance')
             ->getCollection()
             ->addFieldToFilter('instance_type', 'itembanner/banner')
             ->setOrder('sort_order', 'ASC');
-        $count = count($collection);
 
         $priorityArray = [];
         $counter = 1;
@@ -33,6 +41,14 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
         return $priorityArray;
     }
 
+    /**
+     * Build url or path to the file using passed in arguments
+     *
+     * @param $fileName
+     * @param string $mode
+     * @param bool $isTypeUrl
+     * @return mixed|string
+     */
     public function getImageUri($fileName, $mode = '', $isTypeUrl = true)
     {
         $baseDir = Mage::getBaseDir('media');
@@ -48,17 +64,14 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getBaseUrl('media') . str_replace(DS, '/', $path);
     }
 
+    /**
+     * Return corresponding error message to field requested
+     *
+     * @param $field
+     * @return mixed
+     */
     public function geterrorMessage($field)
     {
         return self::$errorMessages[$field];
-    }
-
-    public function getCurrentInstance()
-    {
-        if (!self::$currentInstance) {
-            self::$currentInstance = Mage::registry('current_widget_instance');
-        }
-
-        return self::$currentInstance;
     }
 }

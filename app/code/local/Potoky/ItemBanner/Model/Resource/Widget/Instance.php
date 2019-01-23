@@ -8,6 +8,13 @@
  */
 class Potoky_ItemBanner_Model_Resource_Widget_Instance extends Mage_Widget_Model_Resource_Widget_Instance
 {
+    /**
+     * Prepare and save layout updates data
+     *
+     * @param Mage_Widget_Model_Widget_Instance $widgetInstance
+     * @param array $pageGroupData
+     * @return array of inserted layout updates ids
+     */
     protected function _saveLayoutUpdates($widgetInstance, $pageGroupData)
     {
         $writeAdapter          = $this->_getWriteAdapter();

@@ -2,18 +2,40 @@
 
 class Potoky_ItemBanner_Model_Resource_Product_Collection extends Mage_Catalog_Model_Resource_Product_Collection
 {
+    /**
+     * The quantity of the banners prepared to be displayed on the page
+     *
+     * @var int
+     */
     private $bannersQty = 0;
-    
+
+    /**
+     * Set $this->bannersQty
+     *
+     * @param $qty
+     * @return void
+     */
     public function setBannersQty($qty)
     {
         $this->bannersQty = $qty;
     }
-    
+
+    /**
+     * Get collection size adjusted with banners qty
+     *
+     * @return int
+     */
     public function getSize()
     {
         return parent::getSize() + $this->bannersQty;
     }
 
+    /**
+     * Load entities records into items with addjustment of page size limit with banners
+     *
+     * @throws Exception
+     * @return Mage_Eav_Model_Entity_Collection_Abstract
+     */
     public function _loadEntities($printQuery = false, $logQuery = false)
     {
         if(!$data = Mage::registry('potoky_itembanner')) {

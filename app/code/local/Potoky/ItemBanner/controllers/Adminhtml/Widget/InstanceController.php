@@ -8,7 +8,7 @@ require_once(
 class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_Adminhtml_Widget_InstanceController
 {
     /**
-     * Prepare widget parameters
+     * Prepare widget parameters and validate them if the instance tends to be set as active
      *
      * @return array
      */
@@ -32,8 +32,8 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             }
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
                 $parent['image'] = $image;
-                $this->manageRelCoords($image, $parent['rel_coords_grid'], 'grid');
-                $this->manageRelCoords($image, $parent['rel_coords_list'], 'list');
+                $this->cropFromRelCoords($image, $parent['rel_coords_grid'], 'grid');
+                $this->cropFromRelCoords($image, $parent['rel_coords_list'], 'list');
             }
 
             if ($parent['is_active'] == 1) {
@@ -50,6 +50,11 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         return $parent;
     }
 
+    /**
+     * Upload image for the instance
+     * 
+     * @return bool | string
+     */
     private function imageUpload()
     {
         $path = Mage::getBaseDir('media') . DS . 'itembanner' . DS;
@@ -75,7 +80,16 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         return $result['file'];
     }
 
-    private function manageRelCoords($baseImageFile, $relCoords, $mode)
+    /**
+     * Crop from original image and save a new one from cropping
+     *
+     * @param $baseImageFile
+     * @param $relCoords
+     * @param $mode
+     * 
+     * @return void
+     */
+    private function cropFromRelCoords($baseImageFile, $relCoords, $mode)
     {
         $relCoords = Mage::helper('core')->jsonDecode($relCoords);
         extract($relCoords);
@@ -95,6 +109,14 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         $image->save($modeImageFile);
     }
 
+    /**
+     * Validate parameters of the widget instance for being eligible to be set as active
+     *
+     * @param $parameters
+     *
+     * @return void
+     * @throws Exception
+     */
     private function validateActivationEligibility($parameters)
     {
         $errorMessage = 'The banner can not be activated because';

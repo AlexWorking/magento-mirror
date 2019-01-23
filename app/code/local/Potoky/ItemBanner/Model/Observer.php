@@ -3,13 +3,12 @@
 class Potoky_ItemBanner_Model_Observer
 {
     /**
-     * To be written
+     * Add search handles to the page groups
      *
      * @param Varien_Event_Observer $observer
      * @return $this
-     * @throws Mage_Core_Exception
      */
-    public function additionalBeforeSave(Varien_Event_Observer $observer)
+    public function addSearchHandles(Varien_Event_Observer $observer)
     {
         /* @var $widgetInstance Mage_Widget_Model_Widget_Instance */
         $widgetInstance = $observer->getEvent()->getObject();
@@ -35,7 +34,7 @@ class Potoky_ItemBanner_Model_Observer
     }
 
     /**
-     * To be written
+     * Prepares an array used to position the banners that can be displayed for the particular request
      *
      * @param Varien_Event_Observer $observer
      * @return $this
@@ -93,7 +92,7 @@ class Potoky_ItemBanner_Model_Observer
     }
 
     /**
-     * To be written
+     * Calculates banners priority array when prior banner occupies the position is set in system configuratin
      *
      * @param Mage_Core_Model_Layout $layout
      * @return array | boolean
@@ -130,7 +129,7 @@ class Potoky_ItemBanner_Model_Observer
     }
 
     /**
-     * To be written
+     * Calculates banners priority array when occupy next position if the current one is occupied is set in system configuratin
      *
      * @param Mage_Core_Model_Layout $layout
      * @return array | boolean

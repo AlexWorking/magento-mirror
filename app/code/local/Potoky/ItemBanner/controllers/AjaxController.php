@@ -2,6 +2,11 @@
 
 class Potoky_ItemBanner_AjaxController extends Mage_Core_Controller_Front_Action
 {
+    /**
+     * Increase click quantity by one right after GoTo button on the banner's popup has been clicked on
+     *
+     * @return void
+     */
     public function clickincrementAction()
     {
         $instanceId = $this->getRequest()->getParam('instanceId');
