@@ -11,6 +11,7 @@ var itemBannerInstance = {
     validations: {},
     croppings: {},
     buttonWorkouts: {},
+    errorMessages: {},
     init: function () {
         var ibi = this;
         ibi.isActiveJqElement = $j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" );
@@ -44,19 +45,19 @@ var itemBannerInstance = {
         ibi.validations = {
             link: {
                 jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ),
-                classes: 'validate-url'
+                classes: 'required-entry validate-url'
             },
             position_in_grid: {
                 jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_grid" ),
-                classes: 'validate-digits validate-digits-range digits-range-1-'
+                classes: 'required-entry validate-digits validate-digits-range digits-range-1-'
             },
             position_in_list: {
                 jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_list" ),
-                classes: 'validate-digits validate-digits-range digits-range-1-'
+                classes: 'required-entry validate-digits validate-digits-range digits-range-1-'
             },
             description: {
                 jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_description" ),
-                classes: 'validate-inner-text-length maximum-length-300'
+                classes: 'required-entry validate-inner-text-length maximum-length-300'
             }
         };
         ibi.croppings.main = {};
@@ -90,6 +91,11 @@ var itemBannerInstance = {
                 element.on('click', {c: cropping, m: mode, e:element}, revertAction);
                 return element;
             }
+        };
+        ibi.errorMessages = {
+            'startingMessage': outerVariables.startingErrorMessage,
+            'relCoordsGrid': outerVariables.relCoordsGridErrorMessage,
+            'relCoordsList': outerVariables.relCoordsListErrorMessage
         }
     },
     pullFromOrigRelCoords: function (mode, toCoords) {
@@ -146,7 +152,7 @@ var itemBannerInstance = {
         var action = fullfil + 'Class';
         Object.keys(ibi.validations).forEach(function (field) {
             field = ibi.validations[field];
-            field.jq[action](field.classes);
+            eval("field.jq." + action + "('" + field.classes +"')");
         })
     }
 };
@@ -195,7 +201,7 @@ $j( document ).ready(function () {
                 }]
             ]);
             itemBannerInstance.isActiveJqElement.on('change', function () {
-                if (itemBannerInstance.isActiveJqElement.val() === 1) {
+                if (itemBannerInstance.isActiveJqElement.val() === '1') {
                     itemBannerInstance.toggleValidations('add')
                 } else {
                     itemBannerInstance.toggleValidations('remove')
@@ -750,7 +756,7 @@ function extendOnclick(onclick) {
     if(!$j.isEmptyObject(itemBannerInstance.croppings.main)) {
         if (itemBannerInstance.isActiveJqElement.val() === '1') {
             var areForPostCoordsEmpty = false;
-            var errorMessage = 'The banner can not be activated because';
+            var errorMessage = itemBannerInstance.errorMessages.startingMessage;
             itemBannerInstance.modes.forEach(function (mode) {
                 var forPostCoords = itemBannerInstance.relCoords[mode].forPost;
                 if (itemBannerInstance.relCoords[mode][forPostCoords].length === 0) {

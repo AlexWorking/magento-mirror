@@ -15,7 +15,10 @@
         highlight: "<?= Mage::helper('itembanner')->__('Highlight') ?>",
         revert: "<?= Mage::helper('itembanner')->__('revert') ?>"  + ' ⮌',
         origImageSquare: "<?= $this->getImageSquare() ?>",
-        instanceHtmlIdPrefix: "<?= 'options_fieldset'. md5('itembanner/banner')?>"
+        instanceHtmlIdPrefix: "<?= 'options_fieldset'. md5('itembanner/banner')?>",
+        startingErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('starting_message')) ?>",
+        relCoordsGridErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('rel_coords_grid')) ?>",
+        relCoordsListErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('rel_coords_list')) ?>"
     }
 </script>
 <div style="text-align: center; width: 100%;">

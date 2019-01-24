@@ -4,16 +4,17 @@ class Potoky_ItemBanner_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
      * An associative array with instance parameters and corresponding error messages used in
-     * activeness eligibility validation
+     * activeness eligibility validation plus starting message
      *
      * @var array
      */
     private static $errorMessages = [
+        'starting_message' => 'The banner can not be activated because',
         'image' => 'At least one original size of the image is less than 800 px. The New Image has not been saved.',
         'position_in_grid' => 'Position of the banner for the Grid mode is not correctly defined. Must by a natural number.',
         'position_in_list' => 'Position of the banner for the List mode is not correctly defined. Must by a natural number.',
-        'rel_coords_grid' => 'Grid mode selection is not defined.',
-        'rel_coords_list' => 'List mode selection is not defined.',
+        'rel_coords_grid' => 'Grid mode selection is not defined or there is no image assigned to the banner at all.',
+        'rel_coords_list' => 'List mode selection is not defined or there is no image assigned to the banner at all.',
         'title' => 'The title for the banner popup is empty.',
         'description' => 'The description for the banner popup is empty.',
         'link' => 'The link for the banner popup is empty or incorrect.'

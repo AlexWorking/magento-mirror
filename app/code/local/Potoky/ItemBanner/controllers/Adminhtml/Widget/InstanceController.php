@@ -119,7 +119,7 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
      */
     private function validateActivationEligibility($parameters)
     {
-        $errorMessage = 'The banner can not be activated because';
+        $errorMessage =  Mage::helper('itembanner')->getErrorMessage('starting_message');
         $errorPresent = false;
 
         if (!filter_var($parameters['position_in_grid'], FILTER_VALIDATE_INT, [
