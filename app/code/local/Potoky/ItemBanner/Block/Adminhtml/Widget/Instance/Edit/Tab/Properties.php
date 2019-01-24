@@ -52,7 +52,6 @@ class Potoky_ItemBanner_Block_Adminhtml_Widget_Instance_Edit_Tab_Properties exte
                         break;
                     case 'parameters[description]':
                         $parent->setdata('wysiwyg', true);
-                        $parent->addClass('validate-inner-text-length maximum-length-300');
                         break;
                 }
             }

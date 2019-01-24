@@ -1,28 +1,20 @@
 var itemBannerInstance = {
     isIt: undefined,
-    coordIdentifiers: undefined,
-    imageRelatedJqElements: undefined,
+    isActiveJqElement: undefined,
+    coordIdentifiers: [],
     modes: [],
     relCoordsInputIds: {},
     aspectRatioInputIds: {},
-    popupInputIds: {},
     relCoords: {},
     aspectRatios: {},
+    imageRelatedJqElements: {},
+    validations: {},
     croppings: {},
     buttonWorkouts: {},
     init: function () {
         var ibi = this;
+        ibi.isActiveJqElement = $j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" );
         ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
-        ibi.popupInputIds = {
-            title: outerVariables.instanceHtmlIdPrefix + '_title',
-            description: outerVariables.instanceHtmlIdPrefix + '_description'
-        };
-        ibi.imageRelatedJqElements = {
-            preview: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
-            file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
-            delete: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
-            containers: $j( ".ib_containers" )
-        };
         ibi.modes = ['grid', 'list'];
         ibi.modes.forEach(function (mode) {
             ibi.relCoordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
@@ -43,6 +35,30 @@ var itemBannerInstance = {
             };
             ibi.aspectRatios[mode].differ = (ibi.aspectRatios[mode].orig !== ibi.aspectRatios[mode].config)
         });
+        ibi.imageRelatedJqElements = {
+            preview: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
+            file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
+            delete: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
+            containers: $j( ".ib_containers" )
+        };
+        ibi.validations = {
+            link: {
+                jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ),
+                classes: 'validate-url'
+            },
+            position_in_grid: {
+                jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_grid" ),
+                classes: 'validate-digits validate-digits-range digits-range-1-'
+            },
+            position_in_list: {
+                jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_list" ),
+                classes: 'validate-digits validate-digits-range digits-range-1-'
+            },
+            description: {
+                jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_description" ),
+                classes: 'validate-inner-text-length maximum-length-300'
+            }
+        };
         ibi.croppings.main = {};
         ibi.croppings.preview = {};
         ibi.buttonWorkouts = {
@@ -124,6 +140,14 @@ var itemBannerInstance = {
             number = 1 / number;
         }
         return number;
+    },
+    toggleValidations: function (fullfil) {
+        var ibi = this;
+        var action = fullfil + 'Class';
+        Object.keys(ibi.validations).forEach(function (field) {
+            field = ibi.validations[field];
+            field.jq[action](field.classes);
+        })
     }
 };
 
@@ -150,9 +174,6 @@ $j( document ).ready(function () {
             });
             itemBannerInstance.imageRelatedJqElements.file.on('change', {e: itemBannerInstance.imageRelatedJqElements.file}, saveDialogOne);
             $j( window ).unload(closePreviewWindowIfOpened);
-            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_link" ).addClass('validate-url');
-            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_grid" ).addClass('validate-digits validate-digits-range digits-range-1-');
-            $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_list" ).addClass('validate-digits validate-digits-range digits-range-1-');
             Validation.addAllThese([
                 ['validate-inner-text-length', 'The text here is not allowed to have more than 300 characters', function(v, elm) {
                     var reMax = new RegExp(/^maximum-length-[0-9]+$/);
@@ -173,7 +194,13 @@ $j( document ).ready(function () {
                     return result;
                 }]
             ]);
-
+            itemBannerInstance.isActiveJqElement.on('change', function () {
+                if (itemBannerInstance.isActiveJqElement.val() === 1) {
+                    itemBannerInstance.toggleValidations('add')
+                } else {
+                    itemBannerInstance.toggleValidations('remove')
+                }
+            });
         }
     }
 });
@@ -610,7 +637,7 @@ function saveDialogOne(event) {
             text: "Ok",
             icon: "ui-icon-circle-check",
             click: function () {
-                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" ).val(0);
+                itemBannerInstance.isActiveJqElement.val(0);
                 saveAndContinueEdit();
                 $j( this ).dialog( "close" );
             }
@@ -721,7 +748,7 @@ function closePreviewWindowIfOpened() {
 
 function extendOnclick(onclick) {
     if(!$j.isEmptyObject(itemBannerInstance.croppings.main)) {
-        if ($j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" ).val() === '1') {
+        if (itemBannerInstance.isActiveJqElement.val() === '1') {
             var areForPostCoordsEmpty = false;
             var errorMessage = 'The banner can not be activated because';
             itemBannerInstance.modes.forEach(function (mode) {
@@ -734,7 +761,7 @@ function extendOnclick(onclick) {
             if (areForPostCoordsEmpty) {
                 errorMessage = errorMessage.slice(0, -1) + '.';
                 alert(errorMessage);
-                $j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" ).val('0');
+                itemBannerInstance.isActiveJqElement.val('0');
                 return;
             }
         }
