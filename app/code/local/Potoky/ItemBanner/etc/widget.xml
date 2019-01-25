@@ -32,24 +32,24 @@
             </position_in_list>
             <rel_coords_grid>
                 <label>Coordinates of the Grid Mode Selection</label>
-                <visible>1</visible>
+                <visible>0</visible>
                 <type>text</type>
                 <value>[]</value>
             </rel_coords_grid>
             <rel_coords_list>
                 <label>Coordinates of the List Mode Selection</label>
-                <visible>1</visible>
+                <visible>0</visible>
                 <type>text</type>
                 <value>[]</value>
             </rel_coords_list>
             <orig_aspect_ratio_grid>
                 <label>Original Aspect Ratio of the Grid Mode Croppeing</label>
-                <visible>1</visible>
+                <visible>0</visible>
                 <type>text</type>
             </orig_aspect_ratio_grid>
             <orig_aspect_ratio_list>
                 <label>Original Aspect Ratio of the List Mode Croppeing</label>
-                <visible>1</visible>
+                <visible>0</visible>
                 <type>text</type>
             </orig_aspect_ratio_list>
             <title>
