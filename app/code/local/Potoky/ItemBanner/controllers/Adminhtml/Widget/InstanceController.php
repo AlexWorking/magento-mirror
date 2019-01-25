@@ -20,7 +20,6 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         if ($currentWidgetInstance &&
             $currentWidgetInstance->getType() == 'itembanner/banner') {
             if ($parent['image']['delete']) {
-                //TODO disable widget
                 $parent['image'] = null;
                 $parent['rel_coords_grid'] = Mage::helper('core')->jsonEncode([]);
                 $parent['rel_coords_list'] = Mage::helper('core')->jsonEncode([]);
@@ -125,24 +124,32 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         if (!filter_var($parameters['position_in_grid'], FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1]
         ])) {
-            $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('position_in_grid');
+            $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('position')[0];
             $errorPresent = true;
         }
 
         if (!filter_var($parameters['position_in_list'], FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1]
         ])) {
-            $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('position_in_list');
+            $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('position')[1];
             $errorPresent = true;
         }
 
-        if (empty(Mage::helper('core')->jsonDecode($parameters['rel_coords_grid']))) {
-            $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('rel_coords_grid');
-            $errorPresent = true;
-        }
+        if ($parameters['image'] && !$errorPresent['delete']) {
 
-        if (empty(Mage::helper('core')->jsonDecode($parameters['rel_coords_list']))) {
-            $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('rel_coords_list');
+            if (empty(Mage::helper('core')->jsonDecode($parameters['rel_coords_grid']))) {
+                $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('rel_coords')[0];
+                $errorPresent = true;
+            }
+
+            if (empty(Mage::helper('core')->jsonDecode($parameters['rel_coords_list']))) {
+                $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('rel_coords')[1];
+                $errorPresent = true;
+            }
+
+        }
+        else {
+            $errorMessage .= '<br>' . Mage::helper('itembanner')->getErrorMessage('image')[0];
             $errorPresent = true;
         }
 
@@ -162,7 +169,7 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
         }
 
         if ($errorPresent) {
-            Mage::throwException($errorMessage, 'adminhtml/session');
+            Mage::throwException(trim($errorMessage, ',') . '.', 'adminhtml/session');
         }
     }
 }

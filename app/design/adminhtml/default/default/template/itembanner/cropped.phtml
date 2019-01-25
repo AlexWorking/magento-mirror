@@ -17,8 +17,9 @@
         origImageSquare: "<?= $this->getImageSquare() ?>",
         instanceHtmlIdPrefix: "<?= 'options_fieldset'. md5('itembanner/banner')?>",
         startingErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('starting_message')) ?>",
-        relCoordsGridErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('rel_coords_grid')) ?>",
-        relCoordsListErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('rel_coords_list')) ?>"
+        noImageErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('image')[0]) ?>",
+        gridRelCoordsErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('rel_coords')[0]) ?>",
+        listRelCoordsErrorMessage: "<?= Mage::helper('itembanner')->__(Mage::helper('itembanner')->getErrorMessage('rel_coords')[1]) ?>"
     }
 </script>
 <div style="text-align: center; width: 100%;">

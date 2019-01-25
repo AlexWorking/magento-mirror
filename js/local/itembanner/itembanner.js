@@ -3,6 +3,7 @@ var itemBannerInstance = {
     isActiveJqElement: undefined,
     coordIdentifiers: [],
     modes: [],
+    errorMessages: {},
     relCoordsInputIds: {},
     aspectRatioInputIds: {},
     relCoords: {},
@@ -11,13 +12,18 @@ var itemBannerInstance = {
     validations: {},
     croppings: {},
     buttonWorkouts: {},
-    errorMessages: {},
     init: function () {
         var ibi = this;
         ibi.isActiveJqElement = $j( "#" + outerVariables.instanceHtmlIdPrefix + "_is_active" );
         ibi.coordIdentifiers = ['x', 'y', 'x2', 'y2', 'w', 'h'];
         ibi.modes = ['grid', 'list'];
+        ibi.errorMessages = {
+            'startingMessage': outerVariables.startingErrorMessage,
+            'noImageMessage': outerVariables.noImageErrorMessage,
+            'relCoords': {}
+        };
         ibi.modes.forEach(function (mode) {
+            ibi.errorMessages.relCoords[mode] = eval('outerVariables.' + mode + 'RelCoordsErrorMessage');
             ibi.relCoordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
             ibi.aspectRatioInputIds[mode] = outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode;
             ibi.relCoords[mode] = {
@@ -38,9 +44,9 @@ var itemBannerInstance = {
         });
         ibi.imageRelatedJqElements = {
             preview: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_image" ).parent(),
-            file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" ),
             delete: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image_delete" ),
-            containers: $j( ".ib_containers" )
+            containers: $j( ".ib_containers" ),
+            file: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_image" )
         };
         ibi.validations = {
             link: {
@@ -54,6 +60,10 @@ var itemBannerInstance = {
             position_in_list: {
                 jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_position_in_list" ),
                 classes: 'required-entry validate-digits validate-digits-range digits-range-1-'
+            },
+            title: {
+                jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_title" ),
+                classes: 'required-entry'
             },
             description: {
                 jq: $j( "#" + outerVariables.instanceHtmlIdPrefix + "_description" ),
@@ -91,11 +101,6 @@ var itemBannerInstance = {
                 element.on('click', {c: cropping, m: mode, e:element}, revertAction);
                 return element;
             }
-        };
-        ibi.errorMessages = {
-            'startingMessage': outerVariables.startingErrorMessage,
-            'relCoordsGrid': outerVariables.relCoordsGridErrorMessage,
-            'relCoordsList': outerVariables.relCoordsListErrorMessage
         }
     },
     pullFromOrigRelCoords: function (mode, toCoords) {
@@ -386,7 +391,7 @@ function Cropping(currentWindow, buttons) {
                 }
             },
             bgColor: 'transparent',
-            bgOpacity: .2,
+            bgOpacity: (p.isMainWindowCopping) ? 0 : .2,
             aspectRatio: itemBannerInstance.adaptAspectRatio(mode, 'orig'),
             needsAdjustment: false,
             selection: undefined,
@@ -551,19 +556,22 @@ function freezingAction(event) {
     var cropping = event.data.c,
         mode = event.data.m,
         element = event.data.e,
-        revertButton = cropping.jq( "#ib_crop_revert_" +  mode);
+        revertButton = cropping.jq( "#ib_crop_revert_" +  mode),
+        img = cropping.jq( cropping.jcObjects[mode].imageDomId + "+ div").children("img");
     if(element.html() === outerVariables.frozen) {
         cropping.jcObjects[mode].api.enable();
         cropping.jcObjects[mode].disabled = false;
         cropping.jcObjects[mode].buttons.revert.attrDisabled = false;
         element.html(outerVariables.unfrozen);
         revertButton.removeAttr('disabled');
+        img.css('opacity', 0.2);
     } else {
         cropping.jcObjects[mode].api.disable();
         cropping.jcObjects[mode].disabled = true;
         cropping.jcObjects[mode].buttons.revert.attrDisabled = true;
         element.html(outerVariables.frozen);
         revertButton.attr('disabled', 'disabled');
+        img.css('opacity', cropping.jcObjects[mode].bgOpacity);
     }
 }
 
@@ -755,18 +763,24 @@ function closePreviewWindowIfOpened() {
 function extendOnclick(onclick) {
     if(!$j.isEmptyObject(itemBannerInstance.croppings.main)) {
         if (itemBannerInstance.isActiveJqElement.val() === '1') {
-            var areForPostCoordsEmpty = false;
+            var errorPresent = false;
             var errorMessage = itemBannerInstance.errorMessages.startingMessage;
-            itemBannerInstance.modes.forEach(function (mode) {
-                var forPostCoords = itemBannerInstance.relCoords[mode].forPost;
-                if (itemBannerInstance.relCoords[mode][forPostCoords].length === 0) {
-                    errorMessage = errorMessage  + '\nThe ' + mode + ' mode selection is not defined' + ',';
-                    areForPostCoordsEmpty = true;
-                }
-            });
-            if (areForPostCoordsEmpty) {
+            if (itemBannerInstance.imageRelatedJqElements.delete.prop('checked')) {
+                errorMessage = errorMessage  + '\n' + outerVariables.noImageErrorMessage;
+                errorPresent = true;
+            } else {
+                itemBannerInstance.modes.forEach(function (mode) {
+                    var forPostCoords = itemBannerInstance.relCoords[mode].forPost;
+                    if (itemBannerInstance.relCoords[mode][forPostCoords].length === 0) {
+                        errorMessage = errorMessage  + '\n' + itemBannerInstance.errorMessages.relCoords[mode];
+                        errorPresent = true;
+                    }
+                });
+            }
+            if (errorPresent) {
                 errorMessage = errorMessage.slice(0, -1) + '.';
                 alert(errorMessage);
+                itemBannerInstance.toggleValidations('remove');
                 itemBannerInstance.isActiveJqElement.val('0');
                 return;
             }
