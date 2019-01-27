@@ -312,6 +312,7 @@ function Cropping(currentWindow, buttons) {
             function afterActions() {
                 if (p.jcObjects[mode].disabled === true) {
                     p.jcObjects[mode].api.disable();
+                    p.jq( p.jcObjects[mode].imageDomId + "+ div").children("img").css('opacity', 0);
                 }
                 var onClickElement = p.jq( p.jcObjects[mode].imageDomId ).next( "div.jcrop-holder" );
                 if (p.jcObjects[mode].aspectRatio !== itemBannerInstance.adaptAspectRatio(mode, 'config')) {
@@ -390,8 +391,8 @@ function Cropping(currentWindow, buttons) {
                     p.jcObjects[mode].api[fulfill]();
                 }
             },
-            bgColor: 'transparent',
-            bgOpacity: (p.isMainWindowCopping) ? 0 : .2,
+            bgColor: (p.isMainWindowCopping) ? 'lightgrey' : '#6f8992',
+            bgOpacity: .2,
             aspectRatio: itemBannerInstance.adaptAspectRatio(mode, 'orig'),
             needsAdjustment: false,
             selection: undefined,
@@ -564,14 +565,14 @@ function freezingAction(event) {
         cropping.jcObjects[mode].buttons.revert.attrDisabled = false;
         element.html(outerVariables.unfrozen);
         revertButton.removeAttr('disabled');
-        img.css('opacity', 0.2);
+        img.css('opacity', cropping.jcObjects[mode].bgOpacity);
     } else {
         cropping.jcObjects[mode].api.disable();
         cropping.jcObjects[mode].disabled = true;
         cropping.jcObjects[mode].buttons.revert.attrDisabled = true;
         element.html(outerVariables.frozen);
         revertButton.attr('disabled', 'disabled');
-        img.css('opacity', cropping.jcObjects[mode].bgOpacity);
+        img.css('opacity', 0);
     }
 }
 
