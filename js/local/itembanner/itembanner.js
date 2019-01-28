@@ -254,7 +254,7 @@ function Cropping(currentWindow, buttons) {
     };
 
     this.calculateSelection = function (mode) {
-        var coords = (!p.jcObjects[mode].needsAdjustment) ? itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsForSelect]  : itemBannerInstance.relCoords[mode].original;
+        var coords = (!p.jcObjects[mode].needsAdjustment) ? itemBannerInstance.relCoords[mode][p.jcObjects[mode].coordsForSelect]  : JSON.parse(itemBannerInstance.relCoords[mode].original);
         if (coords[4] > 0 && coords[5] > 0) {
             var selectionArray = [];
             var dimension = 'width';
@@ -355,7 +355,7 @@ function Cropping(currentWindow, buttons) {
             manageSelection: function () {
                 var selectionArray = p.calculateSelection(mode);
                 if (selectionArray) {
-                    p.jcObjects[mode].selection = selectionArray;
+                        p.jcObjects[mode].selection = selectionArray;
                 } else {
                     delete p.jcObjects[mode].selection;
                 }
