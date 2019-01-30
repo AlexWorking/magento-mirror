@@ -4,25 +4,25 @@ class Potoky_AnonymousCustomer_Model_Anonymous extends Mage_Core_Model_Abstract
 {
     /**
      * When set to true it will not allow to create an anonymous customer if
-     * the appropriate regular customer (with the same email and website) id allready exists
+     * the appropriate regular customer (with the same email and website) id already exists
      *
      * @var bool
      */
-    private $_checkIfRegistered = true;
+    private $checkIfRegistered = true;
 
     protected function _construct()
     {
         $this->_init('anonymouscustomer/anonymous');
     }
 
-    public function _setCheckIfRegistered($bool)
+    public function setCheckIfRegistered($bool)
     {
-        $this->_checkIfRegistered = $bool;
+        $this->checkIfRegistered = $bool;
     }
 
-    public function _getCheckIfRegistered()
+    public function getCheckIfRegistered()
     {
-        return $this->_checkIfRegistered;
+        return $this->checkIfRegistered;
     }
 
     /**
@@ -34,7 +34,7 @@ class Potoky_AnonymousCustomer_Model_Anonymous extends Mage_Core_Model_Abstract
     protected function _beforeSave()
     {
         $parent = parent::_beforeSave();
-        if ($this->isObjectNew() && $this->_checkIfRegistered) {
+        if ($this->isObjectNew() && $this->checkIfRegistered) {
             $customer = Mage::helper('anonymouscustomer/entity')->getCustomerEntityByRequest(
                 'customer/customer',
                 $this->getData('email'),

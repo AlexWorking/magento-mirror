@@ -29,6 +29,7 @@ class Potoky_AlertAnonymous_Model_Observer extends Mage_ProductAlert_Model_Obser
         $parent = parent::process();
         self::$helpers['registry']->setRegistry('cron', null, false);
         parent::process();
+        self::$helpers['registry']->setRegistry();
 
         return $parent;
     }
