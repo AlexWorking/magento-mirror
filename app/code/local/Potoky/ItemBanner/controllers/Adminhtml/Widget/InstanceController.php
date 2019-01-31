@@ -31,9 +31,17 @@ class Potoky_ItemBanner_Adminhtml_Widget_InstanceController extends Mage_Widget_
             }
             elseif ($image = $currentWidgetInstance->getWidgetParameters()['image']) {
                 $parent['image'] = $image;
-                $this->cropFromRelCoords($image, $parent['rel_coords_grid'], 'grid');
-                $this->cropFromRelCoords($image, $parent['rel_coords_list'], 'list');
+
+                if ($this->getRequest()->getPost('ib_grid_change_status')) {
+                    $this->cropFromRelCoords($image, $parent['rel_coords_grid'], 'grid');
+                };
+
+                if ($this->getRequest()->getPost('ib_list_change_status')) {
+                    $this->cropFromRelCoords($image, $parent['rel_coords_list'], 'list');
+                }
             }
+
+            $parent['description'] = str_replace('&nbsp;', '', $parent['description']);
 
             if ($parent['is_active'] == 1) {
                 try {

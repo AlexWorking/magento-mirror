@@ -1,4 +1,5 @@
 var itemBannerInstance = {
+    formJqElement: undefined,
     isIt: undefined,
     isActiveJqElement: undefined,
     coordIdentifiers: [],
@@ -26,6 +27,11 @@ var itemBannerInstance = {
             ibi.errorMessages.relCoords[mode] = eval('outerVariables.' + mode + 'RelCoordsErrorMessage');
             ibi.relCoordsInputIds[mode] = outerVariables.instanceHtmlIdPrefix + '_rel_coords_' + mode;
             ibi.aspectRatioInputIds[mode] = outerVariables.instanceHtmlIdPrefix + "_orig_aspect_ratio_" + mode;
+            $j( "<input/>", {
+                name: 'ib_' + mode + '_change_status',
+                type: 'hidden',
+                value: 0
+            }).appendTo(ibi.formJqElement);
             ibi.relCoords[mode] = {
                 original: $j( "#" + ibi.relCoordsInputIds[mode] ).val(),
                 aCoords: [],
@@ -119,6 +125,9 @@ var itemBannerInstance = {
         var ratioToUpload;
         var ratioValue;
         ibi.modes.forEach(function (mode) {
+            if (ibi.relCoords[mode].currentChangeStatus === null) {
+                return
+            }
             arrayToUpload = ibi.relCoords[mode].forPost;
             $j( "#" + ibi.relCoordsInputIds[mode] ).attr(
                 'value',
@@ -129,7 +138,8 @@ var itemBannerInstance = {
             $j( "#" + ibi.aspectRatioInputIds[mode] ).attr(
                 'value',
                 ratioValue
-            )
+            );
+            $j( "input[name='ib_" + mode + "_change_status']" ).val(1)
         });
     },
     swapCoordsToFill: function (mode) {
@@ -165,8 +175,8 @@ var itemBannerInstance = {
 $j( document ).ready(function () {
     itemBannerInstance.isIt = ($j("#type").val() === 'itembanner/banner');
     if (itemBannerInstance.isIt) {
-        var formJq = $j( "#edit_form");
-        formJq.attr("enctype", "multipart/form-data" );
+        itemBannerInstance.formJqElement = $j( "#edit_form" );
+        itemBannerInstance.formJqElement.attr("enctype", "multipart/form-data" );
         $j( ".scalable.save" ).each(function () {
             var onclick = $j(this).attr('onclick');
             onclick = 'extendOnclick("' + onclick + '")';
@@ -310,9 +320,12 @@ function Cropping(currentWindow, buttons) {
             }
 
             function afterActions() {
+                var veil = p.jq( p.jcObjects[mode].imageDomId + "+ div").children("img");
                 if (p.jcObjects[mode].disabled === true) {
                     p.jcObjects[mode].api.disable();
-                    p.jq( p.jcObjects[mode].imageDomId + "+ div").children("img").css('opacity', 0);
+                    veil.css('opacity', 0);
+                } else {
+                    veil.css('opacity', p.jcObjects[mode].bgOpacity);
                 }
                 var onClickElement = p.jq( p.jcObjects[mode].imageDomId ).next( "div.jcrop-holder" );
                 if (p.jcObjects[mode].aspectRatio !== itemBannerInstance.adaptAspectRatio(mode, 'config')) {
@@ -355,7 +368,7 @@ function Cropping(currentWindow, buttons) {
             manageSelection: function () {
                 var selectionArray = p.calculateSelection(mode);
                 if (selectionArray) {
-                        p.jcObjects[mode].selection = selectionArray;
+                    p.jcObjects[mode].selection = selectionArray;
                 } else {
                     delete p.jcObjects[mode].selection;
                 }
